@@ -1,4 +1,4 @@
-import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Scene, SceneExplorer, WebGLStats } from 'harmony-3d';
+import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Scene, SceneExplorer, ShaderEditor, WebGLStats } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, documentStyle } from 'harmony-ui';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
@@ -24,9 +24,11 @@ class Application {
 	#htmlDemoContentTab;
 	#scene = new Scene();
 	#sceneExplorerTab;
+	#shaderEditorTab;
 	#sceneExplorer = new SceneExplorer();
 	#renderer;
 	#useDefaultRenderLoop = true;
+	#shaderEditor;
 	constructor() {
 		window.addEventListener('hashchange', (event) =>
 			this.#loadUri(event.newURL)
@@ -78,6 +80,15 @@ class Application {
 								child: this.#sceneExplorer.htmlElement,
 							}),
 						}),
+						this.#shaderEditorTab = createElement('harmony-tab', {
+							'data-i18n': '#shader_editor',
+							events: {
+								activated: () => {
+									this.#shaderEditor.initEditor({ aceUrl: '/assets/js/ace-builds/src-min/ace.js', displayCustomShaderButtons: false });
+									this.#shaderEditorTab.append(this.#shaderEditor);
+								}
+							},
+						}),
 						this.#htmlDemoContentTab = createElement('harmony-tab', {
 							'data-i18n': '#demo_content',
 						}),
@@ -102,6 +113,7 @@ class Application {
 	}
 
 	#initEngine() {
+		this.#shaderEditor = new ShaderEditor();
 		this.#sceneExplorer.scene = this.#scene;
 
 		this.#renderer = Graphics.initCanvas({

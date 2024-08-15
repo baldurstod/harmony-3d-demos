@@ -7,12 +7,10 @@
 
 .demo-tabs {
 	flex: 1;
-	background-color: blueviolet;
 }
 
 .demo-view {
 	flex: 1;
-	background-color: red;
 	overflow: hidden;
 	position: relative;
 }
