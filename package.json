@@ -9,8 +9,12 @@
   "dependencies": {
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
+    "gl-matrix": "^3.4.3",
+    "harmony-browser-utils": "github:baldurstod/harmony-browser-utils",
     "harmony-css": "github:baldurstod/harmony-css",
+    "harmony-fbx": "github:baldurstod/harmony-fbx",
     "harmony-ui": "github:baldurstod/harmony-ui",
+    "harmony-utils": "github:baldurstod/harmony-utils",
     "rollup-plugin-import-css": "^3.5.1"
   }
 }
