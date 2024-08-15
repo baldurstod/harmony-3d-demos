@@ -1,6 +1,6 @@
-//import { nodeResolve } from '@rollup/plugin-node-resolve';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 import copy from 'rollup-plugin-copy';
-//import css from 'rollup-plugin-import-css';
+import css from 'rollup-plugin-import-css';
 
 export default [
 	{
@@ -10,8 +10,8 @@ export default [
 			format: 'esm'
 		},
 		plugins: [
-			//css(),
-			//nodeResolve(),
+			css(),
+			nodeResolve(),
 			copy({
 				copyOnce: true,
 				targets: [
