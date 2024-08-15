@@ -4,9 +4,9 @@ import { createElement, documentStyle } from 'harmony-ui';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
 import 'harmony-ui/dist/define/harmony-tab.js';
 
-export * from 'gl-matrix';
-export * from 'harmony-3d';
-export * from 'harmony-ui';
+export * as GlMatrix from 'gl-matrix';
+export * as Harmony3D from 'harmony-3d';
+export * as HarmonyUi from 'harmony-ui';
 
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
@@ -26,6 +26,7 @@ class Application {
 	#sceneExplorerTab;
 	#sceneExplorer = new SceneExplorer();
 	#renderer;
+	#useDefaultRenderLoop = true;
 	constructor() {
 		window.addEventListener('hashchange', (event) =>
 			this.#loadUri(event.newURL)
@@ -85,7 +86,9 @@ class Application {
 				createElement('div', {
 					class: 'demo-view',
 					childs: [
-						this.#htmlCanvas = createElement('canvas'),
+						this.#htmlCanvas = createElement('canvas', {
+							id: 'demo-canvas',
+						}),
 						this.#htmlStats = createElement('div', {
 							class: 'stats',
 						}),
@@ -117,7 +120,7 @@ class Application {
 
 	#animate(event) {
 		WebGLStats.tick();
-		if (/*useDefaultRenderLoop && */this.#scene.activeCamera) {
+		if (this.#useDefaultRenderLoop && this.#scene.activeCamera) {
 			this.#renderer.render(this.#scene, this.#scene.activeCamera, event.detail.delta);
 		}
 	}
@@ -137,9 +140,10 @@ class Application {
 		if (demo) {
 			import('./demos/' + demo + '.js').then(
 				(module) => {
-					useDefaultRenderLoop = !(module.useCustomRenderLoop == true);
-					module.initDemo(renderer, scene, Harmony3D, {
-						demoContentTab: htmlDemoContentTab,
+					this.#useDefaultRenderLoop = !(module.useCustomRenderLoop == true);
+					module.initDemo(this.#renderer, this.#scene, {
+						htmlDemoContentTab: this.#htmlDemoContentTab,
+						htmlDemoContent: this.#htmlDemoContent,
 					});
 				},
 				(err) => console.error(err)
