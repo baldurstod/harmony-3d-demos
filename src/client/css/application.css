@@ -14,6 +14,7 @@
 	flex: 1;
 	background-color: red;
 	overflow: hidden;
+	position: relative;
 }
 
 .demo-view>canvas {
@@ -26,4 +27,15 @@
 	top: 0.2rem;
 	left: 0.2rem;
 	pointer-events: none;
+}
+
+.demo-content {
+	position: absolute;
+	top: 0.2rem;
+	right: 0.2rem;
+	pointer-events: none;
+}
+
+.demo-content * {
+	pointer-events: all;
 }

@@ -113,6 +113,7 @@ class Application {
 		});
 		this.#renderer.play();
 		WebGLStats.start();
+		this.#htmlStats.append(WebGLStats.htmlElement);
 
 		GraphicsEvents.addEventListener(GRAPHICS_EVENT_TICK, (event) => this.#animate(event));
 
