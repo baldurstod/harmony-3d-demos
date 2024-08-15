@@ -4,6 +4,10 @@ import { createElement, documentStyle } from 'harmony-ui';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
 import 'harmony-ui/dist/define/harmony-tab.js';
 
+export * from 'gl-matrix';
+export * from 'harmony-3d';
+export * from 'harmony-ui';
+
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
 
