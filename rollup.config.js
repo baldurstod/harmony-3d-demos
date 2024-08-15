@@ -2,6 +2,8 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import copy from 'rollup-plugin-copy';
 import css from 'rollup-plugin-import-css';
 
+const isExamples = process.env.BUILD === 'examples';
+
 export default [
 	{
 		input: './src/client/js/application.js',
@@ -15,7 +17,9 @@ export default [
 			copy({
 				copyOnce: true,
 				targets: [
-					{src: 'src/client/index.html', dest: 'build/client/'},
+					{ src: 'src/client/index.html', dest: 'build/client/' },
+					{ src: 'src/client/js/demos/', dest: 'build/client/js/' },
+					{ src: 'src/client/js/utils.js', dest: 'build/client/js/' },
 				]
 			}),
 		],
