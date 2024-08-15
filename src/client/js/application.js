@@ -1,4 +1,4 @@
-import { Scene } from 'harmony-3d';
+import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Scene, SceneExplorer, WebGLStats } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, documentStyle } from 'harmony-ui';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
@@ -19,11 +19,16 @@ class Application {
 	#htmlDemoList;
 	#htmlDemoContentTab;
 	#scene = new Scene();
+	#sceneExplorerTab;
+	#sceneExplorer = new SceneExplorer();
+	#renderer;
 	constructor() {
 		window.addEventListener('hashchange', (event) =>
 			this.#loadUri(event.newURL)
 		);
 		this.#initHTML();
+		this.#initEngine();
+		this.#loadUri(document.URL);
 	}
 
 	#initHTML() {
@@ -61,6 +66,13 @@ class Application {
 								}),
 							],
 						}),
+						createElement('harmony-tab', {
+							'data-i18n': '#scene_explorer',
+							child: this.#sceneExplorerTab = createElement('div', {
+								style: "height:100%;",
+								child: this.#sceneExplorer.htmlElement,
+							}),
+						}),
 						this.#htmlDemoContentTab = createElement('harmony-tab', {
 							'data-i18n': '#demo_content',
 						}),
@@ -70,7 +82,7 @@ class Application {
 					class: 'demo-view',
 					childs: [
 						this.#htmlCanvas = createElement('canvas'),
-						this.#htmlCanvas = createElement('div', {
+						this.#htmlStats = createElement('div', {
 							class: 'stats',
 						}),
 						this.#htmlDemoContent = createElement('div', {
@@ -80,6 +92,30 @@ class Application {
 				}),
 			],
 		});
+	}
+
+	#initEngine() {
+		this.#sceneExplorer.scene = this.#scene;
+
+		this.#renderer = Graphics.initCanvas({
+			canvas: this.#htmlCanvas,
+			alpha: true,
+			autoResize: true,
+			preserveDrawingBuffer: true,
+			premultipliedAlpha: false
+		});
+		this.#renderer.play();
+		WebGLStats.start();
+
+		GraphicsEvents.addEventListener(GRAPHICS_EVENT_TICK, (event) => this.#animate(event));
+
+	}
+
+	#animate(event) {
+		WebGLStats.tick();
+		if (/*useDefaultRenderLoop && */this.#scene.activeCamera) {
+			this.#renderer.render(this.#scene, this.#scene.activeCamera, event.detail.delta);
+		}
 	}
 
 	#loadUri(uri) {
