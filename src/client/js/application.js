@@ -1,4 +1,4 @@
-import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Scene, SceneExplorer, ShaderEditor, WebGLStats } from 'harmony-3d';
+import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Repositories, Repository, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, Source1ParticleControler, Source2ModelManager, Source2ParticleManager, SourceEngineMaterialManager, WebGLStats } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, documentStyle, hide, show, toggle } from 'harmony-ui';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
@@ -10,6 +10,7 @@ export * as HarmonyUi from 'harmony-ui';
 
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
+import { CS2_REPOSITORY, DEADLOCK_REPOSITORY, DOTA2_REPOSITORY, HLA_REPOSITORY, TF2_REPOSITORY } from './demos/constants';
 
 documentStyle(htmlCSS);
 documentStyle(themeCSS);
@@ -33,10 +34,27 @@ class Application {
 		window.addEventListener('hashchange', (event) =>
 			this.#loadUri(event.newURL)
 		);
+		this.#initRepositories();
 		this.#initHTML();
 		this.#initEngine();
 		this.#loadUri(document.URL);
 		this.#loadDemos();
+	}
+
+	#initRepositories() {
+		Repositories.addRepository(new Repository('tf2', TF2_REPOSITORY));
+		Repositories.addRepository(new Repository('dota2', DOTA2_REPOSITORY));
+		Repositories.addRepository(new Repository('hla', HLA_REPOSITORY));
+		Repositories.addRepository(new Repository('cs2', CS2_REPOSITORY));
+		Repositories.addRepository(new Repository('deadlock', DEADLOCK_REPOSITORY));
+
+		Source1ParticleControler.loadManifest('tf2');
+		Source1ModelManager.loadManifest('tf2');
+		Source2ModelManager.loadManifest('cs2');
+		Source2ModelManager.loadManifest('dota2');
+		Source2ModelManager.loadManifest('hla');
+		SourceEngineMaterialManager.addRepository('tf2');
+		Source2ParticleManager.loadManifests('cs2', 'dota2', 'hla');
 	}
 
 	#initHTML() {
