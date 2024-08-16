@@ -10,7 +10,7 @@ export * as HarmonyUi from 'harmony-ui';
 
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
-import { CS2_REPOSITORY, DEADLOCK_REPOSITORY, DOTA2_REPOSITORY, HLA_REPOSITORY, TF2_REPOSITORY } from './demos/constants';
+import { CS2_REPOSITORY, DEADLOCK_REPOSITORY, DOTA2_REPOSITORY, HLA_REPOSITORY, TF2_REPOSITORY } from '../constants';
 
 documentStyle(htmlCSS);
 documentStyle(themeCSS);
