@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
@@ -15,7 +16,7 @@ import (
 )
 
 func startServer(config HTTP) {
-	engine := initEngine(config)
+	engine := initEngine()
 	var err error
 
 	log.Printf("Listening on port %d\n", config.Port)
@@ -27,7 +28,7 @@ func startServer(config HTTP) {
 	log.Fatal(err)
 }
 
-func initEngine(config HTTP) *gin.Engine {
+func initEngine() *gin.Engine {
 	if ReleaseMode == "true" {
 		gin.SetMode(gin.ReleaseMode)
 	}
@@ -53,17 +54,48 @@ func initEngine(config HTTP) *gin.Engine {
 	}
 
 	r.Use(rewriteURL(r))
-	r.StaticFS("/", http.FS(useFS))
+	r.StaticFS("/static", http.FS(useFS))
+	r.GET("/list", func(c *gin.Context) { listHandler(c, useFS) })
 
 	return r
 }
 
 func rewriteURL(r *gin.Engine) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if c.Request.URL.Path == "/list" {
+			c.Next()
+			return
+		}
 		if strings.HasPrefix(c.Request.URL.Path, "/@") {
 			c.Request.URL.Path = "/"
 			r.HandleContext(c)
+			c.Next()
+			return
+		}
+		if !strings.HasPrefix(c.Request.URL.Path, "/static") {
+			c.Request.URL.Path = "/static" + c.Request.URL.Path
+			r.HandleContext(c)
+			c.Next()
+			return
 		}
 		c.Next()
 	}
+}
+func listHandler(c *gin.Context, f fs.FS) {
+	root := "js/demos"
+	files := make([]string, 0, 100)
+	fs.WalkDir(f, root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(path)
+		if d.IsDir() {
+			return nil
+		}
+		path, _ = strings.CutPrefix(path, root+"/")
+		files = append(files, path)
+		return nil
+	})
+
+	jsonSuccess(c, map[string]interface{}{"files": files})
 }
