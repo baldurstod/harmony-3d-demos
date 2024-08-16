@@ -93,6 +93,7 @@ func listHandler(c *gin.Context, f fs.FS) {
 			return nil
 		}
 		path, _ = strings.CutPrefix(path, root+"/")
+		path, _ = strings.CutSuffix(path, ".js")
 		files = append(files, path)
 		return nil
 	})

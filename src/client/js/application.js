@@ -1,6 +1,6 @@
 import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Scene, SceneExplorer, ShaderEditor, WebGLStats } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
-import { createElement, documentStyle } from 'harmony-ui';
+import { createElement, documentStyle, hide, show, toggle } from 'harmony-ui';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
 import 'harmony-ui/dist/define/harmony-tab.js';
 
@@ -36,6 +36,7 @@ class Application {
 		this.#initHTML();
 		this.#initEngine();
 		this.#loadUri(document.URL);
+		this.#loadDemos();
 	}
 
 	#initHTML() {
@@ -177,6 +178,49 @@ class Application {
 				}
 			}
 		}
+	}
+
+	async #loadDemos() {
+		let divs = [];
+		let response = await fetch('/list');
+		let json = await response.json();
+		let container = this.#htmlDemoList;
+		divs = [container, {}];
+
+		for (let file of json.result.files) {
+			let arr = file.split('/');
+			let currentLevel = divs;
+			for (let i = 0; i < arr.length - 1; ++i) {
+				let d = currentLevel[1][arr[i]];
+				if (!d) {
+					d = document.createElement('div');
+					d.className = 'demos-list-dir';
+					let header = document.createElement('div');
+					header.className = 'demos-list-dir-title';
+					header.innerHTML = arr[i];
+					let content = document.createElement('div');
+					content.className = 'demos-list-dir-content';
+					currentLevel[0].append(d);
+					d.append(header, content);
+					currentLevel[1][arr[i]] = [content, {}];
+					hide(content);
+					header.addEventListener('click', () => toggle(content));
+				}
+				currentLevel = currentLevel[1][arr[i]];
+			}
+			let demo = document.createElement('div');
+			demo.innerHTML = arr[arr.length - 1];
+			demo.addEventListener('click', () =>
+				{
+					let location = document.location;
+					location.hash = '#' + file;
+					document.location = location;
+				}
+			);
+			currentLevel[0].append(demo);
+		}
+		this.#expand(new URL(document.URL).hash.substring(1));
+
 	}
 }
 new Application();
