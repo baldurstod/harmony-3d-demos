@@ -9,8 +9,8 @@ export function initDemo(renderer, scene) {
 }
 
 async function testHero(renderer, scene) {
-	perspectiveCamera.position = [500, 0, 150];
-	orbitCameraControl.target.position = [0, 0, 150];
+	perspectiveCamera.position = [200, 0, 45];
+	orbitCameraControl.target.position = [0, 0, 45];
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 10;
 	perspectiveCamera.verticalFov = 50;
