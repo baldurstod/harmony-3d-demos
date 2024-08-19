@@ -22,6 +22,7 @@ export default [
 					{ src: 'src/client/js/source1.js', dest: 'build/client/js/' },
 					{ src: 'src/client/js/source2.js', dest: 'build/client/js/' },
 					{ src: 'src/client/js/utils.js', dest: 'build/client/js/' },
+					{ src: 'src/client/json/', dest: 'build/client/' },
 				]
 			}),
 		],

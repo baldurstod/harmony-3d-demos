@@ -1,0 +1,29 @@
+{
+	"fonts":{
+		"arial":{
+			"styles":{
+				"normal":"arial_regular.json"
+			}
+		},
+		"gentilis":{
+			"styles":{
+				"normal":"gentilis_bold.json"
+			}
+		},
+		"optimer":{
+			"styles":{
+				"normal":"optimer_bold.json"
+			}
+		},
+		"tf2":{
+			"styles":{
+				"normal":"tf2_regular.json"
+			}
+		},
+		"tf2 build":{
+			"styles":{
+				"normal":"tf2_build.json"
+			}
+		}
+	}
+}
