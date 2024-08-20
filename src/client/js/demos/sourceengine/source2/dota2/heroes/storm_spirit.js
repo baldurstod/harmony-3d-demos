@@ -16,9 +16,12 @@ async function testHero(renderer, scene) {
 	perspectiveCamera.verticalFov = 50;
 
 	const items = [
+		'models/heroes/storm_spirit/storm_hat',
+		'models/heroes/storm_spirit/storm_shoulder',
+		'models/heroes/storm_spirit/storm_shirt',
 	]
 
-	const hero = await AddSource2Model('deadlock', 'models/heroes_staging/archer/archer', renderer, scene);
+	const hero = await AddSource2Model('dota2', 'models/heroes/storm_spirit/storm_spirit', renderer, scene);
 	hero.playSequence('ACT_DOTA_IDLE');
 
 	for (const item of items) {
