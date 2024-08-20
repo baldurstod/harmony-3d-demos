@@ -1,5 +1,5 @@
 import { InitDemoStd } from '/js/utils.js';
-import { Harmony3D } from '/js/application.js';
+import { Harmony3D, GlMatrix } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;
@@ -10,6 +10,7 @@ export function initDemo(renderer, scene) {
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 1;
 	perspectiveCamera.verticalFov = 50;
+	renderer.clearColor(GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 255));
 
 	Harmony3D.FontManager.setFontsPath('./json/fonts/');
 	const group = new Harmony3D.Group({ parent: scene });
@@ -22,22 +23,21 @@ export function initDemo(renderer, scene) {
 	const teta = [];
 	const speed = [];
 
+	let color = GlMatrix.vec3.create()
 	for (let i = 0; i < 4; i++) {
-		let l = new Harmony3D.PointLight({ position: [0, -100, -0], intensity: 0.25, parent: scene });
+		GlMatrix.vec3.random(color);
+		color[0] = Math.abs(color[0]);
+		color[1] = Math.abs(color[1]);
+		color[2] = Math.abs(color[2]);
+		let l = new Harmony3D.PointLight({ position: [0, -100, -0], intensity: 0.5, color: color, parent: scene });
 		lights.push(l);
 		teta.push(Math.random() * 2 * Math.PI);
 		speed.push(Math.random() * 2 - 1);
 	}
-/*
-	let pl0 = new Harmony3D.PointLight({ position: [-100, -100, -100], intensity: 0.25, parent: scene });
-	let pl1 = new Harmony3D.PointLight({ position: [-100, -100, +100], intensity: 0.25, parent: scene });
-	let pl2 = new Harmony3D.PointLight({ position: [+100, -100, -100], intensity: 0.25, parent: scene });
-	let pl3 = new Harmony3D.PointLight({ position: [+100, -100, +100], intensity: 0.25, parent: scene });
-	*/
 
 	for (let i = 0; i <= 10; i++) {
 		for (let j = 0; j <= 10; j++) {
-			let material = new Harmony3D.MeshBasicPbrMaterial({ metalness: i / 10, roughness: j / 10 });
+			let material = new Harmony3D.MeshBasicPbrMaterial({ metalness: i / 10, roughness: j / 10, color:[1, 0, 0, 1] });
 			let sphere = new Harmony3D.Sphere({ material: material, segments: 16, rings: 16 });
 			sphere.position = [(i - 5) * 5, 0, (j - 5) * 5];
 			group.addChild(sphere);
