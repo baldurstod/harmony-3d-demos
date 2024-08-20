@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Source for harmony 3D demos",
   "devDependencies": {
+    "@rollup/plugin-json": "^6.1.0",
     "rollup": "^4.20.0",
     "rollup-plugin-copy": "^3.5.0"
   },

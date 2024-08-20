@@ -1,3 +1,4 @@
+import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import copy from 'rollup-plugin-copy';
 import css from 'rollup-plugin-import-css';
@@ -13,6 +14,9 @@ export default [
 		},
 		plugins: [
 			css(),
+			json({
+				compact: true,
+			}),
 			nodeResolve(),
 			copy({
 				copyOnce: true,
