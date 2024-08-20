@@ -5,12 +5,14 @@
 	background-color: var(--theme-background-secondary);
 }
 
-.demo-tabs {
+.demo-list {
 	flex: 1;
+	min-width: 25rem;
+	max-width: 50rem;
 }
 
 .demo-view {
-	flex: 1;
+	flex: 2;
 	overflow: hidden;
 	position: relative;
 }

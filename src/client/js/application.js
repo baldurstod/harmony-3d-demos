@@ -64,54 +64,59 @@ class Application {
 			parent: document.body,
 			class: 'demos',
 			childs: [
-				createElement('harmony-tab-group', {
-					class: 'demo-tabs',
-					adoptStyle: `
-					.demos-list-dir{
-						cursor: pointer;
-					}
-					.demos-list-dir-title::before{
-						content: "+"
-					}
-					.demos-list-dir-content{
-						padding-left: 20px;
-					}`,
+				createElement('div', {
+					class: 'demo-list',
 					childs: [
-						createElement('harmony-tab', {
-							'data-i18n': '#demos',
+						createElement('harmony-tab-group', {
+							class: 'demo-tabs',
+							adoptStyle: `
+								.demos-list-dir{
+									cursor: pointer;
+								}
+								.demos-list-dir-title::before{
+									content: "+"
+								}
+								.demos-list-dir-content{
+									padding-left: 20px;
+								}`,
 							childs: [
-								/*
-								htmlButtonSavePicture = createElement('button', {
-									style: "height:30px;",
-									innerText: 'Picture',
+								createElement('harmony-tab', {
+									'data-i18n': '#demos',
+									childs: [
+										/*
+										htmlButtonSavePicture = createElement('button', {
+											style: "height:30px;",
+											innerText: 'Picture',
+										}),
+										htmlButtonexportFBX = createElement('button', {
+											style: "height:30px;",
+											innerText: 'Export FBX',
+										}),*/
+										this.#htmlDemoList = createElement('div', {
+											style: "height:300px;",
+										}),
+									],
 								}),
-								htmlButtonexportFBX = createElement('button', {
-									style: "height:30px;",
-									innerText: 'Export FBX',
-								}),*/
-								this.#htmlDemoList = createElement('div', {
-									style: "height:300px;",
+								createElement('harmony-tab', {
+									'data-i18n': '#scene_explorer',
+									child: this.#sceneExplorerTab = createElement('div', {
+										style: "height:100%;",
+										child: this.#sceneExplorer.htmlElement,
+									}),
+								}),
+								this.#shaderEditorTab = createElement('harmony-tab', {
+									'data-i18n': '#shader_editor',
+									events: {
+										activated: () => {
+											this.#shaderEditor.initEditor({ aceUrl: '/assets/js/ace-builds/src-min/ace.js', displayCustomShaderButtons: false });
+											this.#shaderEditorTab.append(this.#shaderEditor);
+										}
+									},
+								}),
+								this.#htmlDemoContentTab = createElement('harmony-tab', {
+									'data-i18n': '#demo_content',
 								}),
 							],
-						}),
-						createElement('harmony-tab', {
-							'data-i18n': '#scene_explorer',
-							child: this.#sceneExplorerTab = createElement('div', {
-								style: "height:100%;",
-								child: this.#sceneExplorer.htmlElement,
-							}),
-						}),
-						this.#shaderEditorTab = createElement('harmony-tab', {
-							'data-i18n': '#shader_editor',
-							events: {
-								activated: () => {
-									this.#shaderEditor.initEditor({ aceUrl: '/assets/js/ace-builds/src-min/ace.js', displayCustomShaderButtons: false });
-									this.#shaderEditorTab.append(this.#shaderEditor);
-								}
-							},
-						}),
-						this.#htmlDemoContentTab = createElement('harmony-tab', {
-							'data-i18n': '#demo_content',
 						}),
 					],
 				}),
@@ -230,12 +235,11 @@ class Application {
 			}
 			let demo = document.createElement('div');
 			demo.innerHTML = arr[arr.length - 1];
-			demo.addEventListener('click', () =>
-				{
-					let location = document.location;
-					location.hash = '#' + file;
-					document.location = location;
-				}
+			demo.addEventListener('click', () => {
+				let location = document.location;
+				location.hash = '#' + file;
+				document.location = location;
+			}
 			);
 			currentLevel[0].append(demo);
 		}
