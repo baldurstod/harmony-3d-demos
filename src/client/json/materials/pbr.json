@@ -1,0 +1,14 @@
+{
+	"rustediron2": {
+		"path": "rustediron2",
+		"color": "rustediron2_basecolor.png",
+		"metalness": "rustediron2_metallic.png",
+		"roughness": "rustediron2_roughness.png"
+	},
+	"streakedmetal": {
+		"path": "streakedmetal",
+		"color": "streakedmetal-albedo.png",
+		"metalness": "streakedmetal-metalness.png",
+		"roughness": "streakedmetal-roughness.png"
+	}
+}
