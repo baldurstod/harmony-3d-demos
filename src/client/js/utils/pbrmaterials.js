@@ -9,9 +9,12 @@ export function createPbrMaterial(name) {
 		return null;
 	}
 
-	let colorTexture, metalnessTexture, roughnessTexture;
+	let colorTexture, normalTexture, metalnessTexture, roughnessTexture;
 	if (params.color) {
 		colorTexture = createTextureFromUrl(prefix + params.path + '/' + params.color);
+	}
+	if (params.normal) {
+		normalTexture = createTextureFromUrl(prefix + params.path + '/' + params.normal);
 	}
 	if (params.metalness) {
 		metalnessTexture = createTextureFromUrl(prefix + params.path + '/' + params.metalness);
@@ -22,6 +25,7 @@ export function createPbrMaterial(name) {
 
 	return new MeshBasicPbrMaterial({
 		colorTexture: colorTexture,
+		normalTexture: normalTexture,
 		metalnessTexture: metalnessTexture,
 		roughnessTexture: roughnessTexture,
 	})
