@@ -18,4 +18,10 @@
 		"metalness": "cerberus_m.png",
 		"roughness": "cerberus_r.png"
 	}
+	,"metal055a": {
+		"path": "metals/metal055a",
+		"color": "metal055a_color.jpg",
+		"metalness": "metal055a_metalness.jpg",
+		"roughness": "metal055a_roughness.jpg"
+	}
 }
