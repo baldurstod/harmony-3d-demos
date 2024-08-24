@@ -24,23 +24,13 @@ export function initDemo(renderer, scene) {
 
 	renderer.autoClear = false;
 
-	let cube = new Harmony3D.Box();
-	scene.addChild(cube);
-	cube.material.uniforms.uColor = [1, 0, 1, 1];
-	cube.material.setDefine('USE_MESH_COLOR');
-	cube.selected = true;
-
-
-	let plane = new Harmony3D.Plane({ width: 10, height: 10 })
-	scene.addChild(plane);
-	plane.material.uniforms.uColor = [1, 0, 0, 1];
-	plane.material.setDefine('USE_MESH_COLOR');
-
 	let composer = new Harmony3D.Composer(renderer);
 	let clearPass = new Harmony3D.ClearPass(GlMatrix.vec4.fromValues(0.2, 0.2, 0.2, 1), 1, 0);
 	let renderPass = new Harmony3D.RenderPass(scene, perspectiveCamera);
 	let pixelatePass = new Harmony3D.PixelatePass(perspectiveCamera);
 
+	pixelatePass.horizontalTiles = 30;
+	pixelatePass.pixelStyle = 0;
 
 	composer.addPass(clearPass);
 	composer.addPass(renderPass);
