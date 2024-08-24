@@ -8,6 +8,8 @@ export * as GlMatrix from 'gl-matrix';
 export * as Harmony3D from 'harmony-3d';
 export * as HarmonyUi from 'harmony-ui';
 export * from './utils/pbrmaterials.js';
+export * from './utils/source1.js';
+export * from './utils/source2.js';
 
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';

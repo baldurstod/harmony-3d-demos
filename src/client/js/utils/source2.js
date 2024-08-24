@@ -1,7 +1,7 @@
-import { Harmony3D } from './application.js';
+import { GRAPHICS_EVENT_TICK, GraphicsEvents, Source2ModelManager } from 'harmony-3d';
 
 export async function AddSource2Model(repository, fileName, renderer, scene) {
-	let model = await Harmony3D.Source2ModelManager.createInstance(repository, fileName, true);
+	let model = await Source2ModelManager.createInstance(repository, fileName, true);
 	if (!model) {
 		return;
 	}
@@ -9,7 +9,7 @@ export async function AddSource2Model(repository, fileName, renderer, scene) {
 	console.error(model);
 	scene.addChild(model);
 
-	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_TICK, (event) => {
+	GraphicsEvents.addEventListener(GRAPHICS_EVENT_TICK, (event) => {
 		model.frame += event.detail.delta / 1000;
 	});
 	return model;
