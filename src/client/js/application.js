@@ -10,6 +10,7 @@ export * as HarmonyUi from 'harmony-ui';
 export * from './utils/pbrmaterials.js';
 export * from './utils/source1.js';
 export * from './utils/source2.js';
+export * from './utils/utils.js';
 
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
