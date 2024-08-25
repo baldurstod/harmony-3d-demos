@@ -3,8 +3,10 @@ import { Harmony3D, GlMatrix, createPbrMaterial } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;
+let ambientLight;
 export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
+	[perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(renderer, scene);
+	ambientLight.intensity = 0.1;
 	perspectiveCamera.position = [0, -10, 0];
 	orbitCameraControl.target.position = [0, 0, 0];
 	perspectiveCamera.farPlane = 1000;
