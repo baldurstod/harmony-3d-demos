@@ -1,6 +1,4 @@
-import { InitDemoStd } from '/js/utils.js';
-
-import { HarmonyUi, GlMatrix, Harmony3D } from '/js/application.js';
+import { HarmonyUi, GlMatrix, Harmony3D, InitDemoStd } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;

@@ -1,5 +1,4 @@
-import { InitDemoStd } from '/js/utils.js';
-import { Harmony3D, GlMatrix } from '/js/application.js';
+import { Harmony3D, GlMatrix, InitDemoStd } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;
@@ -39,7 +38,7 @@ export function initDemo(renderer, scene) {
 
 	for (let i = 0; i <= 10; i++) {
 		for (let j = 0; j <= 10; j++) {
-			let material = new Harmony3D.MeshBasicPbrMaterial({ metalness: i / 10, roughness: j / 10, color:[1, 0, 0, 1] });
+			let material = new Harmony3D.MeshBasicPbrMaterial({ metalness: i / 10, roughness: j / 10, color: [1, 0, 0, 1] });
 			let sphere = new Harmony3D.Sphere({ material: material, segments: 16, rings: 16 });
 			sphere.position = [(i - 5) * 5, 0, (j - 5) * 5];
 			group.addChild(sphere);

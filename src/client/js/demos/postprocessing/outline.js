@@ -1,6 +1,4 @@
-import { AddSource1Model } from '/js/source1.js';
-import { Harmony3D, GlMatrix } from '/js/application.js';
-import { InitDemoStd } from '/js/utils.js';
+import { AddSource1Model, InitDemoStd, Harmony3D, GlMatrix } from '/js/application.js';
 
 export const useCustomRenderLoop = true;
 

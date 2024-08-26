@@ -1,5 +1,4 @@
-import { InitDemoStd } from '/js/utils.js';
-import { Harmony3D, GlMatrix, createPbrMaterial } from '/js/application.js';
+import { Harmony3D, GlMatrix, createPbrMaterial, InitDemoStd } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;

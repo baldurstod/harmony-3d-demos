@@ -1,5 +1,5 @@
-import { AddSource2Model } from '/js/source2.js';
-import { InitDemoStd } from '/js/utils.js';
+import { AddSource2Model, InitDemoStd } from '/js/application.js';
+
 
 let perspectiveCamera;
 let orbitCameraControl;

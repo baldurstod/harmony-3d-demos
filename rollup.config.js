@@ -23,10 +23,7 @@ export default [
 				targets: [
 					{ src: 'src/client/index.html', dest: 'build/client/' },
 					{ src: 'src/client/js/demos/', dest: 'build/client/js/' },
-					{ src: 'src/client/js/source1.js', dest: 'build/client/js/' },
-					{ src: 'src/client/js/source2.js', dest: 'build/client/js/' },
-					{ src: 'src/client/js/utils.js', dest: 'build/client/js/' },
-					{ src: 'src/client/json/', dest: 'build/client/' },
+					{ src: 'src/client/json/fonts/', dest: 'build/client/' },
 				]
 			}),
 		],
