@@ -3,8 +3,10 @@ import { Harmony3D, GlMatrix } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;
+let ambientLight;
 export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
+	[perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(renderer, scene);
+	ambientLight.intensity = 0.;
 	perspectiveCamera.position = [0, -100, 0];
 	orbitCameraControl.target.position = [0, 0, 0];
 	perspectiveCamera.farPlane = 10000;
@@ -29,7 +31,7 @@ export function initDemo(renderer, scene) {
 		color[0] = Math.abs(color[0]);
 		color[1] = Math.abs(color[1]);
 		color[2] = Math.abs(color[2]);
-		let l = new Harmony3D.PointLight({ position: [0, -100, -0], intensity: 5000, color: color, parent: scene });
+		let l = new Harmony3D.PointLight({ position: [0, -100, -0], intensity: 100000, color: color, parent: scene });
 		lights.push(l);
 		teta.push(Math.random() * 2 * Math.PI);
 		speed.push(Math.random() * 2 - 1);
