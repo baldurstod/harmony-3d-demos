@@ -18,12 +18,6 @@ async function testWireframe(renderer, scene) {
 	sphere.wireframe = 0;
 	new Harmony3D.Wireframe({ parent: sphere });
 
-
-	return;
 	let heavy = await AddSource1Model('tf2', 'models/player/heavy', renderer, scene);
 	heavy.playSequence('taunt_laugh');
-	heavy.setWireframe(true);
-
-	//await HarmonyUtils.setTimeoutPromise(5000);
-	//heavy.setWireframe(false);
 }

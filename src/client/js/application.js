@@ -8,6 +8,7 @@ export * as GlMatrix from 'gl-matrix';
 export * as Harmony3D from 'harmony-3d';
 export * as HarmonyUi from 'harmony-ui';
 export * as HarmonyUtils from 'harmony-utils';
+export * as HarmonyBrowserUtils from 'harmony-browser-utils';
 
 export * from './utils/pbrmaterials.js';
 export * from './utils/source1.js';
@@ -136,7 +137,7 @@ class Application {
 							class: 'stats',
 						}),
 						this.#htmlDemoContent = createElement('div', {
-							class: 'demo-content',
+							id: 'demo-content',
 						}),
 					],
 				}),

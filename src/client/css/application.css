@@ -29,13 +29,13 @@
 	pointer-events: none;
 }
 
-.demo-content {
+#demo-content {
 	position: absolute;
 	top: 0.2rem;
 	right: 0.2rem;
 	pointer-events: none;
 }
 
-.demo-content * {
+#demo-content * {
 	pointer-events: all;
 }
