@@ -1,9 +1,11 @@
-import { AddSource2Model, InitDemoStd } from '/js/application.js';
+import { AddSource2Model, InitDemoStd, Harmony3D } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;
+let ambientLight;
 export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
+	[perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(renderer, scene);
+	ambientLight.intensity = 0.1;
 	testHero(renderer, scene);
 }
 
@@ -13,6 +15,8 @@ async function testHero(renderer, scene) {
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 1;
 	perspectiveCamera.verticalFov = 50;
+
+	scene.addChild(new Harmony3D.PointLight({ position: [50, -10, 60], intensity: 10000 }))
 
 	const items = [
 	]
