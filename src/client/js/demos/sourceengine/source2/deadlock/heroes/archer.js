@@ -22,7 +22,7 @@ async function testHero(renderer, scene) {
 	]
 
 	const hero = await AddSource2Model('deadlock', 'models/heroes_staging/archer/archer', renderer, scene);
-	hero.playSequence('ACT_DOTA_IDLE');
+	hero.playAnimation('idle_loadout');
 
 	for (const item of items) {
 		const itemModel = await AddSource2Model('dota2', item, renderer, hero);
