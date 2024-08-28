@@ -183,7 +183,7 @@ class Application {
 		this.#htmlDemoContent.innerText = '';
 		//TODO: cleanup scene and renderer
 		this.#scene.removeChildren();
-		if (demo) {
+		if (demo && !demo.endsWith('/')) {
 			import('./demos/' + demo + '.js').then(
 				(module) => {
 					this.#useDefaultRenderLoop = !(module.useCustomRenderLoop == true);
