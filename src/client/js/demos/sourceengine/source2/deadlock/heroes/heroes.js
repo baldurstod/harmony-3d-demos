@@ -10,16 +10,34 @@ export function initDemo(renderer, scene) {
 	renderer.clearColor(GlMatrix.vec4.fromValues(0., 0., 0., 255));
 	scene.addChild(new Harmony3D.PointLight({ position: [50, -10, 60], intensity: 10000 }));
 
+	let htmlHeroListReleased;
+	let htmlHeroListStaging;
 	const htmlHeroList = HarmonyUi.createElement('div', {
 		parent: document.getElementById('demo-content'),
 		style: 'display: flex;flex-direction: column;',
+		childs: [
+			htmlHeroListReleased = HarmonyUi.createElement('div', {
+				style: 'display: flex;flex-direction: column;',
+				child: HarmonyUi.createElement('div', {
+					innerText: 'Released heroes',
+				}),
+			}),
+			htmlHeroListStaging = HarmonyUi.createElement('div', {
+				style: 'display: flex;flex-direction: column;',
+				child: HarmonyUi.createElement('div', {
+					innerText: 'Shelved heroes',
+				}),
+			}),
+		]
 	});
 
-	for (const name in heroes) {
+	// Sort by name
+	const ordered = Object.keys(heroes).sort().reduce((obj, key) => { obj[key] = heroes[key]; return obj; }, {});
+	for (const name in ordered) {
 		const h = heroes[name];
 
 		HarmonyUi.createElement('button', {
-			parent: htmlHeroList,
+			parent: h.released ? htmlHeroListReleased : htmlHeroListStaging,
 			innerText: name,
 			events: {
 				click: () => testHero(renderer, scene, h),
@@ -39,7 +57,7 @@ async function testHero(renderer, scene, hero) {
 	]
 
 	if (heroModel) {
-		heroModel.remove();
+		heroModel.setVisible(false);
 	}
 
 	heroModel = await AddSource2Model('deadlock', hero.model, renderer, scene);
@@ -53,55 +71,63 @@ async function testHero(renderer, scene, hero) {
 
 
 const heroes = {
-	'Archer': {
-		model: 'models/heroes_staging/archer/archer'
+	'Grey Talon': {
+		model: 'models/heroes_staging/archer/archer',
+		released: true
 	}
 	, 'Astro': {
 		model: 'models/heroes_staging/astro/astro'
 	}
-	, 'Atlas detective': {
-		model: 'models/heroes_staging/atlas_detective_v2/atlas_detective'
+	, 'Abrams': {
+		model: 'models/heroes_staging/atlas_detective_v2/atlas_detective',
+		released: true
 	}
 	, 'Kelvin': {
-		model: 'models/heroes_staging/kelvin/kelvin'
+		model: 'models/heroes_staging/kelvin/kelvin',
+		released: true
 	}
 	, 'Bebop': {
-		model: 'models/heroes_staging/bebop/bebop'
+		model: 'models/heroes_staging/bebop/bebop',
+		released: true
 	}
 	, 'Cadence': {
 		model: 'models/heroes_staging/cadence/cadence'
 	}
-	, 'Chrono': {
-		model: 'models/heroes_staging/chrono/chrono'
+	, 'Paradox': {
+		model: 'models/heroes_staging/chrono/chrono',
+		released: true
 	}
-	, 'Digger': {
-		model: 'models/heroes_staging/digger/digger'
+	, 'Mo & Krill': {
+		model: 'models/heroes_staging/digger/digger',
+		released: true
 	}
-	, 'Engineer': {
-		model: 'models/heroes_staging/engineer/engineer'
+	, 'Mc Ginnis': {
+		model: 'models/heroes_staging/engineer/engineer',
+		released: true
 	}
-	, 'Ghost': {
-		model: 'models/heroes_staging/ghost/ghost'
+	, 'Lady Geist': {
+		model: 'models/heroes_staging/ghost/ghost',
+		released: true
 	}
-	, 'Gigawatt': {
-		model: 'models/heroes_staging/gigawatt/gigawatt'
+	, 'Seven': {
+		model: 'models/heroes_staging/gigawatt/gigawatt',
+		released: true
 	}
-	, 'gigawatt_prisoner': {
-		model: 'models/heroes_staging/gigawatt_prisoner/gigawatt_prisoner'
+	, 'Seven prisoner': {
+		model: 'models/heroes_staging/gigawatt_prisoner/gigawatt_prisoner',
+		released: true
 	}
 	, 'gunslinger': {
 		model: 'models/heroes_staging/gunslinger/gunslinger'
 	}
-	, 'haze': {
-		model: 'models/heroes_staging/haze/haze'
+	, 'Haze': {
+		model: 'models/heroes_staging/haze/haze',
+		released: true
 	}
 	, 'haze_v2': {
 		model: 'models/heroes_staging/haze_v2/haze'
 	}
-	, 'hornet': {
-		model: 'models/heroes_staging/hornet_v3/hornet'
-	}
-	, 'inferno': {
+	, 'Infernus': {
 		model: 'models/heroes_staging/inferno_v4/inferno',
 		anim: 'primary_stand_gun_forward_idle'
 	}
@@ -118,8 +144,9 @@ const heroes = {
 	, 'kelvin_v2': {
 		model: 'models/heroes_staging/kelvin_v2/kelvin'
 	}
-	, 'lash': {
-		model: 'models/heroes_staging/lash_v2/lash'
+	, 'Lash': {
+		model: 'models/heroes_staging/lash_v2/lash',
+		released: true
 	}
 	, 'mirage': {
 		model: 'models/heroes_staging/mirage/mirage'
@@ -127,15 +154,16 @@ const heroes = {
 	, 'nano': {
 		model: 'models/heroes_staging/nano/nano_v2/nano'
 	}
-	, 'prof_dynamo': {
+	, 'Dynamo': {
 		model: 'models/heroes_staging/prof_dynamo/prof_dynamo'
 	}
 	, 'rutger': {
 		model: 'models/heroes_staging/rutger/rutger',
 		anim: 'primary_stand_idle'
 	}
-	, 'shiv': {
-		model: 'models/heroes_staging/shiv/shiv'
+	, 'Shiv': {
+		model: 'models/heroes_staging/shiv/shiv',
+		released: true
 	}
 	, 'skymonk': {
 		model: 'models/heroes_staging/skymonk/skymonk',
@@ -145,12 +173,14 @@ const heroes = {
 		model: 'models/heroes_staging/slork/slork',
 		anim: 'primary_stand_idle'
 	}
-	, 'synth': {
-		model: 'models/heroes_staging/synth/synth'
+	, 'Pocket': {
+		model: 'models/heroes_staging/synth/synth',
+		released: true
 	}
-	, 'tengu': {
+	, 'Ivy': {
 		model: 'models/heroes_staging/tengu/tengu_v2/tengu',
-		anim: 'primary_stand_idle'
+		anim: 'primary_stand_idle',
+		released: true
 	}
 	, 'thumper': {
 		model: 'models/heroes_staging/thumper/thumper',
@@ -159,35 +189,42 @@ const heroes = {
 	, 'tokamak': {
 		model: 'models/heroes_staging/tokamak/tokamak'
 	}
-	, 'vindicta': {
-		model: 'models/heroes_staging/vindicta/vindicta',
-		anim: 'primary_stand_idle'
+	, 'Vindicta': {
+		model: 'models/heroes_staging/hornet_v3/hornet',
+		anim: 'primary_stand_idle',
+		released: true
 	}
-	, 'viscous': {
-		model: 'models/heroes_staging/viscous/viscous'
+	, 'Viscous': {
+		model: 'models/heroes_staging/viscous/viscous',
+		released: true
 	}
 	, 'viscous_v2': {
 		model: 'models/heroes_staging/viscous_v2/viscous'
 	}
-	, 'warden': {
+	, 'Warden': {
 		model: 'models/heroes_staging/warden/warden',
-		anim: 'primary_stand_idle'
+		anim: 'primary_stand_idle',
+		released: true
 	}
-	, 'wraith': {
+	, 'Wraith': {
 		model: 'models/heroes_staging/wraith/wraith',
-		anim: 'primary_stand_idle'
+		anim: 'primary_stand_idle',
+		released: true
 	}
-	, 'wraith_gen_man': {
+	, 'Wraith 2': {
 		model: 'models/heroes_staging/wraith_gen_man/wraith_gen_man',
-		anim: 'primary_stand_idle'
+		anim: 'primary_stand_idle',
+		released: true
 	}
-	, 'wraith_magician': {
+	, 'Wraith magician': {
 		model: 'models/heroes_staging/wraith_magician/wraith_magician',
-		anim: 'primary_stand_idle'
+		anim: 'primary_stand_idle',
+		released: true
 	}
-	, 'wraith_puppeteer': {
+	, 'Wraith puppeteer': {
 		model: 'models/heroes_staging/wraith_puppeteer/wraith_puppeteer',
-		anim: 'primary_stand_idle'
+		anim: 'primary_stand_idle',
+		released: true
 	}
 	, 'wrecker': {
 		model: 'models/heroes_staging/wrecker/wrecker'
@@ -196,7 +233,8 @@ const heroes = {
 		model: 'models/heroes_staging/yakuza/yakuza',
 		anim: 'primary_stand_idle'
 	}
-	, 'yamato': {
-		model: 'models/heroes_staging/yamato_v2/yamato'
+	, 'Yamato': {
+		model: 'models/heroes_staging/yamato_v2/yamato',
+		released: true
 	}
 };
