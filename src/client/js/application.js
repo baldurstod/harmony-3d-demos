@@ -62,6 +62,7 @@ class Application {
 		Source2ModelManager.loadManifest('cs2');
 		Source2ModelManager.loadManifest('dota2');
 		Source2ModelManager.loadManifest('hla');
+		Source2ModelManager.loadManifest('deadlock');
 		SourceEngineMaterialManager.addRepository('tf2');
 		Source2ParticleManager.loadManifests('cs2', 'dota2', 'hla');
 	}
