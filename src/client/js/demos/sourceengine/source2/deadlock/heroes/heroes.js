@@ -129,20 +129,20 @@ const heroes = {
 	}
 	, 'Infernus': {
 		model: 'models/heroes_staging/inferno_v4/inferno',
-		anim: 'primary_stand_gun_forward_idle'
+		anim: 'primary_stand_gun_forward_idle',
+		released: true
 	}
 	, 'kali': {
 		model: 'models/heroes_staging/kali/kali',
 		anim: 'primary_stand_idle'
 	}
-	, 'kelvin': {
-		model: 'models/heroes_staging/kelvin/kelvin'
+	, 'Kelvin': {
+		model: 'models/heroes_staging/kelvin/kelvin',
+		released: true
 	}
-	, 'kelvin_explorer': {
-		model: 'models/heroes_staging/kelvin_explorer/kelvin_explorer_shape'
-	}
-	, 'kelvin_v2': {
-		model: 'models/heroes_staging/kelvin_v2/kelvin'
+	, 'Kelvin v2': {
+		model: 'models/heroes_staging/kelvin_v2/kelvin',
+		released: true
 	}
 	, 'Lash': {
 		model: 'models/heroes_staging/lash_v2/lash',
@@ -155,7 +155,8 @@ const heroes = {
 		model: 'models/heroes_staging/nano/nano_v2/nano'
 	}
 	, 'Dynamo': {
-		model: 'models/heroes_staging/prof_dynamo/prof_dynamo'
+		model: 'models/heroes_staging/prof_dynamo/prof_dynamo',
+		released: true
 	}
 	, 'rutger': {
 		model: 'models/heroes_staging/rutger/rutger',
