@@ -17,7 +17,9 @@ export default [
 			json({
 				compact: true,
 			}),
-			nodeResolve(),
+			nodeResolve({
+				dedupe: ['gl-matrix', 'harmony-ui', 'harmony-browser-utils'],
+			}),
 			copy({
 				copyOnce: true,
 				targets: [

@@ -3,6 +3,7 @@ import { themeCSS } from 'harmony-css';
 import { createElement, documentStyle, hide, show, toggle } from 'harmony-ui';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
 import 'harmony-ui/dist/define/harmony-tab.js';
+import 'harmony-ui/dist/define/harmony-color-picker.js';
 
 export * as GlMatrix from 'gl-matrix';
 export * as Harmony3D from 'harmony-3d';
@@ -32,6 +33,7 @@ class Application {
 	#htmlDemoContent;
 	#htmlDemoList;
 	#htmlDemoContentTab;
+	#htmlOptionsTab;
 	#scene = new Scene();
 	#sceneExplorerTab;
 	#shaderEditorTab;
@@ -82,7 +84,7 @@ class Application {
 									cursor: pointer;
 								}
 								.demos-list-dir-title::before{
-									content: "+"
+									content: '+'
 								}
 								.demos-list-dir-content{
 									padding-left: 20px;
@@ -93,22 +95,35 @@ class Application {
 									childs: [
 										/*
 										htmlButtonSavePicture = createElement('button', {
-											style: "height:30px;",
+											style: 'height:30px;',
 											innerText: 'Picture',
 										}),
 										htmlButtonexportFBX = createElement('button', {
-											style: "height:30px;",
+											style: 'height:30px;',
 											innerText: 'Export FBX',
 										}),*/
 										this.#htmlDemoList = createElement('div', {
-											style: "height:300px;",
+											style: 'height:300px;',
 										}),
 									],
 								}),
 								createElement('harmony-tab', {
+									'data-i18n': '#options',
+									child: this.#htmlOptionsTab = createElement('div', {
+										class: 'demo-options-tab',
+										childs: [
+											createElement('harmony-color-picker', {
+												events: {
+													change: event => this.#renderer.clearColor(event.detail.rgba),
+												},
+											}),
+										],
+									}),
+								}),
+								createElement('harmony-tab', {
 									'data-i18n': '#scene_explorer',
 									child: this.#sceneExplorerTab = createElement('div', {
-										style: "height:100%;",
+										style: 'height:100%;',
 										child: this.#sceneExplorer.htmlElement,
 									}),
 								}),
