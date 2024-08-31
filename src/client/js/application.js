@@ -1,6 +1,7 @@
-import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Repositories, Repository, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, Source1ParticleControler, Source2ModelManager, Source2ParticleManager, SourceEngineMaterialManager, WebGLStats } from 'harmony-3d';
+import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Repositories, Repository, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, Source1ParticleControler, Source2ModelManager, Source2ParticleManager, SourceEngineMaterialManager, WebGLStats, exportToBinaryFBX } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, documentStyle, hide, show, toggle } from 'harmony-ui';
+import { SaveFile } from 'harmony-browser-utils';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
 import 'harmony-ui/dist/define/harmony-tab.js';
 import 'harmony-ui/dist/define/harmony-color-picker.js';
@@ -93,15 +94,22 @@ class Application {
 								createElement('harmony-tab', {
 									'data-i18n': '#demos',
 									childs: [
-										/*
-										htmlButtonSavePicture = createElement('button', {
+										createElement('button', {
 											style: 'height:30px;',
 											innerText: 'Picture',
+											events: {
+												click: () => this.#renderer.savePicture(this.#scene, this.#scene.activeCamera, 'test.png', 1920, 1080),
+											}
 										}),
-										htmlButtonexportFBX = createElement('button', {
+										createElement('button', {
 											style: 'height:30px;',
 											innerText: 'Export FBX',
-										}),*/
+											events: {
+												click: async () => {
+													SaveFile(new File([await exportToBinaryFBX(this.#scene)], 'test.fbx'));
+												},
+											}
+										}),
 										this.#htmlDemoList = createElement('div', {
 											style: 'height:300px;',
 										}),
