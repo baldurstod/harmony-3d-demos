@@ -6,9 +6,16 @@ let ambientLight;
 let heroModel;
 export function initDemo(renderer, scene) {
 	[perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(renderer, scene);
+	perspectiveCamera.position = [200, 0, 45];
+	orbitCameraControl.target.position = [0, 0, 45];
+	perspectiveCamera.farPlane = 10000;
+	perspectiveCamera.nearPlane = 1;
+	perspectiveCamera.verticalFov = 50;
 	ambientLight.intensity = 0.1;
 	renderer.clearColor(GlMatrix.vec4.fromValues(0., 0., 0., 255));
 	scene.addChild(new Harmony3D.PointLight({ position: [50, -10, 60], intensity: 10000 }));
+
+
 
 	let htmlHeroListReleased;
 	let htmlHeroListStaging;
@@ -47,12 +54,6 @@ export function initDemo(renderer, scene) {
 }
 
 async function testHero(renderer, scene, hero) {
-	perspectiveCamera.position = [200, 0, 45];
-	orbitCameraControl.target.position = [0, 0, 45];
-	perspectiveCamera.farPlane = 10000;
-	perspectiveCamera.nearPlane = 1;
-	perspectiveCamera.verticalFov = 50;
-
 	const items = [
 	]
 
