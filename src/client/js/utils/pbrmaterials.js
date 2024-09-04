@@ -42,7 +42,7 @@ export function createTextureFromUrl(url) {
 		return textures.get(url);
 	}
 
-	const texture = TextureManager.createTexture();
+	const texture = TextureManager.createTexture({ flip_y: true });
 	textures.set(url, texture);
 	const image = new Image();
 	image.onload = () => TextureManager.fillTextureWithImage(texture, image);
