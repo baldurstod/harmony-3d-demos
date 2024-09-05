@@ -6,7 +6,7 @@ let perspectiveCamera;
 let orbitCameraControl;
 export function initDemo(renderer, scene, { htmlDemoContent }) {
 	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
-	perspectiveCamera.position = [0, -20, 0];
+	perspectiveCamera.position = [0, 0, 20];
 	orbitCameraControl.target.position = [0, 0, 0];
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 0.1;
@@ -26,7 +26,7 @@ export function initDemo(renderer, scene, { htmlDemoContent }) {
 
 async function testRemGenerator(renderer, scene) {
 	const img = new Image(2048, 2048);
-	img.src = './assets/textures/ldr/earth.jpg';
+	img.src = './assets/textures/ldr/equirectangular/earth.jpg';
 	await img.decode();
 	const earthTexture = Harmony3D.TextureManager.createTextureFromImage(img, { flipY: true })
 
@@ -45,7 +45,7 @@ async function testRemGenerator(renderer, scene) {
 
 	const material = new Harmony3D.MeshBasicMaterial();
 	material.setColorMap(earthTexture);
-	material.setColorMap(renderTarget.texture);
+	material.setColorMap(renderTarget.getTexture());
 	//material.setColorMap(generator.getpingPongRenderTarget().texture);
 
 	const plane = new Harmony3D.Plane({ material: material });
@@ -53,5 +53,9 @@ async function testRemGenerator(renderer, scene) {
 
 
 	renderer.clearColor(GlMatrix.vec4.fromValues(1., 0., 0., 255));
+
+
+	const envMap = await new Harmony3D.RgbeImporter(Harmony3D.Graphics.glContext).fetch('./assets/textures/hdr/equirectangular/venice_sunset_1k.hdr');
+	material.setColorMap(envMap);
 
 }
