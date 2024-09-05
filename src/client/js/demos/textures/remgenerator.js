@@ -29,16 +29,17 @@ async function testRemGenerator(renderer, scene) {
 	img.src = './assets/textures/ldr/equirectangular/earth.jpg';
 	await img.decode();
 	const earthTexture = Harmony3D.TextureManager.createTextureFromImage(img, { flipY: true })
+	earthTexture.addUser(this);
 
 	const generator = new Harmony3D.RemGenerator(renderer);
 	const renderTarget = generator.fromEquirectangular(earthTexture);
 
 	console.info(renderTarget);
 
-	const shadowMapViewer = new Harmony3D.RenderTargetViewer(renderTarget);
+	const renderTargetViewer = new Harmony3D.RenderTargetViewer(renderTarget);
 	function animate(event) {
 		renderer.render(scene, scene.activeCamera, event.detail.delta);
-		shadowMapViewer.render(renderer.forwardRenderer);
+		renderTargetViewer.render(renderer.forwardRenderer);
 	}
 	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_TICK, animate);
 
@@ -46,7 +47,6 @@ async function testRemGenerator(renderer, scene) {
 	const material = new Harmony3D.MeshBasicMaterial();
 	material.setColorMap(earthTexture);
 	material.setColorMap(renderTarget.getTexture());
-	//material.setColorMap(generator.getpingPongRenderTarget().texture);
 
 	const plane = new Harmony3D.Plane({ material: material });
 	scene.addChild(plane);
@@ -54,8 +54,9 @@ async function testRemGenerator(renderer, scene) {
 
 	renderer.clearColor(GlMatrix.vec4.fromValues(1., 0., 0., 255));
 
-
 	const envMap = await new Harmony3D.RgbeImporter(Harmony3D.Graphics.glContext).fetch('./assets/textures/hdr/equirectangular/venice_sunset_1k.hdr');
 	material.setColorMap(envMap);
 
+	const renderTarget2 = generator.fromEquirectangular(envMap);
+	renderTargetViewer.material.setColorMap(renderTarget2.getTexture());
 }
