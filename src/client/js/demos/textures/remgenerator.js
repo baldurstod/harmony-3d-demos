@@ -49,7 +49,9 @@ async function testRemGenerator(renderer, scene) {
 	material.setColorMap(renderTarget.getTexture());
 
 	const plane = new Harmony3D.Plane({ material: material });
+	const quad = new Harmony3D.FullScreenQuad({ material: material });
 	scene.addChild(plane);
+	scene.addChild(quad);
 
 
 	renderer.clearColor(GlMatrix.vec4.fromValues(1., 0., 0., 255));
