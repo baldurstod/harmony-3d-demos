@@ -55,6 +55,7 @@ async function testRemGenerator(renderer, scene) {
 
 
 	renderer.clearColor(GlMatrix.vec4.fromValues(1., 0., 0., 255));
+	renderer.forwardRenderer.setToneMapping(Harmony3D.ToneMapping.Reinhard);
 
 	const envMap = await new Harmony3D.RgbeImporter(Harmony3D.Graphics.glContext).fetch('./assets/textures/hdr/equirectangular/venice_sunset_1k.hdr');
 	material.setColorMap(envMap);
