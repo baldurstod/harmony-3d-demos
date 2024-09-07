@@ -49,16 +49,19 @@ async function testRemGenerator(renderer, scene) {
 	material.setColorMap(renderTarget.getTexture());
 
 	const plane = new Harmony3D.Plane({ material: material });
-	const quad = new Harmony3D.FullScreenQuad({ material: material });
+	//const quad = new Harmony3D.FullScreenQuad({ material: material });
 	scene.addChild(plane);
-	scene.addChild(quad);
+	//scene.addChild(quad);
 
 
 	renderer.clearColor(GlMatrix.vec4.fromValues(1., 0., 0., 255));
 	renderer.forwardRenderer.setToneMapping(Harmony3D.ToneMapping.Reinhard);
+	renderer.forwardRenderer.setToneMappingExposure(3.);
 
 	const envMap = await new Harmony3D.RgbeImporter(Harmony3D.Graphics.glContext).fetch('./assets/textures/hdr/equirectangular/venice_sunset_1k.hdr');
-	material.setColorMap(envMap);
+	//material.setColorMap(envMap);
 
 	renderTargetViewer.setRenderTarget(generator.fromEquirectangular(envMap));
+
+	scene.background = new Harmony3D.CubeBackground({ texture: renderTarget.getTexture() });
 }
