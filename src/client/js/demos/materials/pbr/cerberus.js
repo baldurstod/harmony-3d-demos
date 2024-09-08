@@ -25,7 +25,14 @@ async function testCerberus(renderer, scene) {
 	let mesh = Harmony3D.OBJLoader.load(objFile);
 	mesh.name = 'Cerberus';
 	mesh.rotateX(Harmony3D.HALF_PI);
+	mesh.rotateY(-Harmony3D.HALF_PI);
 	mesh.material = createPbrMaterial('cerberus');
 
 	scene.addChild(mesh);
+
+
+	const envMap = await new Harmony3D.RgbeImporter(Harmony3D.Graphics.glContext).fetch('./assets/textures/hdr/equirectangular/venice_sunset_1k.hdr');
+	const generator = new Harmony3D.RemGenerator(renderer);
+	const renderTarget = generator.fromEquirectangular(envMap);
+	scene.background = new Harmony3D.CubeBackground({ texture: renderTarget.getTexture() });
 }

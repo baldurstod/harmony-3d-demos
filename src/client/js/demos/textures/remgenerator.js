@@ -10,7 +10,7 @@ export function initDemo(renderer, scene, { htmlDemoContent }) {
 	orbitCameraControl.target.position = [0, 0, 0];
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 0.1;
-	perspectiveCamera.verticalFov = 10;
+	perspectiveCamera.verticalFov = 80;
 	renderer.clearColor(GlMatrix.vec4.fromValues(0., 0., 0., 255));
 
 	HarmonyUi.createElement('button', {
