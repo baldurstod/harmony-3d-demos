@@ -26,13 +26,13 @@ export function initDemo(renderer, scene, { htmlDemoContent }) {
 
 async function testRemGenerator(renderer, scene) {
 	const img = new Image(2048, 2048);
-	img.src = './assets/textures/ldr/equirectangular/earth.jpg';
+	img.src = './assets/textures/ldr/equirectangular/atlas1.jpg';
 	await img.decode();
 	const earthTexture = Harmony3D.TextureManager.createTextureFromImage(img, { flipY: true })
 	earthTexture.addUser(this);
 
 	const generator = new Harmony3D.RemGenerator(renderer);
-	const renderTarget = generator.fromEquirectangular(earthTexture);
+	const renderTarget = new Harmony3D.RenderTarget();//= generator.fromEquirectangular(earthTexture);
 
 	console.info(renderTarget);
 
@@ -59,9 +59,11 @@ async function testRemGenerator(renderer, scene) {
 	renderer.forwardRenderer.setToneMappingExposure(3.);
 
 	const envMap = await new Harmony3D.RgbeImporter(Harmony3D.Graphics.glContext).fetch('./assets/textures/hdr/equirectangular/venice_sunset_1k.hdr');
-	//material.setColorMap(envMap);
+	material.setColorMap(envMap);
 
-	renderTargetViewer.setRenderTarget(generator.fromEquirectangular(envMap));
+	const renderTarget2 = generator.fromEquirectangular(envMap);
+	renderTargetViewer.setRenderTarget(renderTarget2);
 
-	scene.background = new Harmony3D.CubeBackground({ texture: renderTarget.getTexture() });
+	scene.background = new Harmony3D.CubeBackground({ texture: renderTarget2.getTexture() });
+	material.setColorMap(renderTarget2.getTexture());
 }
