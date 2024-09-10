@@ -17,7 +17,7 @@ async function TestDog(renderer, scene) {
 	perspectiveCamera.verticalFov = 10;
 	const alyx = await AddSource2Model('hla', 'models/characters/alyx/alyx', renderer, scene);
 	alyx.playAnimation('the_moment_alyx_pre_idle');
-	scene.background.color = GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1);
+	scene.background.setColor(GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1));
 
 	const l = new Harmony3D.PointLight({ position: [0, 150, 0], intensity: 100000, parent: scene });
 }

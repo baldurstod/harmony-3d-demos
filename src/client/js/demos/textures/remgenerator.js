@@ -11,7 +11,7 @@ export function initDemo(renderer, scene, { htmlDemoContent }) {
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 0.1;
 	perspectiveCamera.verticalFov = 80;
-	scene.background.color = GlMatrix.vec4.fromValues(0., 0., 0., 1);
+	scene.background.setColor(GlMatrix.vec4.fromValues(0., 0., 0., 1));
 
 	HarmonyUi.createElement('button', {
 		parent: htmlDemoContent,
@@ -53,7 +53,7 @@ async function testRemGenerator(renderer, scene) {
 	scene.addChild(plane);
 	//scene.addChild(quad);
 
-	scene.background.color = GlMatrix.vec4.fromValues(1, 0., 0., 1);
+	scene.background.setColor(GlMatrix.vec4.fromValues(1, 0., 0., 1));
 	renderer.forwardRenderer.setToneMapping(Harmony3D.ToneMapping.Reinhard);
 	renderer.forwardRenderer.setToneMappingExposure(3.);
 

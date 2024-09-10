@@ -11,7 +11,7 @@ export function initDemo(renderer, scene) {
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 1;
 	perspectiveCamera.verticalFov = 50;
-	scene.background.color = GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1);
+	scene.background.setColor(GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1));
 
 	Harmony3D.FontManager.setFontsPath('./json/fonts/');
 	const group = new Harmony3D.Group({ parent: scene });

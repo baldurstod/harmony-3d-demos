@@ -12,7 +12,7 @@ export function initDemo(renderer, scene) {
 	perspectiveCamera.nearPlane = 1;
 	perspectiveCamera.verticalFov = 50;
 	ambientLight.intensity = 0.1;
-	scene.background.color = GlMatrix.vec4.fromValues(0., 0., 0., 1);
+	scene.background.setColor(GlMatrix.vec4.fromValues(0., 0., 0., 1));
 	scene.addChild(new Harmony3D.PointLight({ position: [50, -10, 60], intensity: 10000 }));
 
 

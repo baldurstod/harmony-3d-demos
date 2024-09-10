@@ -19,7 +19,7 @@ async function TestDog(renderer, scene) {
 	//dog.playAnimation('dog_endscene_01_idle');
 	//dog.playAnimation('anim_test');
 	dog.playAnimation('endscene_post_idle');
-	scene.background.color = GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1);
+	scene.background.setColor(GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1));
 
 
 	//let l = new Harmony3D.PointLight({ position: [40, 0, 85], intensity: 10000, parent: scene });
