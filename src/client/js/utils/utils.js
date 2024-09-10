@@ -1,10 +1,9 @@
-import { vec4 } from "gl-matrix";
-import { AmbientLight, Camera, ContextObserver, GRAPHICS_EVENT_TICK, GraphicsEvents, OrbitControl } from "harmony-3d";
+import { vec4 } from 'gl-matrix';
+import { AmbientLight, Camera, ContextObserver, GRAPHICS_EVENT_TICK, GraphicsEvents, OrbitControl, ColorBackground } from 'harmony-3d';
 
 export function InitDemoStd(renderer, scene) {
 	let perspectiveCamera;
 	let orbitCameraControl;
-	renderer.clearColor(vec4.fromValues(0.5, 0.5, 0.5, 255));
 
 	let ambientLight = scene.addChild(new AmbientLight({ intensity: 1.0 }));
 
@@ -14,6 +13,8 @@ export function InitDemoStd(renderer, scene) {
 	perspectiveCamera.setActiveCamera();
 	scene.addChild(orbitCameraControl.target);
 	ContextObserver.observe(GraphicsEvents, perspectiveCamera);
+
+	scene.background = new ColorBackground({ color: [0.5, 0.5, 0.5, 1] });
 
 	//Harmony3D.SceneExplorer._manipulator.setCamera(perspectiveCamera);
 	return [perspectiveCamera, orbitCameraControl, ambientLight];

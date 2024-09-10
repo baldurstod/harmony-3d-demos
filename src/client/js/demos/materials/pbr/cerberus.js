@@ -11,7 +11,7 @@ export function initDemo(renderer, scene) {
 	perspectiveCamera.farPlane = 1000;
 	perspectiveCamera.nearPlane = 0.1;
 	perspectiveCamera.verticalFov = 50;
-	renderer.clearColor(GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 255));
+	scene.background.color = GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1);
 
 	let l = new Harmony3D.PointLight({ position: [0, -2 * 0, -0], intensity: 10, parent: perspectiveCamera });
 	//new Harmony3D.Sphere({ parent: scene, radius: 1, material: createPbrMaterial('rustediron2'), segments: 32, rings: 32 });

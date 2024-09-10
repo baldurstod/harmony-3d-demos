@@ -7,7 +7,7 @@ let orbitCameraControl;
 export function initDemo(renderer, scene) {
 	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
 	console.log('initDemo', renderer, scene);
-	renderer.clearColor(GlMatrix.vec4.fromValues(0.0, 0.0, 0.0, 255));
+	scene.background.color = GlMatrix.vec4.fromValues(0., 0., 0., 1);
 
 	let ambientLight = scene.addChild(new Harmony3D.AmbientLight({ intensity: 1.0 }));
 	let pointLight = scene.addChild(new Harmony3D.PointLight());

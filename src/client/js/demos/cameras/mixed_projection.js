@@ -13,7 +13,7 @@ export function initDemo(renderer, scene, params) {
 	perspectiveCamera.orthoZoom = 10;
 	//ambientLight.remove();
 
-	renderer.clearColor(GlMatrix.vec4.fromValues(0., 0., 0., 255));
+	scene.background.color = GlMatrix.vec4.fromValues(0., 0., 0., 1);
 
 
 	let material = new Harmony3D.MeshFlatMaterial();
