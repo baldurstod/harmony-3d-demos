@@ -44,7 +44,7 @@ export function initDemo(renderer, scene) {
 			//renderer.render(scene, scene.activeCamera, event.detail.delta);
 		}
 	}
-	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_TICK, animate);
+	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.Tick, animate);
 	testHeavy(renderer, scene);
 
 	renderer.autoResize = true;

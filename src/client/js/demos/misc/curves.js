@@ -45,7 +45,7 @@ async function TestCurves(renderer, scene) {
 		box.position = pos;
 
 	}
-	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_TICK, animate);
+	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.Tick, animate);
 
 	let line = scene.addChild(new Harmony3D.LineSegments());
 	let segments = [];

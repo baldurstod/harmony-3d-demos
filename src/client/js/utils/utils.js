@@ -1,5 +1,5 @@
 import { vec4 } from 'gl-matrix';
-import { AmbientLight, Camera, ContextObserver, GRAPHICS_EVENT_TICK, GraphicsEvents, OrbitControl, ColorBackground } from 'harmony-3d';
+import { AmbientLight, Camera, ContextObserver, GraphicsEvents, OrbitControl, ColorBackground, GraphicsEvent } from 'harmony-3d';
 
 export function InitDemoStd(renderer, scene) {
 	let perspectiveCamera;
@@ -9,7 +9,7 @@ export function InitDemoStd(renderer, scene) {
 
 	perspectiveCamera = scene.addChild(new Camera());
 	orbitCameraControl = new OrbitControl(perspectiveCamera, document.getElementById('demo-canvas'));
-	GraphicsEvents.addEventListener(GRAPHICS_EVENT_TICK, (event) => orbitCameraControl.update(event.detail.delta / 1000));
+	GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => orbitCameraControl.update(event.detail.delta / 1000));
 	perspectiveCamera.setActiveCamera();
 	scene.addChild(orbitCameraControl.target);
 	ContextObserver.observe(GraphicsEvents, perspectiveCamera);

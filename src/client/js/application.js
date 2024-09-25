@@ -1,4 +1,4 @@
-import { Graphics, GRAPHICS_EVENT_TICK, GraphicsEvents, Repositories, Repository, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, Source1ParticleControler, Source2ModelManager, Source2ParticleManager, SourceEngineMaterialManager, WebGLStats, exportToBinaryFBX } from 'harmony-3d';
+import { Graphics, GraphicsEvents, Repositories, Repository, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, Source1ParticleControler, Source2ModelManager, Source2ParticleManager, SourceEngineMaterialManager, WebGLStats, exportToBinaryFBX, GraphicsEvent } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, documentStyle, hide, show, toggle } from 'harmony-ui';
 import { SaveFile } from 'harmony-browser-utils';
@@ -184,7 +184,7 @@ class Application {
 		WebGLStats.start();
 		this.#htmlStats.append(WebGLStats.htmlElement);
 
-		GraphicsEvents.addEventListener(GRAPHICS_EVENT_TICK, (event) => this.#animate(event));
+		GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => this.#animate(event));
 
 	}
 

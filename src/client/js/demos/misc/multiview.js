@@ -65,7 +65,7 @@ async function testMultiView(renderer, scene) {
 
 
 	//renderer.addEventListener('tick', animate);
-	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_TICK, animate);
+	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.Tick, animate);
 
 	scene.addChild(new Harmony3D.Sphere({ radius: 5, segments: 12, rings: 12, material: new Harmony3D.MeshFlatMaterial() }));
 }

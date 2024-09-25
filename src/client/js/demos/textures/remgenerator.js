@@ -41,7 +41,7 @@ async function testRemGenerator(renderer, scene) {
 		renderer.render(scene, scene.activeCamera, event.detail.delta);
 		renderTargetViewer.render(renderer.forwardRenderer);
 	}
-	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_TICK, animate);
+	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.Tick, animate);
 
 
 	const material = new Harmony3D.MeshBasicMaterial();

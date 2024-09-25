@@ -45,7 +45,7 @@ export function initDemo(renderer, scene) {
 		}
 	}
 
-	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_TICK, (event) => {
+	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.Tick, (event) => {
 		//orthoCameraControl.update(event.detail.delta / 1000)
 
 		for (let i = 0; i < 4; i++) {

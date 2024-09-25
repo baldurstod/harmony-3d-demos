@@ -40,7 +40,7 @@ export function initDemo(renderer, scene, params) {
 	scene.addChild(sequencesGroup);
 
 
-	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_MOUSE_MOVE, event => {
+	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.MouseMove, event => {
 		let normalizedX = (event.detail.x / Harmony3D.Graphics.canvas.width) * 2 - 1;
 		let normalizedY = 1 - (event.detail.y / Harmony3D.Graphics.canvas.height) * 2;
 		//console.log(normalizedX, normalizedY);

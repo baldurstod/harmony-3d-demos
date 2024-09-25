@@ -35,7 +35,6 @@ export function initDemo(renderer, scene, params) {
 	const frustum = orthoCam.addChild(new Harmony3D.CameraFrustum());
 
 
-	//	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GRAPHICS_EVENT_TICK, () => frustum.update());
 	Harmony3D.Graphics.useLogDepth(true);
 }
 
