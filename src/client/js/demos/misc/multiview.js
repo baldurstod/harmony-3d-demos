@@ -14,7 +14,7 @@ export function initDemo(renderer, scene, { htmlDemoContentTab }) {
 
 
 	perspectiveCamera2 = scene.addChild(new Harmony3D.Camera());
-	orbitCameraControl2 = new Harmony3D.OrbitControl(perspectiveCamera2, Harmony3D.Graphics.canvas);
+	orbitCameraControl2 = new Harmony3D.OrbitControl(perspectiveCamera2, Harmony3D.Graphics.getCanvas());
 	perspectiveCamera2.position = [0, -200, 0];
 	orbitCameraControl.target.position = [0, 0, 0];
 	perspectiveCamera2.farPlane = 10000;
@@ -41,10 +41,10 @@ async function testMultiView(renderer, scene) {
 		perspectiveCamera2.dirtyCameraMatrix = true;
 		for (let view of views) {
 			GlMatrix.vec4.copy(viewport, view.viewport);
-			viewport[0] *= renderer._width;
-			viewport[1] *= renderer._height;
-			viewport[2] *= renderer._width;
-			viewport[3] *= renderer._height;
+			viewport[0] *= renderer.getWidth();
+			viewport[1] *= renderer.getHeight();
+			viewport[2] *= renderer.getWidth();
+			viewport[3] *= renderer.getHeight();
 			renderer.viewport = viewport;
 			renderer.scissor = viewport;
 			renderer.render(scene, view.camera);
