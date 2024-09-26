@@ -29,7 +29,7 @@ export function initDemo(renderer, scene, params) {
 	const orthoCam = scene.addChild(new Harmony3D.Camera());
 	orthoCam.position = [0, 0, 10];
 	orthoCam.orthoZoom = 10;
-	orthoCam.projectionType = Harmony3D.ORTHOGRAPHIC_CAMERA;
+	orthoCam.setProjection(Harmony3D.CameraProjection.Orthographic);
 	Harmony3D.ContextObserver.observe(Harmony3D.GraphicsEvents, orthoCam);
 
 	const frustum = orthoCam.addChild(new Harmony3D.CameraFrustum());
@@ -53,7 +53,7 @@ function initButtons(htmlDemoContent) {
 		parent: htmlDemoContent,
 		innerHTML: 'ortho',
 		events: {
-			click: () => perspectiveCamera.projectionType = Harmony3D.ORTHOGRAPHIC_CAMERA
+			click: () => perspectiveCamera.setProjection(Harmony3D.CameraProjection.Orthographic)
 		}
 	});
 
@@ -61,7 +61,7 @@ function initButtons(htmlDemoContent) {
 		parent: htmlDemoContent,
 		innerHTML: 'persp',
 		events: {
-			click: () => perspectiveCamera.projectionType = Harmony3D.PERSPECTIVE_CAMERA
+			click: () => perspectiveCamera.setProjection(Harmony3D.CameraProjection.Perspective)
 		}
 	});
 }
