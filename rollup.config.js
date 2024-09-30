@@ -2,6 +2,7 @@ import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import copy from 'rollup-plugin-copy';
 import css from 'rollup-plugin-import-css';
+import typescript from '@rollup/plugin-typescript';
 
 const isExamples = process.env.BUILD === 'examples';
 
@@ -17,6 +18,7 @@ export default [
 			json({
 				compact: true,
 			}),
+			typescript({ compilerOptions: { target: 'es2023' } }),
 			nodeResolve({
 				dedupe: ['gl-matrix', 'harmony-ui', 'harmony-browser-utils'],
 			}),
