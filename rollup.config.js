@@ -18,11 +18,11 @@ export default [
 			json({
 				compact: true,
 			}),
+			typescript(),
 			nodeResolve({
 				dedupe: ['gl-matrix', 'harmony-ui', 'harmony-browser-utils'],
 				extensions: ['.js', '.ts'],
 			}),
-			typescript(),
 			copy({
 				copyOnce: true,
 				targets: [
