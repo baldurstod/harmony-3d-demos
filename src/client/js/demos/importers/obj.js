@@ -17,7 +17,7 @@ async function testImportObj(renderer, scene) {
 	let response = await fetch('./assets/models/obj/alfa147.obj');
 	let objFile = await response.text();
 
-	let mesh = Harmony3D.OBJLoader.load(objFile);
+	let mesh = Harmony3D.OBJImporter.load(objFile);
 
 	scene.addChild(mesh);
 }

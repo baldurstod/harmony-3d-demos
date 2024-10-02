@@ -22,7 +22,7 @@ async function testCerberus(renderer, scene) {
 	let response = await fetch('./assets/models/obj/cerberus.obj');
 	let objFile = await response.text();
 
-	let mesh = Harmony3D.OBJLoader.load(objFile);
+	let mesh = Harmony3D.OBJImporter.load(objFile);
 	mesh.name = 'Cerberus';
 	mesh.rotateX(Harmony3D.HALF_PI);
 	mesh.rotateY(-Harmony3D.HALF_PI);
