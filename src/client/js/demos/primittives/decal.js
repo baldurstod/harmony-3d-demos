@@ -30,7 +30,7 @@ async function testTexturedBox(renderer, scene) {
 
 	let box = scene.addChild(new Harmony3D.Box({ material: material }));
 	let sphere = scene.addChild(new Harmony3D.Sphere({ radius: 1, segments: 32, rings: 32 }));
-	let decal = box.addChild(new Harmony3D.StaticDecal([1, 1, 1], box.material.clone()));
+	let decal = box.addChild(new Harmony3D.Decal({ size: [1, 1, 1], material: box.material.clone() }));
 
 	box.visible = true;
 	decal.visible = true;

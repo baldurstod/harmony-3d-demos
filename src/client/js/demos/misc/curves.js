@@ -33,7 +33,7 @@ async function TestCurves(renderer, scene) {
 		*/
 
 	let box = scene.addChild(new Harmony3D.Box({ width: 20, height: 20, depth: 20 }));
-	let grid = scene.addChild(new Harmony3D.Grid(undefined, 5));
+	let grid = scene.addChild(new Harmony3D.Grid({ spacing: 5 }));
 
 	let t = 0;
 	let pos = GlMatrix.vec3.create();
