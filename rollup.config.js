@@ -3,6 +3,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import copy from 'rollup-plugin-copy';
 import css from 'rollup-plugin-import-css';
 import typescript from '@rollup/plugin-typescript';
+import wasm from '@rollup/plugin-wasm';
 
 const isExamples = process.env.BUILD === 'examples';
 
@@ -18,6 +19,11 @@ export default [
 			json({
 				compact: true,
 			}),
+			wasm(
+				{
+					maxFileSize: 1000000
+				}
+			),
 			typescript(),
 			nodeResolve({
 				dedupe: ['gl-matrix', 'harmony-ui', 'harmony-browser-utils'],

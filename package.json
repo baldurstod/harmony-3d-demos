@@ -5,6 +5,7 @@
   "devDependencies": {
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-typescript": "^12.1.0",
+    "@rollup/plugin-wasm": "^6.2.2",
     "rollup": "^4.20.0",
     "rollup-plugin-copy": "^3.5.0",
     "tslib": "^2.7.0"
