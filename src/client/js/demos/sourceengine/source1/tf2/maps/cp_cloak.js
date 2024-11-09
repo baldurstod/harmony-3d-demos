@@ -1,3 +1,4 @@
+import { Graphics } from 'harmony-3d';
 import { InitDemoStd, Harmony3D } from '/js/application.js';
 
 let perspectiveCamera;
@@ -15,7 +16,7 @@ async function testMap(renderer, scene) {
 	perspectiveCamera.farPlane = 100000;
 	perspectiveCamera.nearPlane = 100;
 	perspectiveCamera.verticalFov = 50;
-	Harmony3D.Graphics.setIncludeCode('test', '#define PHYSICALLY_CORRECT_LIGHTS');
+	new Graphics().setIncludeCode('test', '#define PHYSICALLY_CORRECT_LIGHTS');
 
 	//WORKING
 	//cp_dustbowl

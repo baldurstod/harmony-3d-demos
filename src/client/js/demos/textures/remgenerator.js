@@ -1,3 +1,4 @@
+import { Graphics } from 'harmony-3d';
 import { InitDemoStd, Harmony3D, GlMatrix, HarmonyUi } from '/js/application.js';
 
 export const useCustomRenderLoop = true;
@@ -57,7 +58,7 @@ async function testRemGenerator(renderer, scene) {
 	renderer.getForwardRenderer().setToneMapping(Harmony3D.ToneMapping.Reinhard);
 	renderer.getForwardRenderer().setToneMappingExposure(3.);
 
-	const envMap = await new Harmony3D.RgbeImporter(Harmony3D.Graphics.glContext).fetch('./assets/textures/hdr/cubemaps/venice_sunset_1k.hdr');
+	const envMap = await new Harmony3D.RgbeImporter(new Graphics().glContext).fetch('./assets/textures/hdr/cubemaps/venice_sunset_1k.hdr');
 	material.setColorMap(envMap);
 
 	const renderTarget2 = generator.fromEquirectangular(envMap);

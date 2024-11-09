@@ -1,3 +1,4 @@
+import { Graphics } from 'harmony-3d';
 import { HarmonyUi, GlMatrix, Harmony3D, InitDemoStd } from '/js/application.js';
 
 let perspectiveCamera;
@@ -35,7 +36,7 @@ export function initDemo(renderer, scene, params) {
 	const frustum = orthoCam.addChild(new Harmony3D.CameraFrustum());
 
 
-	Harmony3D.Graphics.useLogDepth(true);
+	new Graphics().useLogDepth(true);
 }
 
 const lambda = 10;

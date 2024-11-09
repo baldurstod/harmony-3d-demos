@@ -1,3 +1,4 @@
+import { Graphics } from 'harmony-3d';
 import {  InitDemoStd, Harmony3D, GlMatrix } from '/js/application.js';
 
 let perspectiveCamera;
@@ -22,8 +23,8 @@ async function testRaycasting(renderer, scene) {
 
 async function testCastray(renderer, scene) {
 	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.MouseDown, (event) => {
-		let normalizedX = (event.detail.x / Harmony3D.Graphics.getWidth()) * 2 - 1;
-		let normalizedY = 1 - (event.detail.y / Harmony3D.Graphics.getHeight()) * 2;
+		let normalizedX = (event.detail.x / new Graphics().getWidth()) * 2 - 1;
+		let normalizedY = 1 - (event.detail.y / new Graphics().getHeight()) * 2;
 
 		let raycaster = new Harmony3D.Raycaster();
 		let intersections = raycaster.castCameraRay(perspectiveCamera, normalizedX, normalizedY, [scene], true);
