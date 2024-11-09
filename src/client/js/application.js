@@ -1,4 +1,4 @@
-import { Graphics, GraphicsEvents, Repositories, Repository, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent } from 'harmony-3d';
+import { Graphics, GraphicsEvents, Repositories, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent, WebRepository } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, documentStyle, hide, show, toggle } from 'harmony-ui';
 import { SaveFile } from 'harmony-browser-utils';
@@ -54,11 +54,11 @@ class Application {
 	}
 
 	#initRepositories() {
-		new Repositories().addRepository(new Repository('tf2', TF2_REPOSITORY));
-		new Repositories().addRepository(new Repository('dota2', DOTA2_REPOSITORY));
-		new Repositories().addRepository(new Repository('hla', HLA_REPOSITORY));
-		new Repositories().addRepository(new Repository('cs2', CS2_REPOSITORY));
-		new Repositories().addRepository(new Repository('deadlock', DEADLOCK_REPOSITORY));
+		new Repositories().addRepository(new WebRepository('tf2', TF2_REPOSITORY));
+		new Repositories().addRepository(new WebRepository('dota2', DOTA2_REPOSITORY));
+		new Repositories().addRepository(new WebRepository('hla', HLA_REPOSITORY));
+		new Repositories().addRepository(new WebRepository('cs2', CS2_REPOSITORY));
+		new Repositories().addRepository(new WebRepository('deadlock', DEADLOCK_REPOSITORY));
 /*
 		Source1ParticleControler.loadManifest('tf2');
 		Source1ModelManager.loadManifest('tf2');
