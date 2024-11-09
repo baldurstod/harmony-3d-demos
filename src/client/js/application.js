@@ -1,10 +1,10 @@
-import { Graphics, GraphicsEvents, Repositories, Repository, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, Source1ParticleControler, Source2ModelManager, Source2ParticleManager, SourceEngineMaterialManager, WebGLStats, exportToBinaryFBX, GraphicsEvent } from 'harmony-3d';
+import { Graphics, GraphicsEvents, Repositories, Repository, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, documentStyle, hide, show, toggle } from 'harmony-ui';
 import { SaveFile } from 'harmony-browser-utils';
 import 'harmony-ui/dist/define/harmony-tab-group.js';
 import 'harmony-ui/dist/define/harmony-tab.js';
-import 'harmony-ui/dist/define/harmony-color-picker.js';
+import { defineharmonycolorpicker } from 'harmony-ui/dist/define/defines';
 
 export * as GlMatrix from 'gl-matrix';
 export * as Harmony3D from 'harmony-3d';
@@ -38,7 +38,7 @@ class Application {
 	#scene = new Scene();
 	#sceneExplorerTab;
 	#shaderEditorTab;
-	#sceneExplorer = new SceneExplorer();
+	#sceneExplorer// = new SceneExplorer();
 	#renderer;
 	#useDefaultRenderLoop = true;
 	#shaderEditor;
@@ -54,12 +54,12 @@ class Application {
 	}
 
 	#initRepositories() {
-		Repositories.addRepository(new Repository('tf2', TF2_REPOSITORY));
-		Repositories.addRepository(new Repository('dota2', DOTA2_REPOSITORY));
-		Repositories.addRepository(new Repository('hla', HLA_REPOSITORY));
-		Repositories.addRepository(new Repository('cs2', CS2_REPOSITORY));
-		Repositories.addRepository(new Repository('deadlock', DEADLOCK_REPOSITORY));
-
+		new Repositories().addRepository(new Repository('tf2', TF2_REPOSITORY));
+		new Repositories().addRepository(new Repository('dota2', DOTA2_REPOSITORY));
+		new Repositories().addRepository(new Repository('hla', HLA_REPOSITORY));
+		new Repositories().addRepository(new Repository('cs2', CS2_REPOSITORY));
+		new Repositories().addRepository(new Repository('deadlock', DEADLOCK_REPOSITORY));
+/*
 		Source1ParticleControler.loadManifest('tf2');
 		Source1ModelManager.loadManifest('tf2');
 		Source2ModelManager.loadManifest('cs2');
@@ -68,9 +68,11 @@ class Application {
 		Source2ModelManager.loadManifest('deadlock');
 		SourceEngineMaterialManager.addRepository('tf2');
 		Source2ParticleManager.loadManifests('cs2', 'dota2', 'hla');
+		*/
 	}
 
 	#initHTML() {
+		defineharmonycolorpicker();
 		this.#htmlElement = createElement('div', {
 			parent: document.body,
 			class: 'demos',
@@ -132,7 +134,7 @@ class Application {
 									'data-i18n': '#scene_explorer',
 									child: this.#sceneExplorerTab = createElement('div', {
 										style: 'height:100%;',
-										child: this.#sceneExplorer.htmlElement,
+										//child: this.#sceneExplorer.htmlElement,
 									}),
 								}),
 								this.#shaderEditorTab = createElement('harmony-tab', {
@@ -171,9 +173,9 @@ class Application {
 
 	#initEngine() {
 		this.#shaderEditor = new ShaderEditor();
-		this.#sceneExplorer.scene = this.#scene;
+		//this.#sceneExplorer.scene = this.#scene;
 
-		this.#renderer = Graphics.initCanvas({
+		this.#renderer = new Graphics().initCanvas({
 			canvas: this.#htmlCanvas,
 			alpha: true,
 			autoResize: true,
