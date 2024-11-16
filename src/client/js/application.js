@@ -21,6 +21,7 @@ import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
 import varsCSS from '../css/vars.css';
 import { CS2_REPOSITORY, DEADLOCK_REPOSITORY, DOTA2_REPOSITORY, HLA_REPOSITORY, TF2_REPOSITORY } from '../constants';
+import { SceneExplorer } from 'harmony-3d';
 
 documentStyle(htmlCSS);
 documentStyle(themeCSS);
@@ -38,7 +39,7 @@ class Application {
 	#scene = new Scene();
 	#sceneExplorerTab;
 	#shaderEditorTab;
-	#sceneExplorer// = new SceneExplorer();
+	#sceneExplorer = new SceneExplorer();
 	#renderer;
 	#useDefaultRenderLoop = true;
 	#shaderEditor;
@@ -51,6 +52,7 @@ class Application {
 		this.#initEngine();
 		this.#loadUri(document.URL);
 		this.#loadDemos();
+		this.#sceneExplorer.setScene(this.#scene);
 	}
 
 	#initRepositories() {
@@ -59,7 +61,7 @@ class Application {
 		new Repositories().addRepository(new WebRepository('hla', HLA_REPOSITORY));
 		new Repositories().addRepository(new WebRepository('cs2', CS2_REPOSITORY));
 		new Repositories().addRepository(new WebRepository('deadlock', DEADLOCK_REPOSITORY));
-/*
+		/*
 		Source1ParticleControler.loadManifest('tf2');
 		Source1ModelManager.loadManifest('tf2');
 		Source2ModelManager.loadManifest('cs2');
@@ -134,7 +136,7 @@ class Application {
 									'data-i18n': '#scene_explorer',
 									child: this.#sceneExplorerTab = createElement('div', {
 										style: 'height:100%;',
-										//child: this.#sceneExplorer.htmlElement,
+										child: this.#sceneExplorer.htmlElement,
 									}),
 								}),
 								this.#shaderEditorTab = createElement('harmony-tab', {
