@@ -1,10 +1,7 @@
 import { Graphics, GraphicsEvents, Repositories, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent, WebRepository } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
-import { createElement, documentStyle, hide, show, toggle } from 'harmony-ui';
+import { createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, show, toggle } from 'harmony-ui';
 import { SaveFile } from 'harmony-browser-utils';
-import 'harmony-ui/dist/define/harmony-tab-group.js';
-import 'harmony-ui/dist/define/harmony-tab.js';
-import { defineharmonycolorpicker } from 'harmony-ui/dist/define/defines';
 
 export * as GlMatrix from 'gl-matrix';
 export * as Harmony3D from 'harmony-3d';
@@ -74,7 +71,9 @@ class Application {
 	}
 
 	#initHTML() {
-		defineharmonycolorpicker();
+		defineHarmonyColorPicker();
+		defineHarmonyTab();
+		defineHarmonyTabGroup();
 		this.#htmlElement = createElement('div', {
 			parent: document.body,
 			class: 'demos',
