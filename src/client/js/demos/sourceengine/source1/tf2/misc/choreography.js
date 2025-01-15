@@ -16,7 +16,7 @@ async function testChoreo(renderer, scene) {
 
 	renderer.clearColor(GlMatrix.vec4.fromValues(0.0, 0.0, 0.0, 255));
 
-	await Harmony3D.ChoreographiesManager.init('tf2', './scenes/scenes.image');
+	await new Harmony3D.ChoreographiesManager().init('tf2', './scenes/scenes.image');
 	let medic = await AddSource1Model('tf2', 'models/player/medic', renderer, scene);
-	await Harmony3D.ChoreographiesManager.playChoreography('scenes\\player\\scout\\low\\taunt_brutalLegend.vcd', [medic]);
+	await new Harmony3D.ChoreographiesManager().playChoreography('scenes\\player\\scout\\low\\taunt_brutalLegend.vcd', [medic]);
 }

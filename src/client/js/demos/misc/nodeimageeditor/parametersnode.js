@@ -1,9 +1,10 @@
+import { Graphics } from 'harmony-3d';
 import { AddSource1Model, InitDemoStd, Harmony3D } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;
 let planeMesh;
-export function initDemo(renderer, scene) {
+export function initDemo(renderer, scene, { htmlDemoContentTab }) {
 	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
 
 	perspectiveCamera.position = [500, 0, 150];
@@ -12,25 +13,25 @@ export function initDemo(renderer, scene) {
 	perspectiveCamera.nearPlane = 10;
 	perspectiveCamera.verticalFov = 10;
 
-	testNodeImageEditor(renderer, scene);
+	testNodeImageEditor(renderer, scene, htmlDemoContentTab);
 }
 
-async function testNodeImageEditor(renderer, scene) {
+async function testNodeImageEditor(renderer, scene, htmlDemoContentTab) {
 	planeMesh = new Harmony3D.Plane({ width: 200, height: 200 });
 	scene.addChild(planeMesh);
 	Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/models/weapons/c_models/c_minigun/c_minigun').then(
 		(material) => planeMesh.setMaterial(material)
 	)
-	testUberSaw(renderer, scene);
+	testUberSaw(renderer, scene, htmlDemoContentTab);
 }
 
-async function testUberSaw(renderer, scene) {
+async function testUberSaw(renderer, scene, htmlDemoContentTab) {
 	let c_ubersaw = await AddSource1Model('tf2', 'models/weapons/c_models/c_ubersaw/c_ubersaw', renderer, scene);
 	c_ubersaw.playSequence('idle');
 
-	let nodeImageEditor = new Harmony3D.NodeImageEditor(Harmony3D.Graphics);
+	let nodeImageEditor = new Harmony3D.NodeImageEditor(new Graphics());
 	let nodeImageEditorGui = new Harmony3D.NodeImageEditorGui(nodeImageEditor);
-	document.getElementById('demo-content').append(nodeImageEditorGui.html);
+	htmlDemoContentTab.append(nodeImageEditorGui.htmlElement);
 	nodeImageEditor.textureSize = 1024;
 
 	//let stickerNode = nodeImageEditor.addNode('sticker');
@@ -144,11 +145,11 @@ async function testUberSaw(renderer, scene) {
 	p_paintkit_tool_wearblend.params.adjustWhite = 1;
 	p_paintkit_tool_wearblend.params.adjustGamma = 1.1;
 
-	let [outputTextureName, outputTexture] = Harmony3D.Source1TextureManager.addInternalTexture();
+	let { name: outputTextureName, texture: outputTexture } = Harmony3D.Source1TextureManager.addInternalTexture();
 	window.outputTexture = outputTexture;
 	finalNode.getOutput('output')._value = outputTexture;
 
-	outputTexture.texImage2D(Harmony3D.Graphics.glContext, Harmony3D.GL_TEXTURE_2D, 1, 1, Harmony3D.TextureFormat.Rgba, Harmony3D.TextureType.UnsignedByte, new Uint8Array([255, 255, 255, 255]));
+	outputTexture.texImage2D(new Graphics().glContext, Harmony3D.GL_TEXTURE_2D, 1, 1, Harmony3D.TextureFormat.Rgba, Harmony3D.TextureType.UnsignedByte, new Uint8Array([255, 255, 255, 255]));
 
 
 	//texImage2D(glContext, target, width, height, format, type, pixels = null, level = 0) {

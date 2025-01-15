@@ -1,4 +1,4 @@
-import { Graphics, GraphicsEvents, Repositories, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent, WebRepository } from 'harmony-3d';
+import { Graphics, GraphicsEvents, Repositories, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent, WebRepository, Source1ModelManager } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, show, toggle } from 'harmony-ui';
 import { SaveFile } from 'harmony-browser-utils';
@@ -58,9 +58,9 @@ class Application {
 		new Repositories().addRepository(new WebRepository('hla', HLA_REPOSITORY));
 		new Repositories().addRepository(new WebRepository('cs2', CS2_REPOSITORY));
 		new Repositories().addRepository(new WebRepository('deadlock', DEADLOCK_REPOSITORY));
+		Source1ModelManager.loadManifest('tf2');
 		/*
 		Source1ParticleControler.loadManifest('tf2');
-		Source1ModelManager.loadManifest('tf2');
 		Source2ModelManager.loadManifest('cs2');
 		Source2ModelManager.loadManifest('dota2');
 		Source2ModelManager.loadManifest('hla');
@@ -178,10 +178,12 @@ class Application {
 
 		this.#renderer = new Graphics().initCanvas({
 			canvas: this.#htmlCanvas,
-			alpha: true,
 			autoResize: true,
-			preserveDrawingBuffer: true,
-			premultipliedAlpha: false
+			webGL: {
+				alpha: true,
+				preserveDrawingBuffer: true,
+				premultipliedAlpha: false
+			}
 		});
 		this.#renderer.play();
 		WebGLStats.start();

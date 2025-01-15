@@ -24,7 +24,7 @@ export function initDemo(renderer, scene) {
 
 	renderer.autoClear = false;
 
-	let composer = new Harmony3D.Composer(renderer);
+	let composer = new Harmony3D.Composer();
 	let clearPass = new Harmony3D.ClearPass(GlMatrix.vec4.fromValues(0.2, 0.2, 0.2, 1), 1, 0);
 	let renderPass = new Harmony3D.RenderPass(scene, perspectiveCamera);
 	let pixelatePass = new Harmony3D.PixelatePass(perspectiveCamera);

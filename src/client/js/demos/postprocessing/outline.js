@@ -23,7 +23,7 @@ export function initDemo(renderer, scene) {
 
 	let scene2 = new Harmony3D.Scene();
 
-	let composer = new Harmony3D.Composer(renderer);
+	let composer = new Harmony3D.Composer();
 	let clearPass = new Harmony3D.ClearPass(GlMatrix.vec4.fromValues(0.2, 0.2, 0.2, 1), 1, 0);
 	let renderPass = new Harmony3D.RenderPass(scene, perspectiveCamera);
 	let renderPass2 = new Harmony3D.RenderPass(scene2, perspectiveCamera);
@@ -64,6 +64,6 @@ async function testHeavy(renderer, scene) {
 	perspectiveCamera.verticalFov = 10;
 	let heavy = await AddSource1Model('tf2', 'models/player/heavy', renderer, scene);
 	heavy.playSequence('taunt_laugh');
-	heavy.selected = true;
-	heavy.forEach((entity) => entity.selected = true);
+	heavy.properties.set('selected', true);
+	heavy.forEach((entity) => entity.properties.set('selected', true));
 }
