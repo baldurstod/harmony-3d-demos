@@ -43,9 +43,9 @@ async function renderUnusuals(renderer, scene, demoContentTab) {
 	renderer.setSize(THUMB_SIZE, THUMB_SIZE);
 
 	let start = Date.now() / 1000;
-	//await renderUnusualList(EffectList, scene.addChild(new Harmony3D.KeepOnlyLastChild()), scene, demoContentTab);
+	await renderUnusualList(EffectList, scene.addChild(new Harmony3D.KeepOnlyLastChild()), scene, demoContentTab);
 	//await renderUnusualList(KillstreakList, scene.addChild(new Harmony3D.KeepOnlyLastChild()), scene, demoContentTab);
-	await renderUnusualList(UnusualTauntList, scene.addChild(new Harmony3D.KeepOnlyLastChild()), scene, demoContentTab);
+	//await renderUnusualList(UnusualTauntList, scene.addChild(new Harmony3D.KeepOnlyLastChild()), scene, demoContentTab);
 	let end = Date.now() / 1000;
 
 	console.log(`Finished in ${Math.round(end - start)}s`)
@@ -72,12 +72,15 @@ async function renderUnusualList(list, parent, scene, demoContentTab) {
 		console.error('Rendering ' + unusual.system);
 		await renderUnusual(unusual, parent, scene);
 
-		ctx.drawImage(new Harmony3D.Graphics().getCanvas(), 0, dy, THUMB_SIZE, THUMB_SIZE);
-		if (ONE_BIG_PICTURE) {
-			dy += THUMB_SIZE;
-		} else {
-			canvas.toBlob((blob) => HarmonyBrowserUtils.saveFile(new File([blob], `${unusual.system}.webp`)), 'image/webp', 1.0);
-		}
+		new Harmony3D.Graphics().savePicture(scene, perspectiveCamera, `${unusual.system}.webp`, THUMB_SIZE, THUMB_SIZE, 'image/webp', 1.0);
+		/*
+			ctx.drawImage(new Harmony3D.Graphics().getCanvas(), 0, dy, THUMB_SIZE, THUMB_SIZE);
+			if (ONE_BIG_PICTURE) {
+				dy += THUMB_SIZE;
+			} else {
+				canvas.toBlob((blob) => HarmonyBrowserUtils.saveFile(new File([blob], `${unusual.system}.webp`)), 'image/webp', 1.0);
+			}
+		*/
 	}
 }
 
@@ -493,15 +496,15 @@ const EffectList = [
 	*/
 
 	// Summer 2025 Unusual
-	{system:'unusual_drunk_parent', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
-	{system:'unusual_excalibur_teamcolor_red', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
-	{system:'unusual_excalibur_teamcolor_blue', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
-	{system:'unusual_excalibur_parent_purple', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
-	{system:'unusual_uber_teamcolor_red', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
-	{system:'unusual_uber_teamcolor_blue', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
-	{system:'unusual_uber_gold_parent', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
-	{system:'unusual_orbitingbullet_parent', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
-	{system:'unusual_typhoon_parent', fov:30, position:[50, 0, 0], target:[0, 0, 10], wait:2000, setQuaternion: true},
+	{ system: 'unusual_drunk_parent', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_excalibur_teamcolor_red', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_excalibur_teamcolor_blue', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_excalibur_parent_purple', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_uber_teamcolor_red', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_uber_teamcolor_blue', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_uber_gold_parent', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_orbitingbullet_parent', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_typhoon_parent', fov: 30, position: [50, 0, 0], target: [0, 0, 10], wait: 2000, setQuaternion: true },
 
 ]
 
@@ -745,14 +748,14 @@ const UnusualTauntList = [
 
 	// Summer 2025 Unusual Taunts
 	{ system: 'utaunt_seamine_teamcolor_red', fov: 60, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
-	{system:'utaunt_seamine_teamcolor_blue', fov:60, position:[50, -100, 50], target:[0, 0, 45], wait:2000, isTaunt: true},
-	{system:'utaunt_iconicoutline_teamcolor_red', fov:60, position:[50, -100, 50], target:[0, 0, 45], wait:2000, isTaunt: true},
-	{system:'utaunt_iconicoutline_teamcolor_blue', fov:60, position:[50, -100, 50], target:[0, 0, 45], wait:2000, isTaunt: true},
-	{system:'utaunt_iconicoutline_pink_parent', fov:60, position:[50, -100, 50], target:[0, 0, 45], wait:2000, isTaunt: true},
-	{system:'utaunt_oceanreef_parent', fov:60, position:[50, -100, 50], target:[0, 0, 45], wait:2000, isTaunt: true},
-	{system:'utaunt_signalinterference_parent', fov:60, position:[50, -100, 50], target:[0, 0, 45], wait:2000, isTaunt: true},
-	{system:'utaunt_waterwave_parent', fov:80, position:[50, -100, 50], target:[0, 0, 45], wait:2000, isTaunt: true},
-	{system:'utaunt_sharkfin2_parent', fov:80, position:[50, -100, 50], target:[0, 0, 45], wait:1000, isTaunt: true},
+	{ system: 'utaunt_seamine_teamcolor_blue', fov: 60, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_iconicoutline_teamcolor_red', fov: 60, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_iconicoutline_teamcolor_blue', fov: 60, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_iconicoutline_pink_parent', fov: 60, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_oceanreef_parent', fov: 60, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_signalinterference_parent', fov: 60, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_waterwave_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_sharkfin2_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 1000, isTaunt: true },
 ]
 
 const UnusualTauntList2 = new Map([
