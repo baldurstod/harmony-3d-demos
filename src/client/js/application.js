@@ -1,7 +1,7 @@
 import { Graphics, GraphicsEvents, Repositories, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent, WebRepository, Source1ModelManager } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, show, toggle } from 'harmony-ui';
-import { SaveFile } from 'harmony-browser-utils';
+import { saveFile } from 'harmony-browser-utils';
 
 export * as GlMatrix from 'gl-matrix';
 export * as Harmony3D from 'harmony-3d';
@@ -53,11 +53,11 @@ class Application {
 	}
 
 	#initRepositories() {
-		new Repositories().addRepository(new WebRepository('tf2', TF2_REPOSITORY));
-		new Repositories().addRepository(new WebRepository('dota2', DOTA2_REPOSITORY));
-		new Repositories().addRepository(new WebRepository('hla', HLA_REPOSITORY));
-		new Repositories().addRepository(new WebRepository('cs2', CS2_REPOSITORY));
-		new Repositories().addRepository(new WebRepository('deadlock', DEADLOCK_REPOSITORY));
+		Repositories.addRepository(new WebRepository('tf2', TF2_REPOSITORY));
+		Repositories.addRepository(new WebRepository('dota2', DOTA2_REPOSITORY));
+		Repositories.addRepository(new WebRepository('hla', HLA_REPOSITORY));
+		Repositories.addRepository(new WebRepository('cs2', CS2_REPOSITORY));
+		Repositories.addRepository(new WebRepository('deadlock', DEADLOCK_REPOSITORY));
 		Source1ModelManager.loadManifest('tf2');
 		/*
 		Source1ParticleControler.loadManifest('tf2');
@@ -109,7 +109,7 @@ class Application {
 											innerText: 'Export FBX',
 											events: {
 												click: async () => {
-													SaveFile(new File([await exportToBinaryFBX(this.#scene)], 'test.fbx'));
+													saveFile(new File([await exportToBinaryFBX(this.#scene)], 'test.fbx'));
 												},
 											}
 										}),

@@ -5,7 +5,7 @@ import * as Harmony3D from '../../../dist/harmony-3d.browser.js';
 import { getRandomInt, exportToBinaryFBX } from '../../../dist/harmony-3d.browser.js';
 import { quat, HALF_PI, Circle } from '../../../dist/harmony-3d.browser.js';
 
-import { SaveFile, setTimeoutPromise, FBXExporter, createElement } from '../../../dist/examples/js/modules.js';
+import { saveFile, setTimeoutPromise, FBXExporter, createElement } from '../../../dist/examples/js/modules.js';
 */
 
 import { AddSource1Model, InitDemoStd, HarmonyUi, HarmonyUtils, Harmony3D, HarmonyBrowserUtils } from '/js/application.js';
@@ -174,12 +174,12 @@ async function exportFBX(scene) {
 	//let fbxFile = await entitytoFBXFile(scene);
 
 	let binaryFBX = await Harmony3D.exportToBinaryFBX(scene);//new FBXExporter().exportBinary(fbxFile);
-	HarmonyBrowserUtils.SaveFile(new File([binaryFBX], 'test.fbx'));
+	HarmonyBrowserUtils.saveFile(new File([binaryFBX], 'test.fbx'));
 
 	return;
 
 	let resultJSON = JSON.stringify(fbxFile, null, '	');
-	HarmonyBrowserUtils.SaveFile(new File([resultJSON], 'test.json'));
+	HarmonyBrowserUtils.saveFile(new File([resultJSON], 'test.json'));
 
 	return;
 
@@ -242,6 +242,6 @@ function exportFBX2(fbxMeshes, filename) {
 	//console.log(exportedBinary);
 
 	//await writeFile('test/created.fbx', new Uint8Array(exportedBinary));
-	HarmonyBrowserUtils.SaveFile(new File([exportedBinary], filename));
-	HarmonyBrowserUtils.SaveFile(new File([resultJSON], filename + '.json'));
+	HarmonyBrowserUtils.saveFile(new File([exportedBinary], filename));
+	HarmonyBrowserUtils.saveFile(new File([resultJSON], filename + '.json'));
 }
