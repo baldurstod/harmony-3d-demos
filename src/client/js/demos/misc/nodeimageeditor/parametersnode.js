@@ -29,7 +29,7 @@ async function testUberSaw(renderer, scene, htmlDemoContentTab) {
 	let c_ubersaw = await AddSource1Model('tf2', 'models/weapons/c_models/c_ubersaw/c_ubersaw', renderer, scene);
 	c_ubersaw.playSequence('idle');
 
-	let nodeImageEditor = new Harmony3D.NodeImageEditor(new Graphics());
+	let nodeImageEditor = new Harmony3D.NodeImageEditor(Graphics);
 	let nodeImageEditorGui = new Harmony3D.NodeImageEditorGui(nodeImageEditor);
 	htmlDemoContentTab.append(nodeImageEditorGui.htmlElement);
 	nodeImageEditor.textureSize = 1024;
@@ -149,7 +149,7 @@ async function testUberSaw(renderer, scene, htmlDemoContentTab) {
 	window.outputTexture = outputTexture;
 	finalNode.getOutput('output')._value = outputTexture;
 
-	outputTexture.texImage2D(new Graphics().glContext, Harmony3D.GL_TEXTURE_2D, 1, 1, Harmony3D.TextureFormat.Rgba, Harmony3D.TextureType.UnsignedByte, new Uint8Array([255, 255, 255, 255]));
+	outputTexture.texImage2D(Graphics.glContext, Harmony3D.GL_TEXTURE_2D, 1, 1, Harmony3D.TextureFormat.Rgba, Harmony3D.TextureType.UnsignedByte, new Uint8Array([255, 255, 255, 255]));
 
 
 	//texImage2D(glContext, target, width, height, format, type, pixels = null, level = 0) {

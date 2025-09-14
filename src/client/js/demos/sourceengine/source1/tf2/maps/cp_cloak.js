@@ -16,7 +16,7 @@ async function testMap(renderer, scene) {
 	perspectiveCamera.farPlane = 100000;
 	perspectiveCamera.nearPlane = 100;
 	perspectiveCamera.verticalFov = 50;
-	new Graphics().setIncludeCode('test', '#define PHYSICALLY_CORRECT_LIGHTS');
+	Graphics.setIncludeCode('test', '#define PHYSICALLY_CORRECT_LIGHTS');
 
 	//WORKING
 	//cp_dustbowl

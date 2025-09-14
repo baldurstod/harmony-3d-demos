@@ -32,7 +32,7 @@ async function testCerberus(renderer, scene) {
 	scene.addChild(mesh);
 
 
-	const envMap = await new Harmony3D.RgbeImporter(new Graphics().glContext).fetch('./assets/textures/hdr/cubemaps/venice_sunset_1k.hdr');
+	const envMap = await new Harmony3D.RgbeImporter(Graphics.glContext).fetch('./assets/textures/hdr/cubemaps/venice_sunset_1k.hdr');
 	const generator = new Harmony3D.RemGenerator(renderer);
 	const renderTarget = generator.fromEquirectangular(envMap);
 	scene.background = new Harmony3D.CubeBackground({ texture: renderTarget.getTexture() });

@@ -42,8 +42,8 @@ export function initDemo(renderer, scene, params) {
 
 
 	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.MouseMove, event => {
-		let normalizedX = (event.detail.x / new Graphics().canvas.width) * 2 - 1;
-		let normalizedY = 1 - (event.detail.y / new Graphics().canvas.height) * 2;
+		let normalizedX = (event.detail.x / Graphics.canvas.width) * 2 - 1;
+		let normalizedY = 1 - (event.detail.y / Graphics.canvas.height) * 2;
 		//console.log(normalizedX, normalizedY);
 
 

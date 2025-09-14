@@ -176,7 +176,7 @@ class Application {
 		this.#shaderEditor = new ShaderEditor();
 		//this.#sceneExplorer.scene = this.#scene;
 
-		this.#renderer = new Graphics().initCanvas({
+		this.#renderer = Graphics.initCanvas({
 			canvas: this.#htmlCanvas,
 			autoResize: true,
 			webGL: {

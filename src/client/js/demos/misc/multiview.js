@@ -15,7 +15,7 @@ export function initDemo(renderer, scene, { htmlDemoContentTab }) {
 
 
 	perspectiveCamera2 = scene.addChild(new Harmony3D.Camera());
-	orbitCameraControl2 = new Harmony3D.OrbitControl(perspectiveCamera2, new Graphics().getCanvas());
+	orbitCameraControl2 = new Harmony3D.OrbitControl(perspectiveCamera2, Graphics.getCanvas());
 	perspectiveCamera2.position = [0, -200, 0];
 	orbitCameraControl.target.position = [0, 0, 0];
 	perspectiveCamera2.farPlane = 10000;
