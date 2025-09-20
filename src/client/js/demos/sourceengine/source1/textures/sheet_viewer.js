@@ -1,10 +1,9 @@
-import { Graphics } from 'harmony-3d';
 import { InitDemoStd, Harmony3D, HarmonyUtils } from '/js/application.js';
 
 let perspectiveCamera;
 let orbitCameraControl;
 
-const LINE_WIDTH = 5;
+const LINE_WIDTH = 1;
 const sequencesGroup = new Harmony3D.Group();
 const raycaster = new Harmony3D.Raycaster();
 const planes = new Map();
@@ -42,8 +41,8 @@ export function initDemo(renderer, scene, params) {
 
 
 	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.MouseMove, event => {
-		let normalizedX = (event.detail.x / Graphics.canvas.width) * 2 - 1;
-		let normalizedY = 1 - (event.detail.y / Graphics.canvas.height) * 2;
+		let normalizedX = (event.detail.x / Harmony3D.Graphics.getWidth()) * 2 - 1;
+		let normalizedY = 1 - (event.detail.y / Harmony3D.Graphics.getHeight()) * 2;
 		//console.log(normalizedX, normalizedY);
 
 
@@ -58,7 +57,7 @@ export function initDemo(renderer, scene, params) {
 						pickupScene.addChild(plane);
 					}
 				}
-				scene.addChild(intersection.entity);
+				//scene.addChild(intersection.entity);
 				params.htmlDemoContent.innerHTML = `<div>Sequence: ${seq.sequence}</div><div>Frame: ${seq.frame}</div>`;
 			}
 		}
@@ -75,43 +74,44 @@ async function testMaterials(renderer, scene) {
 
 	/*let plane2 = new Harmony3D.Plane();
 	scene.addChild(plane2);
-	plane2.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/models/workshop/player/items/all_class/fall2013_the_special_eyes/fall2013_the_special_eyes_1.vmt'));*/
+	plane2.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/models/workshop/player/items/all_class/fall2013_the_special_eyes/fall2013_the_special_eyes_1.vmt'));*/
 
 	let plane = new Harmony3D.Plane();
 	scene.addChild(plane);
 	plane.quaternion = [1, 1, 0, 0];
 
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/tile/floor_tile_001a.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/models/workshop/player/items/all_class/fall2013_the_special_eyes_style1/fall2013_the_special_eyes_style1.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/creepysmile.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/axeoutline.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/crystal_ball/ghost_hand.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/devilish_horns.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/particle/flamethrowerfire/flamethrowerfire102.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/buble/buble1.vmt'));
-	plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/tail_right.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/animatedeyes/animated_eyes.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/debris/nutsnbolts.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/animatedtentmonster/animated_tentmonster01.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/skeleton_dance/skeleton_dance.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/pumpkin_face_class_sprites/pumpkin_face_class_sprites.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/halloween_evil_eyes/lurkingeyes.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/animated_ghost/animated_ghost.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/unusual_eyeboss.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/gargoyle_spin.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/monoculus_eye.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/pumpkin_glow.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/unusual_lantern.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/animatedmoth/animated_moth.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/pumpkinhead/pumpkinhead.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/effects/workshop/pumpkin_moon_sprites/pumpkin_moon_faces.vmt'));
-	//plane.setMaterial(await Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/models/workshop/player/items/all_class/fall2013_the_special_eyes/fall2013_the_special_eyes'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/tile/floor_tile_001a.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/models/workshop/player/items/all_class/fall2013_the_special_eyes_style1/fall2013_the_special_eyes_style1.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/creepysmile.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/axeoutline.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/crystal_ball/ghost_hand.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/devilish_horns.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/particle/flamethrowerfire/flamethrowerfire102.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/buble/buble1.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/tail_right.vmt'));
+	plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/animatedcards/animated_cards_blue.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/animatedeyes/animated_eyes.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/debris/nutsnbolts.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/animatedtentmonster/animated_tentmonster01.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/skeleton_dance/skeleton_dance.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/pumpkin_face_class_sprites/pumpkin_face_class_sprites.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/halloween_evil_eyes/lurkingeyes.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/animated_ghost/animated_ghost.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/unusual_eyeboss.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/gargoyle_spin.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/monoculus_eye.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/pumpkin_glow.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/unusual_lantern.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/animatedmoth/animated_moth.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/pumpkinhead/pumpkinhead.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/effects/workshop/pumpkin_moon_sprites/pumpkin_moon_faces.vmt'));
+	//plane.setMaterial(await Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/models/workshop/player/items/all_class/fall2013_the_special_eyes/fall2013_the_special_eyes'));
 	//workshop/player/items/all_class/fall2013_the_special_eyes_style1/fall2013_the_special_eyes_style1_1.vmt
 	plane.material.renderFace(Harmony3D.RenderFace.Back);
 
 	await HarmonyUtils.setTimeoutPromise(1000);
 	console.log(plane.material.colorMap.vtf);
-	makeSheet(plane.material.colorMap.vtf);
+	makeSheet(plane.material.colorMap.properties.get('vtf'));
 }
 
 function makeSheet(vtf) {
