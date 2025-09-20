@@ -19,7 +19,7 @@ export function initDemo(renderer, scene, { htmlDemoContentTab }) {
 async function testNodeImageEditor(renderer, scene, htmlDemoContentTab) {
 	planeMesh = new Harmony3D.Plane({ width: 200, height: 200 });
 	scene.addChild(planeMesh);
-	Harmony3D.SourceEngineMaterialManager.getMaterial('tf2', 'materials/models/weapons/c_models/c_minigun/c_minigun').then(
+	Harmony3D.Source1MaterialManager.getMaterial('tf2', 'materials/models/weapons/c_models/c_minigun/c_minigun').then(
 		(material) => planeMesh.setMaterial(material)
 	)
 	testUberSaw(renderer, scene, htmlDemoContentTab);
