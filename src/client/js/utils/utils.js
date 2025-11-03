@@ -7,7 +7,7 @@ export function InitDemoStd(renderer, scene) {
 
 	let ambientLight = scene.addChild(new AmbientLight({ intensity: 1.0 }));
 
-	perspectiveCamera = scene.addChild(new Camera());
+	perspectiveCamera = scene.addChild(new Camera({ autoResize: true }));
 	orbitCameraControl = new OrbitControl(perspectiveCamera, document.getElementById('demo-canvas'));
 	GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => orbitCameraControl.update(event.detail.delta / 1000));
 	perspectiveCamera.setActiveCamera();

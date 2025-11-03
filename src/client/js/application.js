@@ -28,6 +28,7 @@ documentStyle(applicationCSS)
 class Application {
 	#htmlElement;
 	#htmlCanvas;
+	#htmlCanvasContainer;
 	#htmlStats;
 	#htmlDemoContent;
 	#htmlDemoList;
@@ -40,6 +41,8 @@ class Application {
 	#renderer;
 	#useDefaultRenderLoop = true;
 	#shaderEditor;
+	#mainCanvas;
+
 	constructor() {
 		window.addEventListener('hashchange', (event) =>
 			this.#loadUri(event.newURL)
@@ -154,12 +157,14 @@ class Application {
 						}),
 					],
 				}),
-				createElement('div', {
+				this.#htmlCanvasContainer = createElement('div', {
 					class: 'demo-view',
 					childs: [
+						/*
 						this.#htmlCanvas = createElement('canvas', {
 							id: 'demo-canvas',
 						}),
+						*/
 						this.#htmlStats = createElement('div', {
 							class: 'stats',
 						}),
@@ -177,7 +182,7 @@ class Application {
 		//this.#sceneExplorer.scene = this.#scene;
 
 		this.#renderer = Graphics.initCanvas({
-			canvas: this.#htmlCanvas,
+			useOffscreenCanvas: true,
 			autoResize: true,
 			webGL: {
 				alpha: true,
@@ -185,6 +190,21 @@ class Application {
 				premultipliedAlpha: false
 			}
 		});
+
+		this.#mainCanvas = Graphics.addCanvas(undefined, {
+			name: 'main_canvas',
+			/*
+			scene: {
+				scene: loadoutScene,
+				composer: this.#composer,
+			},
+			*/
+			autoResize: true
+		});
+
+		this.#htmlCanvasContainer.append(this.#mainCanvas.canvas);
+
+
 		this.#renderer.play();
 		WebGLStats.start();
 		this.#htmlStats.append(WebGLStats.htmlElement);
@@ -196,7 +216,8 @@ class Application {
 	#animate(event) {
 		WebGLStats.tick();
 		if (this.#useDefaultRenderLoop && this.#scene.activeCamera) {
-			this.#renderer.render(this.#scene, this.#scene.activeCamera, event.detail.delta, {});
+			//this.#renderer.render(this.#scene, this.#scene.activeCamera, event.detail.delta, {});
+			Graphics.renderMultiCanvas(event.detail.delta);
 		}
 	}
 
@@ -216,7 +237,7 @@ class Application {
 			import('./demos/' + demo + '.js').then(
 				(module) => {
 					this.#useDefaultRenderLoop = !(module.useCustomRenderLoop == true);
-					module.initDemo(this.#renderer, this.#scene, {
+					module.initDemo(this.#mainCanvas, this.#renderer, this.#scene, {
 						htmlDemoContentTab: this.#htmlDemoContentTab,
 						htmlDemoContent: this.#htmlDemoContent,
 					});
