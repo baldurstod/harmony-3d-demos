@@ -1,30 +1,27 @@
-import { vec4 } from 'gl-matrix';
-import { AmbientLight, Camera, ContextObserver, GraphicsEvents, OrbitControl, ColorBackground, GraphicsEvent, Graphics, CanvasLayout, CanvasView } from 'harmony-3d';
+import { AmbientLight, Camera, CanvasLayout, CanvasView, ColorBackground, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, OrbitControl, Scene } from 'harmony-3d';
 
-export function InitDemoStd(renderer, scene) {
+export function InitDemoStd(scene: Scene): [Camera, OrbitControl, AmbientLight] {
 	let perspectiveCamera;
 	let orbitCameraControl;
 
-	let ambientLight = scene.addChild(new AmbientLight({ intensity: 1.0 }));
+	let ambientLight = new AmbientLight({ intensity: 1.0, parent: scene, });
 
-	perspectiveCamera = scene.addChild(new Camera({ autoResize: true }));
-	orbitCameraControl = new OrbitControl(perspectiveCamera, document.getElementById('demo-canvas'));
-	GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => orbitCameraControl.update(event.detail.delta / 1000));
+	perspectiveCamera = new Camera({ autoResize: true, parent: scene });
+	orbitCameraControl = new OrbitControl(perspectiveCamera/*, document.getElementById('demo-canvas')*/);
+	GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => orbitCameraControl.update((event as CustomEvent<GraphicTickEvent>).detail.delta / 1000));
 	perspectiveCamera.setActiveCamera();
 	scene.addChild(orbitCameraControl.target);
-	ContextObserver.observe(GraphicsEvents, perspectiveCamera);
+	//ContextObserver.observe(GraphicsEvents, perspectiveCamera);
 	scene.activeCamera = perspectiveCamera;
 
 	scene.background = new ColorBackground({ color: [0.5, 0.5, 0.5, 1] });
 
-	const mainCanvas = Graphics.getCanvas('main_canvas');
+	const mainCanvas = Graphics.getCanvas('main_canvas')!;
 
 	mainCanvas.useLayout = 'default';
 	mainCanvas.addLayout(new CanvasLayout('default', [
 		new CanvasView({ name: 'view', scene }),
 	]));
-
-
 
 	//Harmony3D.SceneExplorer._manipulator.setCamera(perspectiveCamera);
 	return [perspectiveCamera, orbitCameraControl, ambientLight];

@@ -1,24 +1,13 @@
-import { Graphics, GraphicsEvents, Repositories, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent, WebRepository, Source1ModelManager, ContextType } from 'harmony-3d';
-import { themeCSS } from 'harmony-css';
-import { createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, show, toggle } from 'harmony-ui';
+import { exportToBinaryFBX, Graphics, GraphicsEvent, GraphicsEvents, Repositories, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, WebGLStats, WebRepository } from 'harmony-3d';
 import { saveFile } from 'harmony-browser-utils';
-
-export * as GlMatrix from 'gl-matrix';
-export * as Harmony3D from 'harmony-3d';
-export * as HarmonyUi from 'harmony-ui';
-export * as HarmonyUtils from 'harmony-utils';
-export * as HarmonyBrowserUtils from 'harmony-browser-utils';
-
-export * from './utils/pbrmaterials';
-export * from './utils/source1';
-export * from './utils/source2';
-export * from './utils/utils';
-
+import { themeCSS } from 'harmony-css';
+import { createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, HTMLHarmonyTabElement, show, toggle } from 'harmony-ui';
+import { CS2_REPOSITORY, DEADLOCK_REPOSITORY, DOTA2_REPOSITORY, HLA_REPOSITORY, TF2_REPOSITORY } from '../constants';
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
 import varsCSS from '../css/vars.css';
-import { CS2_REPOSITORY, DEADLOCK_REPOSITORY, DOTA2_REPOSITORY, HLA_REPOSITORY, TF2_REPOSITORY } from '../constants';
-import { SceneExplorer } from 'harmony-3d';
+import { getDemo, getDemoList } from './demos/demos';
+export * from './demos/export';
 
 documentStyle(htmlCSS);
 documentStyle(themeCSS);
@@ -32,7 +21,7 @@ class Application {
 	#htmlStats;
 	#htmlDemoContent;
 	#htmlDemoList;
-	#htmlDemoContentTab;
+	#htmlDemoContentTab!: HTMLHarmonyTabElement;
 	#htmlOptionsTab;
 	#scene = new Scene();
 	#sceneExplorerTab;
@@ -233,14 +222,23 @@ class Application {
 		this.#initDemo(hash);
 	}
 
-	async #initDemo(demo) {
-		this.#expand(demo);
+	async #initDemo(path: string): Promise<void> {
+		this.#expand(path);
 		this.#htmlDemoContentTab.innerText = '';
 		this.#htmlDemoContent.innerText = '';
 		//TODO: cleanup scene and renderer
 		this.#scene.removeChildren();
-		if (demo && !demo.endsWith('/')) {
-			import('./demos/' + demo + '.js').then(
+		if (path && !path.endsWith('/')) {
+
+			const demo = getDemo(path);
+			if (demo) {
+				demo.initDemo(this.#scene, {
+					htmlDemoContentTab: this.#htmlDemoContentTab,
+					htmlDemoContent: this.#htmlDemoContent,
+				});
+			}
+			/*
+			import('./demos/' + path + '.js').then(
 				(module) => {
 					this.#useDefaultRenderLoop = !(module.useCustomRenderLoop == true);
 					module.initDemo(this.#renderer, this.#scene, {
@@ -250,6 +248,7 @@ class Application {
 				},
 				(err) => console.error(err)
 			);
+			*/
 		}
 	}
 
@@ -268,18 +267,18 @@ class Application {
 		}
 	}
 
-	async #loadDemos() {
+	#loadDemos(): void {
 		let divs = [];
-		let response = await fetch('/list');
-		let json = await response.json();
+		//let response = await fetch('/list');
+		//let json = await response.json();
 		let container = this.#htmlDemoList;
 		divs = [container, {}];
 
-		for (let file of json.result.files) {
+		for (let file of getDemoList()) {
 			let arr = file.split('/');
 			let currentLevel = divs;
 			for (let i = 0; i < arr.length - 1; ++i) {
-				let d = currentLevel[1][arr[i]];
+				let d = currentLevel[1][arr[i]!];
 				if (!d) {
 					d = document.createElement('div');
 					d.className = 'demos-list-dir';
