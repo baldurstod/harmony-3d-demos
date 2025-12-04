@@ -4,7 +4,7 @@ let perspectiveCamera;
 let perspectiveCamera2;
 let orbitCameraControl;
 let orbitCameraControl2;
-export function initDemo(canvas, renderer, scene, { htmlDemoContentTab, htmlDemoContent }) {
+export function initDemo(renderer, scene, { htmlDemoContentTab, htmlDemoContent }) {
 	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
 	perspectiveCamera.position = [0, -200, 0];
 	orbitCameraControl.target.position = [0, 0, 0];
@@ -22,7 +22,7 @@ export function initDemo(canvas, renderer, scene, { htmlDemoContentTab, htmlDemo
 	perspectiveCamera2.verticalFov = 20;
 	//Harmony3D.ContextObserver.observe(Harmony3D.GraphicsEvents, perspectiveCamera2);
 
-	testMultiView(canvas, renderer, scene, htmlDemoContent);
+	testMultiView(renderer, scene, htmlDemoContent);
 
 	HarmonyUi.createElement('button', {
 		parent: htmlDemoContentTab,
@@ -33,24 +33,7 @@ export function initDemo(canvas, renderer, scene, { htmlDemoContentTab, htmlDemo
 	});
 }
 
-async function testMultiView(canvas, renderer, scene, htmlDemoContent) {
-	function animate(event) {
-		Harmony3D.WebGLStats.tick();
-		renderer.scissorTest = true;
-		perspectiveCamera.dirtyCameraMatrix = true;
-		perspectiveCamera2.dirtyCameraMatrix = true;
-		for (let view of views) {
-			GlMatrix.vec4.copy(viewport, view.viewport);
-			viewport[0] *= renderer.getWidth();
-			viewport[1] *= renderer.getHeight();
-			viewport[2] *= renderer.getWidth();
-			viewport[3] *= renderer.getHeight();
-			renderer.viewport = viewport;
-			renderer.scissor = viewport;
-			renderer.render(scene, view.camera);
-		}
-	}
-
+async function testMultiView(renderer, scene, htmlDemoContent) {
 	let views = new Set();
 	views.add({
 		viewport: [0, 0, 0.5, 0.5],
@@ -61,6 +44,8 @@ async function testMultiView(canvas, renderer, scene, htmlDemoContent) {
 		camera: perspectiveCamera2
 	});
 
+
+	const mainCanvas = Harmony3D.Graphics.getCanvas('main_canvas');
 	let viewport = GlMatrix.vec4.create();
 
 	//canvas.groups = [
@@ -89,8 +74,8 @@ async function testMultiView(canvas, renderer, scene, htmlDemoContent) {
 
 
 	const layouts = [{ views: [] }, { views: [] }];
-	canvas.layouts.set('spheres', layouts[0]);
-	canvas.layouts.set('boxes', layouts[1],);
+	mainCanvas.layouts.set('spheres', layouts[0]);
+	mainCanvas.layouts.set('boxes', layouts[1],);
 	for (let i = 0; i < 10; i++) {
 		const scene = new Harmony3D.Scene({ background: new Harmony3D.ColorBackground({ color: [0.5, 0.5, 0.5, 1] }) });
 		switch (i % 2) {
@@ -120,7 +105,7 @@ async function testMultiView(canvas, renderer, scene, htmlDemoContent) {
 		parent: htmlDemoContent,
 		i18n: '#display_group',
 		//$change: event => { groups[0].enabled = event.target.state; groups[1].enabled = !event.target.state },
-		$change: event => { canvas.useLayout = event.target.state ? 'spheres' : 'boxes' },
+		$change: event => { mainCanvas.useLayout = event.target.state ? 'spheres' : 'boxes' },
 		state: true,
 	});
 

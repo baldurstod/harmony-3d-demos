@@ -5,6 +5,11 @@ let orbitCameraControl;
 export function initDemo(renderer, scene, { htmlDemoContent }) {
 	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
 	testAnimations(renderer, scene, htmlDemoContent);
+
+	canvas.scenes = [{
+		scene,
+		camera:perspectiveCamera,
+	}];
 }
 
 async function testAnimations(renderer, scene, htmlDemoContent) {
@@ -25,7 +30,7 @@ async function testAnimations(renderer, scene, htmlDemoContent) {
 
 	const sw = HarmonyUi.createElement('harmony-switch', {
 		parent: htmlDemoContent,
-		i18: '#new_animations',
+		i18n: '#new_animations',
 		events: {
 			change: event => Harmony3D.Source1ModelInstance.useNewAnimSystem = event.target.state,
 		}

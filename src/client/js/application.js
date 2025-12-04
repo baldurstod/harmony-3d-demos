@@ -1,4 +1,4 @@
-import { Graphics, GraphicsEvents, Repositories, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent, WebRepository, Source1ModelManager } from 'harmony-3d';
+import { Graphics, GraphicsEvents, Repositories, Scene, ShaderEditor, WebGLStats, exportToBinaryFBX, GraphicsEvent, WebRepository, Source1ModelManager, ContextType } from 'harmony-3d';
 import { themeCSS } from 'harmony-css';
 import { createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, show, toggle } from 'harmony-ui';
 import { saveFile } from 'harmony-browser-utils';
@@ -44,15 +44,20 @@ class Application {
 	#mainCanvas;
 
 	constructor() {
+		this.#init();
+	}
+
+	async #init() {
 		window.addEventListener('hashchange', (event) =>
 			this.#loadUri(event.newURL)
 		);
 		this.#initRepositories();
 		this.#initHTML();
-		this.#initEngine();
+		await this.#initEngine();
 		this.#loadUri(document.URL);
 		this.#loadDemos();
 		this.#sceneExplorer.setScene(this.#scene);
+
 	}
 
 	#initRepositories() {
@@ -177,21 +182,22 @@ class Application {
 		});
 	}
 
-	#initEngine() {
+	async #initEngine() {
 		this.#shaderEditor = new ShaderEditor();
 		//this.#sceneExplorer.scene = this.#scene;
 
-		this.#renderer = Graphics.initCanvas({
+		this.#renderer = await Graphics.initCanvas({
 			useOffscreenCanvas: true,
 			autoResize: true,
+			//type: ContextType.WebGPU,
 			webGL: {
 				alpha: true,
-				preserveDrawingBuffer: true,
+				//preserveDrawingBuffer: true,
 				premultipliedAlpha: false
 			}
 		});
 
-		this.#mainCanvas = Graphics.addCanvas(undefined, {
+		this.#mainCanvas = Graphics.addCanvas({
 			name: 'main_canvas',
 			/*
 			scene: {
@@ -237,7 +243,7 @@ class Application {
 			import('./demos/' + demo + '.js').then(
 				(module) => {
 					this.#useDefaultRenderLoop = !(module.useCustomRenderLoop == true);
-					module.initDemo(this.#mainCanvas, this.#renderer, this.#scene, {
+					module.initDemo(this.#renderer, this.#scene, {
 						htmlDemoContentTab: this.#htmlDemoContentTab,
 						htmlDemoContent: this.#htmlDemoContent,
 					});

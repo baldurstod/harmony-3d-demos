@@ -14,11 +14,20 @@ async function testHeavy(renderer, scene) {
 	perspectiveCamera.nearPlane = 10;
 	perspectiveCamera.verticalFov = 10;
 
+	scene.background = new Harmony3D.ColorBackground({ color: [1.0, 1.0, 1.0, 1] });
 	scene.background = new Harmony3D.ColorBackground({ color: [0.0, 0.0, 0.0, 1] });
 
 	let systemName;
 	systemName = 'unusual_icrown_teamcolor_red';
 	systemName = 'unusual_icrown_plasma_red';
+	systemName = 'utaunt_voidcrawlers_parent';
+	systemName = 'utaunt_voidcrawlers_base';
+	systemName = 'utaunt_voidcrawlers_ikrig_base';
+	systemName = 'unusual_conductor_teamc_teamcolor_red';
+	systemName = 'unusual_conductor_teamc_blu_lcp2';
+	systemName = 'unusual_conductor_teamc_blu_cp';
+	//systemName = 'unusual_conductor_teamc_red_lightning_trail1';
+	//systemName = 'unusual_conductor_teamc_blu_lcp1';
 	//systemName = 'unusual_icrown_gradient_red';
 	//systemName = 'unusual_icrown_rays_red';
 
