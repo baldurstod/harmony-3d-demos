@@ -1,67 +1,70 @@
-import { HarmonyUi, GlMatrix, Harmony3D, InitDemoStd } from '/js/application.js';
+import { vec4 } from 'gl-matrix';
+import { Camera, CameraFrustum, CameraProjection, ColorBackground, Graphics, Grid, MeshFlatMaterial, PointLight, Scene, Sphere } from 'harmony-3d';
+import { createElement } from 'harmony-ui';
+import { InitDemoStd } from '../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../demos';
 
-let perspectiveCamera;
-let orbitCameraControl;
-let ambientLight;
-export function initDemo(renderer, scene, params) {
-	[perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(renderer, scene);
-	perspectiveCamera.position = [70, -85, 80];
-	orbitCameraControl.target.position = [0, 0, 0];
-	perspectiveCamera.farPlane = 10000;
-	perspectiveCamera.nearPlane = 0.1;
-	perspectiveCamera.verticalFov = 30;
-	perspectiveCamera.orthoZoom = 10;
-	//ambientLight.remove();
+class MixedProjectionDemo implements Demo {
+	static readonly path = 'cameras/mixed_projection';
 
-	scene.background.setColor(GlMatrix.vec4.fromValues(0., 0., 0., 1));
+	initDemo(scene: Scene, params: InitDemoParams): void {
+		const [perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(scene);
+		perspectiveCamera.position = [70, -85, 80];
+		orbitCameraControl.target.position = [0, 0, 0];
+		perspectiveCamera.farPlane = 10000;
+		perspectiveCamera.nearPlane = 0.1;
+		perspectiveCamera.verticalFov = 30;
+		perspectiveCamera.orthoZoom = 10;
+		//ambientLight.remove();
 
-
-	let material = new Harmony3D.MeshFlatMaterial();
-	let sphere = scene.addChild(new Harmony3D.Sphere({ radius: 5, segments: 12, rings: 12, material: material/*, phiLength:1.57, thetaLength:1.57*/ }));
-	scene.addChild(new Harmony3D.Grid());
-
-
-	let light = scene.addChild(new Harmony3D.PointLight());
-	light.position = perspectiveCamera.position;
-
-	initButtons(params.htmlDemoContent);
-
-	const orthoCam = scene.addChild(new Harmony3D.Camera());
-	orthoCam.position = [0, 0, 10];
-	orthoCam.orthoZoom = 10;
-	orthoCam.setProjection(Harmony3D.CameraProjection.Orthographic);
-	Harmony3D.ContextObserver.observe(Harmony3D.GraphicsEvents, orthoCam);
-
-	const frustum = orthoCam.addChild(new Harmony3D.CameraFrustum());
+		scene.background = new ColorBackground({ color: vec4.fromValues(0., 0., 0., 1) });
 
 
-	new Harmony3D.Graphics().useLogDepth(true);
+		let material = new MeshFlatMaterial();
+		let sphere = scene.addChild(new Sphere({ radius: 5, segments: 12, rings: 12, material: material/*, phiLength:1.57, thetaLength:1.57*/ }));
+		scene.addChild(new Grid());
+
+
+		let light = scene.addChild(new PointLight({ position: perspectiveCamera.position }));
+
+		initButtons(params.htmlDemoContent, perspectiveCamera);
+
+		const orthoCam = scene.addChild(new Camera({ position: [0, 0, 10], orthoZoom: 10, projection: CameraProjection.Orthographic, autoResize: true })) as Camera;
+		//ContextObserver.observe(GraphicsEvents, orthoCam);
+
+		const frustum = orthoCam.addChild(new CameraFrustum());
+
+
+		Graphics.useLogDepth(true);
+	}
 }
 
+registerDemo(MixedProjectionDemo);
+
 const lambda = 10;
-function initButtons(htmlDemoContent) {
-	HarmonyUi.createElement('input', {
+function initButtons(htmlDemoContent: HTMLElement, perspectiveCamera: Camera) {
+	createElement('input', {
 		parent: htmlDemoContent,
 		type: 'range',
 		min: 0,
 		max: 100,
 		events: {
-			input: (event) => perspectiveCamera.setProjectionMix(event.target.value * 0.01),
+			input: (event: Event) => perspectiveCamera.setProjectionMix(Number((event.target as HTMLInputElement).value) * 0.01),
 		}
 	});
-	HarmonyUi.createElement('button', {
+	createElement('button', {
 		parent: htmlDemoContent,
 		innerHTML: 'ortho',
 		events: {
-			click: () => perspectiveCamera.setProjection(Harmony3D.CameraProjection.Orthographic)
+			click: () => perspectiveCamera.setProjection(CameraProjection.Orthographic)
 		}
 	});
 
-	HarmonyUi.createElement('button', {
+	createElement('button', {
 		parent: htmlDemoContent,
 		innerHTML: 'persp',
 		events: {
-			click: () => perspectiveCamera.setProjection(Harmony3D.CameraProjection.Perspective)
+			click: () => perspectiveCamera.setProjection(CameraProjection.Perspective)
 		}
 	});
 }

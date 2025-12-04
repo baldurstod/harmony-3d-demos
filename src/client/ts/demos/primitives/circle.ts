@@ -13,7 +13,7 @@ class CircleDemo implements Demo {
 		perspectiveCamera.nearPlane = 0.1;
 		perspectiveCamera.verticalFov = 10;
 
-		//scene.addChild(new Harmony3D.Circle(1, undefined, undefined, -1.57 * 0.5, 1.57))
+		//scene.addChild(new Circle(1, undefined, undefined, -1.57 * 0.5, 1.57))
 		scene.addChild(new Circle({ radius: 1, startAngle: -1.57 * 0.5, endAngle: 1.57 }));
 	}
 }

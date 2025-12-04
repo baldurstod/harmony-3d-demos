@@ -1,69 +1,53 @@
-import { AddSource1Model, InitDemoStd, Harmony3D, GlMatrix } from '/js/application.js';
+import { vec4 } from 'gl-matrix';
+import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, CopyPass, Graphics, OrbitControl, OutlinePass, PixelatePass, PointLight, RenderPass, Scene } from 'harmony-3d';
+import { AddSource1Model } from '../../utils/source1';
+import { InitDemoStd } from '../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../demos';
 
-export const useCustomRenderLoop = true;
+class OutlineDemo implements Demo {
+	static readonly path = 'postprocessing/outline';
 
-let perspectiveCamera;
-let orbitCameraControl;
-export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
-	console.log('initDemo', renderer, scene);
-	scene.background.setColor(GlMatrix.vec4.fromValues(0., 0., 0., 1));
+	initDemo(scene: Scene, params: InitDemoParams): void {
+		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
+		scene.background = new ColorBackground({ color: vec4.fromValues(0., 0., 0., 1) });//.setColor(vec4.fromValues(0., 0., 0., 1));
 
-	let ambientLight = scene.addChild(new Harmony3D.AmbientLight({ intensity: 1.0 }));
-	let pointLight = scene.addChild(new Harmony3D.PointLight());
-	pointLight.position = [100, 0, 50];
+		scene.addChild(new AmbientLight({ intensity: 1.0 }));
+		scene.addChild(new PointLight({ position: [100, 0, 50] }));
 
-	perspectiveCamera.position = [0, -20, 0];
-	orbitCameraControl.target.position = [0, 0, 0];
-	perspectiveCamera.lookAt([50, 0, 0]);
-	perspectiveCamera.verticalFov = 50;
-	perspectiveCamera.farPlane = 10000;
+		perspectiveCamera.position = [0, -20, 0];
+		orbitCameraControl.target.position = [0, 0, 0];
+		perspectiveCamera.lookAt([50, 0, 0]);
+		perspectiveCamera.verticalFov = 50;
+		perspectiveCamera.farPlane = 10000;
 
-	renderer.autoClear = false;
+		//renderer.autoClear = false;
 
-	let scene2 = new Harmony3D.Scene();
+		let scene2 = new Scene();
 
-	let composer = new Harmony3D.Composer();
-	let clearPass = new Harmony3D.ClearPass(GlMatrix.vec4.fromValues(0.2, 0.2, 0.2, 1), 1, 0);
-	let renderPass = new Harmony3D.RenderPass(scene, perspectiveCamera);
-	let renderPass2 = new Harmony3D.RenderPass(scene2, perspectiveCamera);
-	let outlinePass = new Harmony3D.OutlinePass(scene, perspectiveCamera);
-	let copyPass = new Harmony3D.CopyPass(perspectiveCamera);
-
-
-	composer.addPass(clearPass);
-	composer.addPass(renderPass);
-	//composer.addPass(renderPass2);
-	composer.addPass(outlinePass);
-	//composer.addPass(copyPass);
-
-	window.clearPass = clearPass;
-	window.renderPass = renderPass;
-	window.renderPass2 = renderPass2;
-	window.outlinePass = outlinePass;
-	window.copyPass = copyPass;
+		let composer = new Composer();
+		let clearPass = new ClearPass(vec4.fromValues(0.2, 0.2, 0.2, 1), 1, 0);
+		let renderPass = new RenderPass(scene, perspectiveCamera);
+		let outlinePass = new OutlinePass(scene, perspectiveCamera);
 
 
-	function animate(event) {
-		composer.render(event.detail.delta);
+		composer.addPass(clearPass);
+		composer.addPass(renderPass);
+		//composer.addPass(renderPass2);
+		composer.addPass(outlinePass);
 
-		//cube.material.uniforms.uColor = [Math.sin(performance.now()), 0, 0, 1];
-		if (scene.activeCamera) {
-			//renderer.render(scene, scene.activeCamera, event.detail.delta);
-		}
+		testHeavy(scene, perspectiveCamera, orbitCameraControl);
 	}
-	Harmony3D.GraphicsEvents.addEventListener(Harmony3D.GraphicsEvent.Tick, animate);
-	testHeavy(renderer, scene);
 }
+registerDemo(OutlineDemo);
 
-async function testHeavy(renderer, scene) {
+async function testHeavy(scene: Scene, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
 	perspectiveCamera.position = [500, 0, 150];
 	orbitCameraControl.target.position = [0, 0, 50];
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 10;
 	perspectiveCamera.verticalFov = 10;
-	let heavy = await AddSource1Model('tf2', 'models/player/heavy', renderer, scene);
+	let heavy = (await AddSource1Model('tf2', 'models/player/heavy', scene))!;
 	heavy.playSequence('taunt_laugh');
-	heavy.properties.set('selected', true);
-	heavy.forEach((entity) => entity.properties.set('selected', true));
+	//heavy.selected = true;
+	//heavy.forEach((entity) => entity.selected = true);
 }

@@ -1,40 +1,40 @@
-/*
-import { AddSource1Model } from '../js/source1.js';
-import { InitDemoStd } from '../js/utils.js';
-import * as Harmony3D from '../../../dist/harmony-3d.browser.js';
-import { getRandomInt, exportToBinaryFBX } from '../../../dist/harmony-3d.browser.js';
-import { quat, HALF_PI, Circle } from '../../../dist/harmony-3d.browser.js';
+import { Scene } from 'harmony-3d';
+import { createElement } from 'harmony-ui';
+import { setTimeoutPromise } from 'harmony-utils';
+import { exportFBX } from '../../utils/fbx';
+import { AddSource1Model } from '../../utils/source1';
+import { InitDemoStd } from '../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../demos';
 
-import { saveFile, setTimeoutPromise, FBXExporter, createElement } from '../../../dist/examples/js/modules.js';
-*/
+class FbxDemo implements Demo {
+	static readonly path = 'exporters/fbx';
 
-import { AddSource1Model, InitDemoStd, HarmonyUi, HarmonyUtils, Harmony3D, HarmonyBrowserUtils } from '/js/application.js';
+	initDemo(scene: Scene, params: InitDemoParams): void {
+		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
+		perspectiveCamera.position = [0, -200, 0];
+		orbitCameraControl.target.position = [0, 0, 0];
+		perspectiveCamera.farPlane = 10000;
+		perspectiveCamera.nearPlane = 0.1;
+		perspectiveCamera.verticalFov = 10;
+		//TestExportFbx(renderer, scene);
+		//testExportFbx2(renderer, scene);
+		//testExportSoldier(renderer, scene);
+		testExportFireBell(scene);
+		//testExportTransforms(renderer, scene);
+		//testExportCircle(renderer, scene);
 
-let perspectiveCamera;
-let orbitCameraControl;
-export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
-	perspectiveCamera.position = [0, -200, 0];
-	orbitCameraControl.target.position = [0, 0, 0];
-	perspectiveCamera.farPlane = 10000;
-	perspectiveCamera.nearPlane = 0.1;
-	perspectiveCamera.verticalFov = 10;
-	//TestExportFbx(renderer, scene);
-	//testExportFbx2(renderer, scene);
-	//testExportSoldier(renderer, scene);
-	testExportFireBell(renderer, scene);
-	//testExportTransforms(renderer, scene);
-	//testExportCircle(renderer, scene);
-
-	HarmonyUi.createElement('button', {
-		parent: document.getElementById('demo-content'),
-		innerHTML: 'Export fbx',
-		events: {
-			click: () => exportFBX(scene)
-		}
-	});
+		createElement('button', {
+			parent: params.htmlDemoContent,
+			innerHTML: 'Export fbx',
+			events: {
+				click: () => exportFBX(scene)
+			}
+		});
+	}
 }
 
+registerDemo(FbxDemo);
+/*
 async function testExportFbx(renderer, scene) {
 	let modelName;
 	modelName = 'models/weapons/c_models/c_wooden_bat/c_wooden_bat';
@@ -43,7 +43,7 @@ async function testExportFbx(renderer, scene) {
 	let model = await AddSource1Model('tf2', modelName, renderer, scene);
 	model.playSequence('stand_primary');
 	//model.playSequence('idle');
-	await HarmonyUtils.setTimeoutPromise(1000);
+	await setTimeoutPromise(1000);
 	exportFBX(scene);
 	return;
 }
@@ -51,7 +51,7 @@ async function testExportFbx(renderer, scene) {
 
 async function testExportFbx2(renderer, scene) {
 
-	//let sphere = scene.addChild(new Harmony3D.Sphere({segments: 16, rings: 16}));
+	//let sphere = scene.addChild(new Sphere({segments: 16, rings: 16}));
 	let heavy = await AddSource1Model('tf2', 'models/player/heavy', renderer, scene);
 	//let minigun = await AddSource1Model('tf2', 'models/weapons/c_models/c_minigun/c_minigun', renderer, heavy);
 	let heavy_zombie = await AddSource1Model('tf2', 'models/player/items/heavy/heavy_zombie', renderer, heavy);
@@ -61,7 +61,7 @@ async function testExportFbx2(renderer, scene) {
 	heavy_zombie.playSequence('idle');
 	heavy.skin = 4;
 	//minigun.visible = false;
-	await HarmonyUtils.setTimeoutPromise(2000);
+	await setTimeoutPromise(2000);
 	exportFBX(scene);
 }
 
@@ -71,46 +71,46 @@ async function testExportSoldier(renderer, scene) {
 	let soldier_viking = await AddSource1Model('tf2', 'models/player/items/soldier/soldier_viking', renderer, soldier);
 	soldier.playSequence('stand_primary');
 	soldier_viking.playSequence('idle');
-	await HarmonyUtils.setTimeoutPromise(2000);
+	await setTimeoutPromise(2000);
 	exportFBX(scene);
 }
-
-async function testExportFireBell(renderer, scene) {
+*/
+async function testExportFireBell(scene: Scene) {
 	//testExportFireBell2();
 	//return;
 	/*let heavy = await AddSource1Model('tf2', 'models/player/heavy', renderer, scene);
 	heavy.playSequence('stand_primary');
 	heavy.quaternion = [0, 0, 0.7, -0.7];*/
-	let bot_worker = await AddSource1Model('tf2', 'models/bots/bot_worker/bot_worker', renderer, scene);
+	let bot_worker = (await AddSource1Model('tf2', 'models/bots/bot_worker/bot_worker', scene))!;
 	bot_worker.playSequence('panic');
 	bot_worker.quaternion = [0, 0, 0.7, -0.7];
 	/*let fire_bell01 = await AddSource1Model('tf2', 'models/props_spytech/fire_bell01', renderer, scene);
 	fire_bell01.quaternion = [0, 0, 0.7, -0.7];
 	fire_bell01.playSequence('idle');*/
-	await HarmonyUtils.setTimeoutPromise(1000);
+	await setTimeoutPromise(1000);
 	//exportFBX(scene);
 }
-
+/*
 async function testExportCircle(renderer, scene) {
 	const circle = new Circle({ segments: 8 });
 	scene.addChild(circle);
-	await HarmonyUtils.setTimeoutPromise(2000);
+	await setTimeoutPromise(2000);
 	//exportFBX(scene);
 }
 
 async function testExportTransforms(renderer, scene) {
 	testExportFireBell2();
-	const root = new Harmony3D.Entity();
+	const root = new Entity();
 	scene.addChild(root);
 	root.rotateZ(1);
 	root.scale = [1, 1, 10];
 
-	let cylinder = new Harmony3D.Cylinder({ height: 1, name: 'test cylinder' });
+	let cylinder = new Cylinder({ height: 1, name: 'test cylinder' });
 	//cylinder.scale = [1, 1, 10];
 	cylinder.position = [10, 0, 0.5];
 
 	root.addChild(cylinder);
-	await HarmonyUtils.setTimeoutPromise(2000);
+	await setTimeoutPromise(2000);
 	//exportFBX(scene);
 }
 
@@ -170,59 +170,6 @@ async function testExportFireBell2() {
 
 }
 
-async function exportFBX(scene) {
-	//let fbxFile = await entitytoFBXFile(scene);
-
-	let binaryFBX = await Harmony3D.exportToBinaryFBX(scene);//new FBXExporter().exportBinary(fbxFile);
-	HarmonyBrowserUtils.saveFile(new File([binaryFBX], 'test.fbx'));
-
-	return;
-
-	let resultJSON = JSON.stringify(fbxFile, null, '	');
-	HarmonyBrowserUtils.saveFile(new File([resultJSON], 'test.json'));
-
-	return;
-
-	let meshes = scene.getMeshList();
-	//	console.log(meshes);
-
-	let fbxMeshes = [];
-	for (let mesh of meshes) {
-		if (!mesh.isStaticMesh) {
-			continue;
-		}
-		let fbxMesh = { name: 'test', modelId: getRandomInt(Number.MAX_SAFE_INTEGER), geometryId: getRandomInt(Number.MAX_SAFE_INTEGER), materialId: getRandomInt(Number.MAX_SAFE_INTEGER) };
-		let meshDatas = mesh.exportObj();
-		//console.log(meshDatas);
-
-		let polygons = [];
-		let edges = [];
-
-		let vertexIndices = meshDatas.f;
-		let vertexIndex1;
-		let vertexIndex2;
-		let vertexIndex3;
-		for (let i = 0, l = vertexIndices.length; i < l; i += 3) {
-			vertexIndex1 = vertexIndices[i];
-			vertexIndex2 = vertexIndices[i + 1];
-			vertexIndex3 = vertexIndices[i + 2];
-			polygons.push(vertexIndex1, vertexIndex2, ~vertexIndex3);
-			edges.push(vertexIndex1, vertexIndex2, vertexIndex3);
-		}
-
-		fbxMesh.vertices = meshDatas.v;
-		fbxMesh.normals = meshDatas.vn;
-		fbxMesh.vertices = meshDatas.v;
-		fbxMesh.polygons = polygons;
-		fbxMesh.edges = edges;
-
-		//console.log(polygons);
-		//console.log(edges);
-		fbxMeshes.push(fbxMesh);
-	}
-
-	exportFBX(fbxMeshes, 'test.fbx');
-}
 
 function exportFBX2(fbxMeshes, filename) {
 
@@ -242,6 +189,7 @@ function exportFBX2(fbxMeshes, filename) {
 	//console.log(exportedBinary);
 
 	//await writeFile('test/created.fbx', new Uint8Array(exportedBinary));
-	HarmonyBrowserUtils.saveFile(new File([exportedBinary], filename));
-	HarmonyBrowserUtils.saveFile(new File([resultJSON], filename + '.json'));
+	saveFile(new File([exportedBinary], filename));
+	saveFile(new File([resultJSON], filename + '.json'));
 }
+*/

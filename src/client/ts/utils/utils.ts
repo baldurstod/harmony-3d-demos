@@ -23,6 +23,6 @@ export function InitDemoStd(scene: Scene): [Camera, OrbitControl, AmbientLight] 
 		new CanvasView({ name: 'view', scene }),
 	]));
 
-	//Harmony3D.SceneExplorer._manipulator.setCamera(perspectiveCamera);
+	//SceneExplorer._manipulator.setCamera(perspectiveCamera);
 	return [perspectiveCamera, orbitCameraControl, ambientLight];
 }
