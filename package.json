@@ -2,14 +2,16 @@
   "name": "harmony-3d-demos",
   "version": "0.0.1",
   "description": "Source for harmony 3D demos",
-	"type": "module",
+  "type": "module",
   "devDependencies": {
     "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-typescript": "^12.1.0",
+    "@rollup/plugin-typescript": "^12.3.0",
     "@rollup/plugin-wasm": "^6.2.2",
     "rollup": "^4.20.0",
     "rollup-plugin-copy": "^3.5.0",
-    "tslib": "^2.7.0"
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.1"
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^15.2.3",

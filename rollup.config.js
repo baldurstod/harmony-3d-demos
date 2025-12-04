@@ -9,7 +9,7 @@ const isExamples = process.env.BUILD === 'examples';
 
 export default [
 	{
-		input: './src/client/js/application.js',
+		input: './src/client/ts/application.ts',
 		output: {
 			file: './build/client/js/application.js',
 			format: 'esm'
