@@ -1,242 +1,140 @@
-import { AddSource2Model, InitDemoStd, Harmony3D, HarmonyUi, GlMatrix } from '/js/application.js';
+import { vec4 } from 'gl-matrix';
+import { ColorBackground, Cone, Kv3Element, Kv3Value, PointLight, Repositories, Scene, Source2File, Source2FileLoader, Source2ModelInstance } from 'harmony-3d';
+import { createElement } from 'harmony-ui';
+import { addSource2Model } from '../../../../../utils/source2';
+import { InitDemoStd } from '../../../../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../../../../demos';
+import { parse } from 'harmony-vdf';
 
-let perspectiveCamera;
-let orbitCameraControl;
-let ambientLight;
-let heroModel;
-export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(renderer, scene);
-	perspectiveCamera.position = [200, 0, 45];
-	orbitCameraControl.target.position = [0, 0, 45];
-	perspectiveCamera.farPlane = 10000;
-	perspectiveCamera.nearPlane = 1;
-	perspectiveCamera.verticalFov = 50;
-	ambientLight.intensity = 0.1;
-	scene.background.setColor(GlMatrix.vec4.fromValues(0., 0., 0., 1));
-	scene.addChild(new Harmony3D.PointLight({ position: [50, -10, 60], intensity: 10000 }));
+type Hero = {
+	//name: string;
+	model: string;
+	anim?: string;
+	released?: boolean;
+}
+
+class Source2DeadlockArcher implements Demo {
+	static readonly path = 'sourceengine/source2/deadlock/heroes/heroes';
+	#heroModel?: Source2ModelInstance;
+
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
+		const [perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(scene);
+		perspectiveCamera.position = [200, 0, 45];
+		orbitCameraControl.target.position = [0, 0, 45];
+		perspectiveCamera.farPlane = 10000;
+		perspectiveCamera.nearPlane = 1;
+		perspectiveCamera.verticalFov = 50;
+		ambientLight.intensity = 0.1;
+		scene.background = new ColorBackground({ color: vec4.fromValues(0, 0, 0, 1) });
+		scene.addChild(new PointLight({ position: [50, -10, 60], intensity: 10000 }));
 
 
-
-	let htmlHeroListReleased;
-	let htmlHeroListStaging;
-	const htmlHeroList = HarmonyUi.createElement('div', {
-		parent: document.getElementById('demo-content'),
-		style: 'display: flex;flex-direction: column;',
-		childs: [
-			htmlHeroListReleased = HarmonyUi.createElement('div', {
-				style: 'display: flex;flex-direction: column;',
-				child: HarmonyUi.createElement('div', {
-					innerText: 'Released heroes',
+		let htmlHeroListReleased;
+		let htmlHeroListStaging;
+		const htmlHeroList = createElement('div', {
+			parent: params.htmlDemoContent,
+			style: 'display: flex;flex-direction: column;',
+			childs: [
+				htmlHeroListReleased = createElement('div', {
+					style: 'display: flex;flex-direction: column;',
+					child: createElement('div', {
+						innerText: 'Released heroes',
+					}),
 				}),
-			}),
-			htmlHeroListStaging = HarmonyUi.createElement('div', {
-				style: 'display: flex;flex-direction: column;',
-				child: HarmonyUi.createElement('div', {
-					innerText: 'Shelved heroes',
+				htmlHeroListStaging = createElement('div', {
+					style: 'display: flex;flex-direction: column;',
+					child: createElement('div', {
+						innerText: 'Shelved heroes',
+					}),
 				}),
-			}),
-		]
-	});
-
-	// Sort by name
-	const ordered = Object.keys(heroes).sort().reduce((obj, key) => { obj[key] = heroes[key]; return obj; }, {});
-	for (const name in ordered) {
-		const h = heroes[name];
-
-		HarmonyUi.createElement('button', {
-			parent: h.released ? htmlHeroListReleased : htmlHeroListStaging,
-			innerText: name,
-			events: {
-				click: () => testHero(renderer, scene, h),
-			}
+			]
 		});
+
+		// Sort by name
+
+		const heroes = await this.#loadHeroes()
+
+		const ordered = [...heroes.keys()].sort().reduce((obj: Record<string, Hero>, key: string) => { obj[key] = heroes.get(key)!; return obj; }, {});
+		for (const name in ordered) {
+			const h = heroes.get(name)!;
+
+			createElement('button', {
+				parent: h.released ? htmlHeroListReleased : htmlHeroListStaging,
+				innerText: name,
+				events: {
+					click: () => this.#testHero(scene, h),
+				}
+			});
+		}
+
+		await this.#loadHeroes();
+	}
+
+	async #testHero(scene: Scene, hero: Hero) {
+		const items: string[] = [
+		]
+
+		if (this.#heroModel) {
+			this.#heroModel.setVisible(false);
+		}
+
+		this.#heroModel = await addSource2Model('deadlock', hero.model, scene);
+		this.#heroModel!.playAnimation(hero.anim ?? 'idle_loadout');
+
+		for (const item of items) {
+			const itemModel = await addSource2Model('dota2', item, this.#heroModel!) as Source2ModelInstance;
+			itemModel.playSequence('ACT_DOTA_IDLE');
+		}
+	}
+
+	async #loadHeroes(): Promise<Map<string, Hero>> {
+		const heroes = new Map<string, Hero>();
+
+		const dataFile = await new Source2FileLoader().load('deadlock', 'scripts/heroes.vdata_c') as Source2File;
+		const kv = dataFile.getKeyValueRoot();
+
+		if (!kv || !kv.root) {
+			return heroes;
+		}
+
+		//const english = await new Source2FileLoader().load('deadlock', 'resource/localization/citadel_gc_hero_names/citadel_gc_hero_names_english.txt') as Source2File;
+		//const kvEnglish = english.getKeyValueRoot();
+		const response = await Repositories.getFileAsText('deadlock', 'resource/localization/citadel_gc_hero_names/citadel_gc_hero_names_english.txt');
+		if (response.error) {
+			return heroes;
+		}
+
+		const kvEnglish = parse(response.text!);
+		console.info(kvEnglish);
+
+		const tokens = kvEnglish?.getKeyByName('lang')?.getKeyByName('Tokens');
+
+		for (const [token, property] of kv.root.getProperties()) {
+			if (!(property as Kv3Value).isKv3Value) {
+				continue;
+			}
+
+			const name = tokens?.getKeyByName(token + ':n'/* why do we do that ?*/);
+			if (!name) {
+				continue;
+			}
+
+			const elem = (property as Kv3Value).getValue();
+
+			if (!(elem as Kv3Element).isKv3Element) {
+				continue;
+			}
+
+			const modelName = (elem as Kv3Element).getSubValueAsResource('m_strModelName');
+			//console.info(modelName);
+
+			if (modelName) {
+				heroes.set(name.value as string, { model: modelName });
+			}
+		}
+
+		return heroes;
 	}
 }
 
-async function testHero(renderer, scene, hero) {
-	const items = [
-	]
-
-	if (heroModel) {
-		heroModel.setVisible(false);
-	}
-
-	heroModel = await AddSource2Model('deadlock', hero.model, renderer, scene);
-	heroModel.playAnimation(hero.anim ?? 'idle_loadout');
-
-	for (const item of items) {
-		const itemModel = await AddSource2Model('dota2', item, renderer, heroModel);
-		itemModel.playSequence('ACT_DOTA_IDLE');
-	}
-}
-
-
-const heroes = {
-	'Grey Talon': {
-		model: 'models/heroes_staging/archer/archer',
-		released: true
-	}
-	, 'Astro': {
-		model: 'models/heroes_staging/astro/astro'
-	}
-	, 'Abrams': {
-		model: 'models/heroes_staging/atlas_detective_v2/atlas_detective',
-		released: true
-	}
-	, 'Kelvin': {
-		model: 'models/heroes_staging/kelvin/kelvin',
-		released: true
-	}
-	, 'Bebop': {
-		model: 'models/heroes_staging/bebop/bebop',
-		released: true
-	}
-	, 'Cadence': {
-		model: 'models/heroes_staging/cadence/cadence'
-	}
-	, 'Paradox': {
-		model: 'models/heroes_staging/chrono/chrono',
-		released: true
-	}
-	, 'Mo & Krill': {
-		model: 'models/heroes_staging/digger/digger',
-		released: true
-	}
-	, 'Mc Ginnis': {
-		model: 'models/heroes_staging/engineer/engineer',
-		released: true
-	}
-	, 'Lady Geist': {
-		model: 'models/heroes_staging/ghost/ghost',
-		released: true
-	}
-	, 'Seven': {
-		model: 'models/heroes_staging/gigawatt/gigawatt',
-		released: true
-	}
-	, 'Seven prisoner': {
-		model: 'models/heroes_staging/gigawatt_prisoner/gigawatt_prisoner',
-		released: true
-	}
-	, 'gunslinger': {
-		model: 'models/heroes_staging/gunslinger/gunslinger'
-	}
-	, 'Haze': {
-		model: 'models/heroes_staging/haze/haze',
-		released: true
-	}
-	, 'haze_v2': {
-		model: 'models/heroes_staging/haze_v2/haze'
-	}
-	, 'Infernus': {
-		model: 'models/heroes_staging/inferno_v4/inferno',
-		anim: 'primary_stand_gun_forward_idle',
-		released: true
-	}
-	, 'kali': {
-		model: 'models/heroes_staging/kali/kali',
-		anim: 'primary_stand_idle'
-	}
-	, 'Kelvin': {
-		model: 'models/heroes_staging/kelvin/kelvin',
-		released: true
-	}
-	, 'Kelvin v2': {
-		model: 'models/heroes_staging/kelvin_v2/kelvin',
-		released: true
-	}
-	, 'Lash': {
-		model: 'models/heroes_staging/lash_v2/lash',
-		released: true
-	}
-	, 'mirage': {
-		model: 'models/heroes_staging/mirage/mirage'
-	}
-	, 'nano': {
-		model: 'models/heroes_staging/nano/nano_v2/nano'
-	}
-	, 'Dynamo': {
-		model: 'models/heroes_staging/prof_dynamo/prof_dynamo',
-		released: true
-	}
-	, 'rutger': {
-		model: 'models/heroes_staging/rutger/rutger',
-		anim: 'primary_stand_idle'
-	}
-	, 'Shiv': {
-		model: 'models/heroes_staging/shiv/shiv',
-		released: true
-	}
-	, 'skymonk': {
-		model: 'models/heroes_staging/skymonk/skymonk',
-		anim: 'primary_stand_idle'
-	}
-	, 'slork': {
-		model: 'models/heroes_staging/slork/slork',
-		anim: 'primary_stand_idle'
-	}
-	, 'Pocket': {
-		model: 'models/heroes_staging/synth/synth',
-		released: true
-	}
-	, 'Ivy': {
-		model: 'models/heroes_staging/tengu/tengu_v2/tengu',
-		anim: 'primary_stand_idle',
-		released: true
-	}
-	, 'thumper': {
-		model: 'models/heroes_staging/thumper/thumper',
-		anim: 'primary_stand_idle'
-	}
-	, 'tokamak': {
-		model: 'models/heroes_staging/tokamak/tokamak'
-	}
-	, 'Vindicta': {
-		model: 'models/heroes_staging/hornet_v3/hornet',
-		anim: 'primary_stand_idle',
-		released: true
-	}
-	, 'Viscous': {
-		model: 'models/heroes_staging/viscous/viscous',
-		released: true
-	}
-	, 'viscous_v2': {
-		model: 'models/heroes_staging/viscous_v2/viscous'
-	}
-	, 'Warden': {
-		model: 'models/heroes_staging/warden/warden',
-		anim: 'primary_stand_idle',
-		released: true
-	}
-	, 'Wraith': {
-		model: 'models/heroes_staging/wraith/wraith',
-		anim: 'primary_stand_idle',
-		released: true
-	}
-	, 'Wraith 2': {
-		model: 'models/heroes_staging/wraith_gen_man/wraith_gen_man',
-		anim: 'primary_stand_idle',
-		released: true
-	}
-	, 'Wraith magician': {
-		model: 'models/heroes_staging/wraith_magician/wraith_magician',
-		anim: 'primary_stand_idle',
-		released: true
-	}
-	, 'Wraith puppeteer': {
-		model: 'models/heroes_staging/wraith_puppeteer/wraith_puppeteer',
-		anim: 'primary_stand_idle',
-		released: true
-	}
-	, 'wrecker': {
-		model: 'models/heroes_staging/wrecker/wrecker'
-	}
-	, 'yakuza': {
-		model: 'models/heroes_staging/yakuza/yakuza',
-		anim: 'primary_stand_idle'
-	}
-	, 'Yamato': {
-		model: 'models/heroes_staging/yamato_v2/yamato',
-		released: true
-	}
-};
+registerDemo(Source2DeadlockArcher);

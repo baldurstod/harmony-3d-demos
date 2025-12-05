@@ -2,7 +2,7 @@ import { Camera, GraphicMouseEventData, GraphicsEvent, GraphicsEvents, Raycaster
 import { InitDemoStd } from '../../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../../demos';
 
-class CircleDemo implements Demo {
+class CameraRayCastingDemo implements Demo {
 	static readonly path = 'misc/raycasting/camera_raycasting';
 
 	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
@@ -20,7 +20,7 @@ class CircleDemo implements Demo {
 	}
 }
 
-registerDemo(CircleDemo);
+registerDemo(CameraRayCastingDemo);
 
 async function testCastray(scene: Scene, perspectiveCamera: Camera) {
 	GraphicsEvents.addEventListener(GraphicsEvent.MouseDown, (event) => {

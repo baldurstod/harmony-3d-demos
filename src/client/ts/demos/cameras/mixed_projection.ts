@@ -7,7 +7,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class MixedProjectionDemo implements Demo {
 	static readonly path = 'cameras/mixed_projection';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(scene);
 		perspectiveCamera.position = [70, -85, 80];
 		orbitCameraControl.target.position = [0, 0, 0];

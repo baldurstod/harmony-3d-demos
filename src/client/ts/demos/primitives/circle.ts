@@ -5,7 +5,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class CircleDemo implements Demo {
 	static readonly path = 'primitives/circle';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		perspectiveCamera.setPosition([0, 0, 20]);
 		orbitCameraControl.target.setPosition([0, 0, 0]);

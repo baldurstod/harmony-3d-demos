@@ -1,47 +1,58 @@
-import { AddSource1Model, InitDemoStd, Harmony3D, GlMatrix, HarmonyUi } from '/js/application.js';
+import { vec4 } from 'gl-matrix';
+import { Camera, ColorBackground, OrbitControl, Scene, Source1ModelInstance } from 'harmony-3d';
+import { createElement, defineHarmonySwitch, HarmonySwitchChange, HTMLHarmonySwitchElement } from 'harmony-ui';
+import { AddSource1Model } from '../../../../utils/source1';
+import { InitDemoStd } from '../../../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../../../demos';
 
-let perspectiveCamera;
-let orbitCameraControl;
-export function initDemo(renderer, scene, { htmlDemoContent }) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
-	testAnimations(renderer, scene, htmlDemoContent);
+class Source1AnimationsDemo implements Demo {
+	static readonly path = 'sourceengine/source1/animations/animations';
 
-	canvas.scenes = [{
-		scene,
-		camera:perspectiveCamera,
-	}];
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
+		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
+		testAnimations(scene, params.htmlDemoContent, perspectiveCamera, orbitCameraControl);
+
+		/*
+		canvas.scenes = [{
+			scene,
+			camera: perspectiveCamera,
+		}];
+		*/
+	}
 }
 
-async function testAnimations(renderer, scene, htmlDemoContent) {
+registerDemo(Source1AnimationsDemo);
+
+async function testAnimations(scene: Scene, htmlDemoContent: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
 	perspectiveCamera.position = [500, 0, 80];
 	orbitCameraControl.target.position = [0, 0, 80];
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 10;
 	perspectiveCamera.verticalFov = 10;
 
-	renderer.clearColor(GlMatrix.vec4.fromValues(0.0, 0.0, 0.0, 255));
+	scene.background = new ColorBackground({ color: vec4.fromValues(0.1, 0.1, 0.1, 1) });
 
-	testMedic(renderer, scene);
-	testScout(renderer, scene);
-	testEngie(renderer, scene);
-	testDemo(renderer, scene);
+	testMedic(scene);
+	testScout(scene);
+	testEngie(scene);
+	testDemo(scene);
 
-	HarmonyUi.defineHarmonySwitch();
+	defineHarmonySwitch();
 
-	const sw = HarmonyUi.createElement('harmony-switch', {
+	const sw = createElement('harmony-switch', {
 		parent: htmlDemoContent,
 		i18n: '#new_animations',
-		events: {
-			change: event => Harmony3D.Source1ModelInstance.useNewAnimSystem = event.target.state,
-		}
-	});
+		state: true,
+		$change: (event: CustomEvent<HarmonySwitchChange>) => Source1ModelInstance.useNewAnimSystem = event.detail.state as boolean,
 
-	sw.state = true;
+	}) as HTMLHarmonySwitchElement;
+
+	//sw.state = true;
 }
 
-async function testMedic(renderer, scene) {
-	const medic = await AddSource1Model('tf2', 'models/player/medic', renderer, scene);
-	const gun = await AddSource1Model('tf2', 'models/weapons/c_models/c_syringegun/c_syringegun', renderer, medic);
+async function testMedic(scene: Scene) {
+	const medic = (await AddSource1Model('tf2', 'models/player/medic', scene))!;
+	const gun = (await AddSource1Model('tf2', 'models/weapons/c_models/c_syringegun/c_syringegun', medic))!;
 	await gun.addAnimation(0, 'idle');
 
 	await medic.addAnimation(0, 'stand_primary');
@@ -51,19 +62,14 @@ async function testMedic(renderer, scene) {
 	//await medic.addAnimation(1, 'a_flinch01');
 
 	medic.playSequence('reloadstand_primary');
-
-	return;
-	const medic2 = await AddSource1Model('tf2', 'models/player/medic', renderer, scene);
-	await medic2.addAnimation('stand_primary');
-	medic2.position = [0, 50, 0];
 }
 
-async function testScout(renderer, scene) {
-	const scout = await AddSource1Model('tf2', 'models/player/scout', renderer, scene);
-	await AddSource1Model('tf2', 'models/weapons/c_models/c_scattergun', renderer, scout);
+async function testScout(scene: Scene) {
+	const scout = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
+	await AddSource1Model('tf2', 'models/weapons/c_models/c_scattergun', scout);
 
-	await scout.setAnimation(0, 'stand_primary');
-	await scout.setAnimation(1, 'primary_reload_loop');
+	await scout.setAnimation(0, 'stand_primary', 1);
+	await scout.setAnimation(1, 'primary_reload_loop', 1);
 	//await scout.addAnimation(1, 'reloadstand_primary');
 	//await scout.addAnimation(1, 'ref');
 	//await scout.addAnimation(1, 'a_flinch01');
@@ -71,16 +77,16 @@ async function testScout(renderer, scene) {
 	scout.playSequence('stand_primary');
 }
 
-async function testEngie(renderer, scene) {
-	const engineer = await AddSource1Model('tf2', 'models/player/engineer', renderer, scene);
+async function testEngie(scene: Scene) {
+	const engineer = (await AddSource1Model('tf2', 'models/player/engineer', scene))!;
 
 	await engineer.addAnimation(0, 'stand_item2');
 	await engineer.addAnimation(1, 'item2_swing');
 }
 
-async function testDemo(renderer, scene) {
-	const demo = await AddSource1Model('tf2', 'models/player/demo', renderer, scene);
-	await AddSource1Model('tf2', 'models/weapons/c_models/c_stickybomb_launcher/c_stickybomb_launcher', renderer, demo);
+async function testDemo(scene: Scene) {
+	const demo = (await AddSource1Model('tf2', 'models/player/demo', scene))!;
+	await AddSource1Model('tf2', 'models/weapons/c_models/c_stickybomb_launcher/c_stickybomb_launcher', demo);
 
 	await demo.addAnimation(0, 'stand_primary');
 	await demo.addAnimation(1, 'gesture_primary_help');

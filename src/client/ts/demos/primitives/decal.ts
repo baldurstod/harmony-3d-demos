@@ -5,7 +5,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class DecalDemo implements Demo {
 	static readonly path = 'primitives/decal';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		perspectiveCamera.position = [20, -20, 10];
 		orbitCameraControl.target.setPosition([0, 0, 0]);

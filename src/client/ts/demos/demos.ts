@@ -9,7 +9,7 @@ export type InitDemoParams = {
 export class Demo {
 	static readonly path: string;
 	static readonly name: string;
-	initDemo(scene: Scene, params: InitDemoParams): void { };
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> { };
 }
 
 const demos = new Map<string, typeof Demo>();

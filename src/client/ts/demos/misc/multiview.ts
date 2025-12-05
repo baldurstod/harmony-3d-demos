@@ -16,7 +16,7 @@ let orbitCameraControl2;
 class MultiviewDemo implements Demo {
 	static readonly path = 'misc/multiview';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		//export function initDemo(renderer, scene, { htmlDemoContentTab, htmlDemoContent }) {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		perspectiveCamera.position = [0, -200, 0];

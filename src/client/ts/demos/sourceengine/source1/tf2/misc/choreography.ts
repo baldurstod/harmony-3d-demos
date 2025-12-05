@@ -1,22 +1,27 @@
-import { AddSource1Model, InitDemoStd, Harmony3D, GlMatrix } from '/js/application.js';
+import { vec4 } from 'gl-matrix';
+import { Camera, ChoreographiesManager, ColorBackground, OrbitControl, Scene } from 'harmony-3d';
+import { AddSource1Model } from '../../../../../utils/source1';
+import { InitDemoStd } from '../../../../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../../../../demos';
 
-let perspectiveCamera;
-let orbitCameraControl;
-export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
-	testChoreo(renderer, scene);
+class ChoreographyDemo implements Demo {
+	static readonly path = 'sourceengine/source1/tf2/misc/choreography';
+
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
+		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
+
+		perspectiveCamera.position = [0, 500, 80];
+		orbitCameraControl.target.position = [0, 0, 80];
+		perspectiveCamera.farPlane = 10000;
+		perspectiveCamera.nearPlane = 10;
+		perspectiveCamera.verticalFov = 10;
+
+		scene.background = new ColorBackground({ color: vec4.fromValues(0., 0., 0., 1) });
+
+		await new ChoreographiesManager().init('tf2', './scenes/scenes.image');
+		let medic = (await AddSource1Model('tf2', 'models/player/medic', scene))!;
+		await new ChoreographiesManager().playChoreography('scenes\\player\\scout\\low\\taunt_brutalLegend.vcd', [medic]);
+	}
 }
 
-async function testChoreo(renderer, scene) {
-	perspectiveCamera.position = [0, 500, 80];
-	orbitCameraControl.target.position = [0, 0, 80];
-	perspectiveCamera.farPlane = 10000;
-	perspectiveCamera.nearPlane = 10;
-	perspectiveCamera.verticalFov = 10;
-
-	renderer.clearColor(GlMatrix.vec4.fromValues(0.0, 0.0, 0.0, 255));
-
-	await new Harmony3D.ChoreographiesManager().init('tf2', './scenes/scenes.image');
-	let medic = await AddSource1Model('tf2', 'models/player/medic', renderer, scene);
-	await new Harmony3D.ChoreographiesManager().playChoreography('scenes\\player\\scout\\low\\taunt_brutalLegend.vcd', [medic]);
-}
+registerDemo(ChoreographyDemo);

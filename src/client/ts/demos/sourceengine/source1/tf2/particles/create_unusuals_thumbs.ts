@@ -1,58 +1,72 @@
-//import { Harmony3D.KeepOnlyLastChild, Graphics, Harmony3D.ColorBackground } from '../../../../../dist/harmony-3d.browser.js';
-import { AddSource1Model, GlMatrix, Harmony3D, HarmonyBrowserUtils, HarmonyUtils, InitDemoStd } from '/js/application.js';
+import { vec3, vec4 } from 'gl-matrix';
+import { Camera, ColorBackground, Entity, Graphics, KeepOnlyLastChild, OrbitControl, Scene, Source1ModelInstance, Source1ParticleControler } from 'harmony-3d';
+import { setTimeoutPromise } from 'harmony-utils';
+import { AddSource1Model } from '../../../../../utils/source1';
+import { InitDemoStd } from '../../../../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../../../../demos';
 
-let perspectiveCamera;
-let orbitCameraControl;
-let heavy;
-let scout;
-export function initDemo(renderer, scene, { htmlDemoContentTab }) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
-	renderUnusuals(renderer, scene, htmlDemoContentTab);
+class CreateUnusualsThumbsDemo implements Demo {
+	static readonly path = 'sourceengine/source1/tf2/particles/create_unusuals_thumbs';
+
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
+		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
+		renderUnusuals(scene, params.htmlDemoContentTab, perspectiveCamera, orbitCameraControl);
+	}
 }
+
+registerDemo(CreateUnusualsThumbsDemo);
 
 const THUMB_SIZE = 256;
 
-async function renderUnusuals(renderer, scene, demoContentTab) {
+type Effect = {
+	system: string;
+	name?: string;
+	fov: number;
+	wait: number;
+	position: [number, number, number];
+	target: [number, number, number];
+	upVector?: [number, number, number];
+	setQuaternion: boolean;
+	isTaunt?: boolean;
+	isKillstreak?: boolean;
+}
+
+async function renderUnusuals(scene: Scene, demoContentTab: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
 	perspectiveCamera.position = [100, 0, 50];
 	orbitCameraControl.target.position = [0, 0, 0];
 	perspectiveCamera.farPlane = 1000;
 	perspectiveCamera.nearPlane = 0.1;
 	perspectiveCamera.verticalFov = 50;
 
-	heavy = await AddSource1Model('tf2', 'models/player/heavy', renderer, scene);
-	heavy.visible = false;
+	const heavy = (await AddSource1Model('tf2', 'models/player/heavy', scene))!;
+	heavy.setVisible(false);
 	heavy.playSequence('ref');
-	scout = await AddSource1Model('tf2', 'models/player/scout', renderer, scene);
+	const scout = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
 	scout.visible = false;
 	scout.playSequence('stand_PRIMARY');
 
-	//rgb(52, 113, 255)
-	//rgb(38, 62, 117);
-	renderer.clearColor(GlMatrix.vec4.fromValues(0.5, 0.5, 0.5, 1.0));
-	renderer.clearColor(GlMatrix.vec4.fromValues(38 / 256, 62 / 256, 117 / 256, 1.0));
-	renderer.clearColor(GlMatrix.vec4.fromValues(0x13 / 256, 0x38 / 256, 0x5D / 256, 1.0));
+	scene.background = new ColorBackground({ color: vec4.fromValues(0x13 / 256, 0x38 / 256, 0x5D / 256, 1.0) });
 
 	// Dark color
-	scene.background = new Harmony3D.ColorBackground({ color: GlMatrix.vec4.fromValues(0x21 / 255, 0x25 / 255, 0x2b / 255, 1.0) });
-	scene.background = new Harmony3D.ColorBackground({ color: GlMatrix.vec4.fromValues(49 / 255, 51 / 255, 56 / 255, 1.0) });
+	scene.background = new ColorBackground({ color: vec4.fromValues(0x21 / 255, 0x25 / 255, 0x2b / 255, 1.0) });
+	scene.background = new ColorBackground({ color: vec4.fromValues(49 / 255, 51 / 255, 56 / 255, 1.0) });
 
 	// Light color
-	//scene.background = new Harmony3D.ColorBackground({ color: GlMatrix.vec4.fromValues(222 / 256, 218 / 256, 212 / 256, 1.0) });
+	//scene.background = new ColorBackground({ color: vec4.fromValues(222 / 256, 218 / 256, 212 / 256, 1.0) });
 
-	renderer.autoResize = false;
-	renderer.setSize(THUMB_SIZE, THUMB_SIZE);
+	//renderer.autoResize = false;
+	//renderer.setSize(THUMB_SIZE, THUMB_SIZE);
 
 	let start = Date.now() / 1000;
-	await renderUnusualList(EffectList, scene.addChild(new Harmony3D.KeepOnlyLastChild()), scene, demoContentTab);
-	//await renderUnusualList(KillstreakList, scene.addChild(new Harmony3D.KeepOnlyLastChild()), scene, demoContentTab);
-	//await renderUnusualList(UnusualTauntList, scene.addChild(new Harmony3D.KeepOnlyLastChild()), scene, demoContentTab);
+	await renderUnusualList(EffectList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
+	//await renderUnusualList(KillstreakList, scene.addChild(new KeepOnlyLastChild()), scene, demoContentTab);
+	//await renderUnusualList(UnusualTauntList, scene.addChild(new KeepOnlyLastChild()), scene, demoContentTab);
 	let end = Date.now() / 1000;
 
 	console.log(`Finished in ${Math.round(end - start)}s`)
 }
 
-
-async function renderUnusualList(list, parent, scene, demoContentTab) {
+async function renderUnusualList(list: Effect[], parent: Entity, scene: Scene, demoContentTab: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl, scout: Source1ModelInstance, heavy: Source1ModelInstance) {
 	const ONE_BIG_PICTURE = false;
 	let canvas = document.createElement('canvas');
 	//document.getElementById('demo-content').append(canvas);
@@ -70,24 +84,24 @@ async function renderUnusualList(list, parent, scene, demoContentTab) {
 	let dy = 0;
 	for (const unusual of list) {
 		console.error('Rendering ' + unusual.system);
-		await renderUnusual(unusual, parent, scene);
+		await renderUnusual(unusual, parent, scene, perspectiveCamera, orbitCameraControl, scout, heavy);
 
-		Harmony3D.Graphics.savePicture(scene, perspectiveCamera, `${unusual.system}.webp`, THUMB_SIZE, THUMB_SIZE, 'image/webp', 1.0);
+		Graphics.savePicture(scene, perspectiveCamera, `${unusual.system}.webp`, THUMB_SIZE, THUMB_SIZE, 'image/webp', 1.0);
 		/*
-			ctx.drawImage(new Harmony3D.Graphics().getCanvas(), 0, dy, THUMB_SIZE, THUMB_SIZE);
+			ctx.drawImage(new Graphics().getCanvas(), 0, dy, THUMB_SIZE, THUMB_SIZE);
 			if (ONE_BIG_PICTURE) {
 				dy += THUMB_SIZE;
 			} else {
-				canvas.toBlob((blob) => HarmonyBrowserUtils.saveFile(new File([blob], `${unusual.system}.webp`)), 'image/webp', 1.0);
+				canvas.toBlob((blob) => saveFile(new File([blob], `${unusual.system}.webp`)), 'image/webp', 1.0);
 			}
 		*/
 	}
 }
 
-async function renderUnusual(unusual, parent, scene) {
-	perspectiveCamera.position = GlMatrix.vec3.add(GlMatrix.vec3.create(), unusual.position ?? [100, 0, 0], [0, 0, unusual.isTaunt ? 0 : 80]);
+async function renderUnusual(unusual: Effect, parent: Entity, scene: Scene, perspectiveCamera: Camera, orbitCameraControl: OrbitControl, scout: Source1ModelInstance, heavy: Source1ModelInstance) {
+	perspectiveCamera.position = vec3.add(vec3.create(), unusual.position ?? [100, 0, 0], [0, 0, unusual.isTaunt ? 0 : 80]);
 	perspectiveCamera.verticalFov = unusual.fov ?? 30;
-	orbitCameraControl.target.position = GlMatrix.vec3.add(GlMatrix.vec3.create(), unusual.target ?? [100, 0, 0], [0, 0, unusual.isTaunt ? 0 : 80]);
+	orbitCameraControl.target.position = vec3.add(vec3.create(), unusual.target ?? [100, 0, 0], [0, 0, unusual.isTaunt ? 0 : 80]);
 
 	if (unusual.upVector) {
 		orbitCameraControl.upVector = unusual.upVector;
@@ -95,37 +109,37 @@ async function renderUnusual(unusual, parent, scene) {
 		orbitCameraControl.upVector = [0, 0, 1];
 	}
 	let sys2;
-	let sys = await Harmony3D.Source1ParticleControler.createSystem('tf2', unusual.system);
+	let sys = await Source1ParticleControler.createSystem('tf2', unusual.system);
 	sys.start();
 	parent.addChild(sys);
 
 
 	if (!unusual.isKillstreak) {
-		sys.getControlPoint(0).position = [0, 0, 80];
+		sys.getControlPoint(0)!.position = [0, 0, 80];
 	}
 
 	if (unusual.setQuaternion) {
-		sys.getControlPoint(0).quaternion = [-1, 0, 0, 1];
+		sys.getControlPoint(0)!.quaternion = [-1, 0, 0, 1];
 	}
 
 	if (unusual.isTaunt) {
-		sys.getControlPoint(0).position = [0, 0, 0];
+		sys.getControlPoint(0)!.position = [0, 0, 0];
 		scout.addChild(sys.getControlPoint(0));
 		sys.reset();
 	}
 
 	if (unusual.isKillstreak) {
-		sys2 = await Harmony3D.Source1ParticleControler.createSystem('tf2', unusual.system);
+		sys2 = await Source1ParticleControler.createSystem('tf2', unusual.system);
 		sys2.start();
 		scene.addChild(sys2);
-		sys.getControlPoint(9).position = [1, 111 / 255, 5 / 255];
-		sys2.getControlPoint(9).position = [1, 111 / 255, 5 / 255];
+		sys.getControlPoint(9)!.position = [1, 111 / 255, 5 / 255];
+		sys2.getControlPoint(9)!.position = [1, 111 / 255, 5 / 255];
 
-		heavy.getAttachement('eyeglow_R').addChild(sys.getControlPoint(0));
-		heavy.getAttachement('eyeglow_L').addChild(sys2.getControlPoint(0));
+		heavy.getAttachment('eyeglow_R')!.addChild(sys.getControlPoint(0));
+		heavy.getAttachment('eyeglow_L')!.addChild(sys2.getControlPoint(0));
 	}
 
-	await HarmonyUtils.setTimeoutPromise(unusual.wait ?? 5000);
+	await setTimeoutPromise(unusual.wait ?? 5000);
 	sys.stop();
 	if (sys2) {
 		sys2.stop();
@@ -134,7 +148,7 @@ async function renderUnusual(unusual, parent, scene) {
 }
 
 
-const EffectList = [
+const EffectList: Effect[] = [
 	/*
 	{system:'superrare_confetti_green', name:'Green Confetti', fov:60, position:[30, 0, 0], target:[0, 0, 0], wait:2200},
 	{system:'superrare_confetti_purple', name:'Purple Confetti', fov:60, position:[30, 0, 0], target:[0, 0, 0], wait:2200},

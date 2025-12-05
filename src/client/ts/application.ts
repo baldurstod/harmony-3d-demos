@@ -1,7 +1,7 @@
-import { exportToBinaryFBX, Graphics, GraphicsEvent, GraphicsEvents, Repositories, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, WebGLStats, WebRepository } from 'harmony-3d';
+import { CanvasAttributes, exportToBinaryFBX, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Repositories, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, WebGLStats, WebRepository } from 'harmony-3d';
 import { saveFile } from 'harmony-browser-utils';
 import { themeCSS } from 'harmony-css';
-import { createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, HTMLHarmonyTabElement, show, toggle } from 'harmony-ui';
+import { ColorPickerEventData, createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, HTMLHarmonyTabElement, show, toggle } from 'harmony-ui';
 import { CS2_REPOSITORY, DEADLOCK_REPOSITORY, DOTA2_REPOSITORY, HLA_REPOSITORY, TF2_REPOSITORY } from '../constants';
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
@@ -15,22 +15,22 @@ documentStyle(varsCSS);
 documentStyle(applicationCSS)
 
 class Application {
-	#htmlElement;
-	#htmlCanvas;
-	#htmlCanvasContainer;
-	#htmlStats;
-	#htmlDemoContent;
-	#htmlDemoList;
+	#htmlElement!: HTMLElement;
+	#htmlCanvas!: HTMLCanvasElement;
+	#htmlCanvasContainer!: HTMLElement;
+	#htmlStats!: HTMLElement;
+	#htmlDemoContent!: HTMLElement;
+	#htmlDemoList!: HTMLElement;
 	#htmlDemoContentTab!: HTMLHarmonyTabElement;
-	#htmlOptionsTab;
+	#htmlOptionsTab!: HTMLElement;
 	#scene = new Scene();
-	#sceneExplorerTab;
-	#shaderEditorTab;
+	#sceneExplorerTab!: HTMLElement;
+	#shaderEditorTab!: HTMLElement;
 	#sceneExplorer = new SceneExplorer();
-	#renderer;
+	#renderer!: typeof Graphics;
 	#useDefaultRenderLoop = true;
-	#shaderEditor;
-	#mainCanvas;
+	#shaderEditor = new ShaderEditor();
+	#mainCanvas!: CanvasAttributes;
 
 	constructor() {
 		this.#init();
@@ -98,7 +98,7 @@ class Application {
 											style: 'height:30px;',
 											innerText: 'Picture',
 											events: {
-												click: () => this.#renderer.savePicture(this.#scene, this.#scene.activeCamera, 'test.png', 1920, 1080),
+												click: () => this.#renderer.savePicture(this.#scene, this.#scene.activeCamera!, 'test.png', 1920, 1080),
 											}
 										}),
 										createElement('button', {
@@ -121,9 +121,7 @@ class Application {
 										class: 'demo-options-tab',
 										childs: [
 											createElement('harmony-color-picker', {
-												events: {
-													change: event => this.#renderer.clearColor(event.detail.rgba),
-												},
+												$change: (event: CustomEvent<ColorPickerEventData>) => this.#renderer.clearColor(event.detail.rgba),
 											}),
 										],
 									}),
@@ -146,7 +144,7 @@ class Application {
 								}),
 								this.#htmlDemoContentTab = createElement('harmony-tab', {
 									'data-i18n': '#demo_content',
-								}),
+								}) as HTMLHarmonyTabElement,
 							],
 						}),
 					],
@@ -172,7 +170,7 @@ class Application {
 	}
 
 	async #initEngine() {
-		this.#shaderEditor = new ShaderEditor();
+		//this.#shaderEditor = new ShaderEditor();
 		//this.#sceneExplorer.scene = this.#scene;
 
 		this.#renderer = await Graphics.initCanvas({
@@ -195,7 +193,7 @@ class Application {
 			},
 			*/
 			autoResize: true
-		});
+		})!;
 
 		this.#htmlCanvasContainer.append(this.#mainCanvas.canvas);
 
@@ -204,11 +202,11 @@ class Application {
 		WebGLStats.start();
 		this.#htmlStats.append(WebGLStats.htmlElement);
 
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => this.#animate(event));
+		GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => this.#animate(event as CustomEvent<GraphicTickEvent>));
 
 	}
 
-	#animate(event) {
+	#animate(event: CustomEvent<GraphicTickEvent>) {
 		WebGLStats.tick();
 		if (this.#useDefaultRenderLoop && this.#scene.activeCamera) {
 			//this.#renderer.render(this.#scene, this.#scene.activeCamera, event.detail.delta, {});
@@ -216,7 +214,7 @@ class Application {
 		}
 	}
 
-	#loadUri(uri) {
+	#loadUri(uri: string) {
 		const url = new URL(uri);
 		const hash = url.hash.substring(1);
 		this.#initDemo(hash);
@@ -252,15 +250,15 @@ class Application {
 		}
 	}
 
-	#expand(path) {
+	#expand(path: string) {
 		let container = this.#htmlDemoList;
 		let arr = path.split('/');
 		while (arr.length) {
 			let value = arr.shift();
 			for (let child of container.children) {
-				if (child.firstChild.innerHTML == value) {
-					show(child.lastChild);
-					container = child.lastChild;
+				if (child.firstChild && (child.firstChild as HTMLElement).innerHTML == value) {
+					show(child.lastChild as HTMLElement);
+					container = child.lastChild as HTMLElement;
 					break;
 				}
 			}
@@ -268,35 +266,32 @@ class Application {
 	}
 
 	#loadDemos(): void {
-		let divs = [];
+		//let divs = [];
 		//let response = await fetch('/list');
 		//let json = await response.json();
+		type toto = [HTMLElement, Record<string, HTMLElement | toto>];
+
 		let container = this.#htmlDemoList;
-		divs = [container, {}];
+		const divs: toto = [container, {}];
 
 		for (let file of getDemoList()) {
 			let arr = file.split('/');
-			let currentLevel = divs;
+			let currentLevel: toto | undefined = divs;
 			for (let i = 0; i < arr.length - 1; ++i) {
-				let d = currentLevel[1][arr[i]!];
+				let d: HTMLElement | undefined = currentLevel![1]![arr[i]!] as HTMLElement;
 				if (!d) {
-					d = document.createElement('div');
-					d.className = 'demos-list-dir';
-					let header = document.createElement('div');
-					header.className = 'demos-list-dir-title';
-					header.innerHTML = arr[i];
-					let content = document.createElement('div');
-					content.className = 'demos-list-dir-content';
+					d = createElement('div', { class: 'demos-list-dir' });
+					let header = createElement('div', { class: 'demos-list-dir-title', innerText: arr[i]! });
+					let content = createElement('div', { class: 'demos-list-dir-content' });
 					currentLevel[0].append(d);
 					d.append(header, content);
-					currentLevel[1][arr[i]] = [content, {}];
+					currentLevel[1][arr[i]!] = [content, {}];
 					hide(content);
 					header.addEventListener('click', () => toggle(content));
 				}
-				currentLevel = currentLevel[1][arr[i]];
+				currentLevel = currentLevel[1][arr[i]!] as toto;
 			}
-			let demo = document.createElement('div');
-			demo.innerHTML = arr[arr.length - 1];
+			let demo = createElement('div', { innerText: arr[arr.length - 1] });
 			demo.addEventListener('click', () => {
 				let location = document.location;
 				location.hash = '#' + file;
@@ -306,7 +301,6 @@ class Application {
 			currentLevel[0].append(demo);
 		}
 		this.#expand(new URL(document.URL).hash.substring(1));
-
 	}
 }
 new Application();

@@ -1,18 +1,25 @@
-import { Harmony3D, GlMatrix, InitDemoStd } from '/js/application.js';
+import { vec4 } from 'gl-matrix';
+import { ColorBackground, FontManager, MeshBasicPbrMaterial, PointLight, Scene, Sphere } from 'harmony-3d';
+import { InitDemoStd } from '../../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../../demos';
 
-let perspectiveCamera;
-let orbitCameraControl;
-export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl] = InitDemoStd(renderer, scene);
-	perspectiveCamera.position = [0, 0, -2];
-	orbitCameraControl.target.position = [0, 0, 0];
-	perspectiveCamera.farPlane = 1000;
-	perspectiveCamera.nearPlane = 0.1;
-	perspectiveCamera.verticalFov = 50;
-	scene.background.setColor(GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1));
+class PbrSphereDemo implements Demo {
+	static readonly path = 'materials/pbr/sphere';
 
-	Harmony3D.FontManager.setFontsPath('./json/fonts/');
-	let l = new Harmony3D.PointLight({ position: [1.25, 1.0, -2], intensity: 1, color: [1, 1, 1], parent: scene });
-	let material = new Harmony3D.MeshBasicPbrMaterial({ metalness: 0, roughness: 0.2, color: [1, 0, 0, 1] });
-	let sphere = new Harmony3D.Sphere({ parent: scene, material: material, segments: 32, rings: 32 });
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
+		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
+		perspectiveCamera.position = [0, 0, -2];
+		orbitCameraControl.target.position = [0, 0, 0];
+		perspectiveCamera.farPlane = 1000;
+		perspectiveCamera.nearPlane = 0.1;
+		perspectiveCamera.verticalFov = 50;
+		scene.background = new ColorBackground({ color: vec4.fromValues(0.1, 0.1, 0.1, 1) });
+
+		FontManager.setFontsPath(new URL('./json/fonts/', document.location.origin));
+		let l = new PointLight({ position: [1.25, 1.0, -2], intensity: 1, color: [1, 1, 1], parent: scene });
+		let material = new MeshBasicPbrMaterial({ metalness: 0, roughness: 0.2, color: [1, 0, 0, 1] });
+		let sphere = new Sphere({ parent: scene, material: material, segments: 32, rings: 32 });
+	}
 }
+
+registerDemo(PbrSphereDemo);

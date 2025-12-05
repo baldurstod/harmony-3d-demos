@@ -6,7 +6,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class CurvesDemo implements Demo {
 	static readonly path = 'misc/curves';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		perspectiveCamera.position = [500, 500, 6000];
 		orbitCameraControl.target.position = [500, 500, 0];

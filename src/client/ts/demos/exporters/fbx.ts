@@ -9,7 +9,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class FbxDemo implements Demo {
 	static readonly path = 'exporters/fbx';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		perspectiveCamera.position = [0, -200, 0];
 		orbitCameraControl.target.position = [0, 0, 0];

@@ -3,12 +3,20 @@ import pbr from '../../json/materials/pbr.json';
 
 const prefix = '/assets/textures/pbr/';
 
-export function getPbrParams(name) {
-	return pbr[name];
+export type PbrParams = {
+	'path': string,
+	'color': string,
+	'metalness': string,
+	'roughness': string,
+	'normal'?: string,
 }
 
-export function createPbrMaterial(name) {
-	const params = pbr[name];
+export function getPbrParams(name: string) {
+	return (pbr as Record<string, PbrParams>)[name]!;
+}
+
+export function createPbrMaterial(name: string) {
+	const params = (pbr as Record<string, PbrParams>)[name];
 	if (!params) {
 		return null;
 	}
@@ -37,7 +45,7 @@ export function createPbrMaterial(name) {
 }
 
 const textures = new Map();
-export function createTextureFromUrl(url) {
+export function createTextureFromUrl(url: string) {
 	if (textures.has(url)) {
 		return textures.get(url);
 	}

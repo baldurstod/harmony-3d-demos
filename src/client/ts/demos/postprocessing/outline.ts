@@ -7,7 +7,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class OutlineDemo implements Demo {
 	static readonly path = 'postprocessing/outline';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		scene.background = new ColorBackground({ color: vec4.fromValues(0., 0., 0., 1) });//.setColor(vec4.fromValues(0., 0., 0., 1));
 

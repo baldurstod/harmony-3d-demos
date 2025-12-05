@@ -5,7 +5,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class WireframeDemo implements Demo {
 	static readonly path = 'misc/wireframe';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		perspectiveCamera.position = [0, -20, 0];
 		orbitCameraControl.target.position = [0, 0, 0];

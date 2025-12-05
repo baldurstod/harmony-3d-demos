@@ -1,26 +1,33 @@
-import { Harmony3D, GlMatrix, createPbrMaterial, createTextureFromUrl, getPbrParams, InitDemoStd } from '/js/application.js';
+import { vec4 } from 'gl-matrix';
+import { ColorBackground, Material, MateriaParameterType, PointLight, Scene, ShaderMaterial, Sphere } from 'harmony-3d';
+import { createPbrMaterial, createTextureFromUrl, getPbrParams } from '../../../utils/pbrmaterials';
+import { InitDemoStd } from '../../../utils/utils';
+import { Demo, InitDemoParams, registerDemo } from '../../demos';
 
-let perspectiveCamera;
-let orbitCameraControl;
-let ambientLight;
-export function initDemo(renderer, scene) {
-	[perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(renderer, scene);
-	ambientLight.intensity = 0.1;
-	perspectiveCamera.position = [0, -10, 0];
-	orbitCameraControl.target.position = [0, 0, 0];
-	perspectiveCamera.farPlane = 1000;
-	perspectiveCamera.nearPlane = 0.1;
-	perspectiveCamera.verticalFov = 50;
-	scene.background.setColor(GlMatrix.vec4.fromValues(0.1, 0.1, 0.1, 1));
+class RustedIron2Demo implements Demo {
+	static readonly path = 'materials/pbr/rusted_iron2';
 
-	let l = new Harmony3D.PointLight({ position: [0, -2, -0], intensity: 1, parent: scene });
-	new Harmony3D.Sphere({ position: [-1, 0, 0], parent: scene, radius: 1, material: createPbrMaterial('rustediron2'), segments: 32, rings: 32 });
-	new Harmony3D.Sphere({ position: [1, 0, 0], parent: scene, radius: 1, material: createCustomMaterial('rustediron2'), segments: 32, rings: 32 });
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
+		const [perspectiveCamera, orbitCameraControl, ambientLight] = InitDemoStd(scene);
+		ambientLight.intensity = 0.1;
+		perspectiveCamera.position = [0, -10, 0];
+		orbitCameraControl.target.position = [0, 0, 0];
+		perspectiveCamera.farPlane = 1000;
+		perspectiveCamera.nearPlane = 0.1;
+		perspectiveCamera.verticalFov = 50;
+		scene.background = new ColorBackground({ color: vec4.fromValues(0.1, 0.1, 0.1, 1) });
+
+		let l = new PointLight({ position: [0, -2, -0], intensity: 1, parent: scene });
+		new Sphere({ position: [-1, 0, 0], parent: scene, radius: 1, material: createPbrMaterial('rustediron2')!, segments: 32, rings: 32 });
+		new Sphere({ position: [1, 0, 0], parent: scene, radius: 1, material: createCustomMaterial('rustediron2'), segments: 32, rings: 32 });
+	}
 }
 
+registerDemo(RustedIron2Demo);
 
-function createCustomMaterial(name) {
-	const material = new Harmony3D.ShaderMaterial({
+
+function createCustomMaterial(name: string): Material {
+	const material = new ShaderMaterial({
 		vertex: `
 layout (location = 0) in vec3 aVertexPosition;
 layout (location = 1) in vec3 aVertexNormal;
@@ -232,13 +239,13 @@ void main()
 
 	const prefix = '/assets/textures/pbr/';
 
-	material.addParameter('color', Harmony3D.MateriaParameterType.Color4, null, newValue => material.setColor4Uniform('uColor', newValue ?? GlMatrix.vec4.fromValues(1.0, 1.0, 1.0, 1.0)));
-	material.addParameter('metalness', Harmony3D.MateriaParameterType.NormalizedFloat, 0, newValue => { material.uniforms['uMetalness'] = newValue });
-	material.addParameter('roughness', Harmony3D.MateriaParameterType.NormalizedFloat, 0, newValue => { material.uniforms['uRoughness'] = newValue });
-	material.addParameter('color_texture', Harmony3D.MateriaParameterType.Texture, null, newValue => material.setTexture('uColorTexture', newValue, 'USE_COLOR_TEXTURE'));
-	material.addParameter('normal_texture', Harmony3D.MateriaParameterType.Texture, null, newValue => material.setTexture('uNormalTexture', newValue, 'USE_NORMAL_TEXTURE'));
-	material.addParameter('metalness_texture', Harmony3D.MateriaParameterType.Texture, null, newValue => material.setTexture('uMetalnessTexture', newValue, 'USE_METALNESS_TEXTURE'));
-	material.addParameter('roughness_texture', Harmony3D.MateriaParameterType.Texture, null, newValue => material.setTexture('uRoughnessTexture', newValue, 'USE_ROUGHNESS_TEXTURE'));
+	material.addParameter('color', MateriaParameterType.Color4, null, newValue => material.setColor4Uniform('uColor', newValue ?? vec4.fromValues(1.0, 1.0, 1.0, 1.0)));
+	material.addParameter('metalness', MateriaParameterType.NormalizedFloat, 0, newValue => { material.uniforms['uMetalness'] = newValue });
+	material.addParameter('roughness', MateriaParameterType.NormalizedFloat, 0, newValue => { material.uniforms['uRoughness'] = newValue });
+	material.addParameter('color_texture', MateriaParameterType.Texture, null, newValue => material.setTexture('uColorTexture', newValue, 'USE_COLOR_TEXTURE'));
+	material.addParameter('normal_texture', MateriaParameterType.Texture, null, newValue => material.setTexture('uNormalTexture', newValue, 'USE_NORMAL_TEXTURE'));
+	material.addParameter('metalness_texture', MateriaParameterType.Texture, null, newValue => material.setTexture('uMetalnessTexture', newValue, 'USE_METALNESS_TEXTURE'));
+	material.addParameter('roughness_texture', MateriaParameterType.Texture, null, newValue => material.setTexture('uRoughnessTexture', newValue, 'USE_ROUGHNESS_TEXTURE'));
 
 	const params = getPbrParams(name);
 	if (params) {

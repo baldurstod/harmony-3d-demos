@@ -5,7 +5,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class ImportObjDemo implements Demo {
 	static readonly path = 'importers/obj';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		testImportObj(scene, perspectiveCamera, orbitCameraControl);
 	}

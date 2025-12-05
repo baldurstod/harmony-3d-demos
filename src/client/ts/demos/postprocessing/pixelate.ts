@@ -7,7 +7,7 @@ import { Demo, InitDemoParams, registerDemo } from '../demos';
 class PixelateDemo implements Demo {
 	static readonly path = 'postprocessing/pixelate';
 
-	initDemo(scene: Scene, params: InitDemoParams): void {
+	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		//renderer.autoResize = false;
 		//renderer.setSize(0, 0);
