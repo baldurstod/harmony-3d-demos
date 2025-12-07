@@ -31,7 +31,18 @@ class RemGeneratorDemo implements Demo {
 		const img = new Image(2048, 2048);
 		img.src = './assets/textures/ldr/equirectangular/atlas1.jpg';
 		await img.decode();
-		const earthTexture = TextureManager.createTextureFromImage(img, { flipY: true })
+		const earthTexture = TextureManager.createTextureFromImage({
+			webgpuDescriptor: {
+				size: {
+					width: img.naturalWidth,
+					height: img.naturalHeight,
+				},
+				format: 'rgba8unorm',
+				usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+			},
+			image: img,
+			flipY: true,
+		});
 		earthTexture.addUser(this);
 
 		const generator = new RemGenerator(Graphics.getForwardRenderer()!);

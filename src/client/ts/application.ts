@@ -1,4 +1,4 @@
-import { CanvasAttributes, exportToBinaryFBX, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Repositories, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, WebGLStats, WebRepository } from 'harmony-3d';
+import { CanvasAttributes, ContextType, exportToBinaryFBX, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Repositories, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, WebGLStats, WebRepository } from 'harmony-3d';
 import { saveFile } from 'harmony-browser-utils';
 import { themeCSS } from 'harmony-css';
 import { ColorPickerEventData, createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, HTMLHarmonyTabElement, show, toggle } from 'harmony-ui';
@@ -173,10 +173,17 @@ class Application {
 		//this.#shaderEditor = new ShaderEditor();
 		//this.#sceneExplorer.scene = this.#scene;
 
+		let type = ContextType.WebGL;
+
+		const url = new URL(document.URL);
+		if (url.pathname.startsWith('/@webgpu')) {
+			type = ContextType.WebGPU;
+		}
+
 		this.#renderer = await Graphics.initCanvas({
 			useOffscreenCanvas: true,
 			autoResize: true,
-			//type: ContextType.WebGPU,
+			type,
 			webGL: {
 				alpha: true,
 				//preserveDrawingBuffer: true,

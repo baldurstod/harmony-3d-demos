@@ -18,15 +18,15 @@ class RustedIron2Demo implements Demo {
 		scene.background = new ColorBackground({ color: vec4.fromValues(0.1, 0.1, 0.1, 1) });
 
 		let l = new PointLight({ position: [0, -2, -0], intensity: 1, parent: scene });
-		new Sphere({ position: [-1, 0, 0], parent: scene, radius: 1, material: createPbrMaterial('rustediron2')!, segments: 32, rings: 32 });
-		new Sphere({ position: [1, 0, 0], parent: scene, radius: 1, material: createCustomMaterial('rustediron2'), segments: 32, rings: 32 });
+		new Sphere({ position: [-1, 0, 0], parent: scene, radius: 1, material: await createPbrMaterial('rustediron2') as Material, segments: 32, rings: 32 });
+		new Sphere({ position: [1, 0, 0], parent: scene, radius: 1, material: await createCustomMaterial('rustediron2'), segments: 32, rings: 32 });
 	}
 }
 
 registerDemo(RustedIron2Demo);
 
 
-function createCustomMaterial(name: string): Material {
+async function  createCustomMaterial(name: string): Promise<Material> {
 	const material = new ShaderMaterial({
 		vertex: `
 layout (location = 0) in vec3 aVertexPosition;
@@ -251,22 +251,22 @@ void main()
 	if (params) {
 		let colorTexture, normalTexture, metalnessTexture, roughnessTexture;
 		if (params.color) {
-			colorTexture = createTextureFromUrl(prefix + params.path + '/' + params.color);
+			colorTexture = await createTextureFromUrl(prefix + params.path + '/' + params.color);
+			material.setParameterValue('color_texture', colorTexture);
 		}
 		if (params.normal) {
-			normalTexture = createTextureFromUrl(prefix + params.path + '/' + params.normal);
+			normalTexture = await createTextureFromUrl(prefix + params.path + '/' + params.normal);
+			material.setParameterValue('normal_texture', normalTexture);
 		}
 		if (params.metalness) {
-			metalnessTexture = createTextureFromUrl(prefix + params.path + '/' + params.metalness);
+			metalnessTexture = await createTextureFromUrl(prefix + params.path + '/' + params.metalness);
+			material.setParameterValue('metalness_texture', metalnessTexture);
 		}
 		if (params.metalness) {
-			roughnessTexture = createTextureFromUrl(prefix + params.path + '/' + params.roughness);
+			roughnessTexture = await createTextureFromUrl(prefix + params.path + '/' + params.roughness);
+			material.setParameterValue('roughness_texture', roughnessTexture);
 		}
 
-		material.setParameterValue('color_texture', colorTexture);
-		material.setParameterValue('normal_texture', normalTexture);
-		material.setParameterValue('metalness_texture', metalnessTexture);
-		material.setParameterValue('roughness_texture', roughnessTexture);
 	}
 	return material;
 }

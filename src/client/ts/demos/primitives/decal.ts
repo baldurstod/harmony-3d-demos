@@ -28,7 +28,18 @@ async function testTexturedBox(scene: Scene) {
 	await img.decode();
 
 
-	material.setColorMap(TextureManager.createTextureFromImage(img, { flipY: true }));
+	material.setColorMap(TextureManager.createTextureFromImage({
+		webgpuDescriptor: {
+			size: {
+				width: img.naturalWidth,
+				height: img.naturalHeight,
+			},
+			format: 'rgba8unorm',
+			usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+		},
+		image: img,
+		flipY: true,
+	}));
 
 
 	//updateGeometry(radius = 1, widthSegments = 8, heightSegments = 6, phiStart = 0, phiLength = TWO_PI, thetaStart = 0, thetaLength = Math.PI) {
@@ -41,7 +52,18 @@ async function testTexturedBox(scene: Scene) {
 	//box.set = true;
 	//decal.visible = true;
 
-	decal.getMaterial().setColorMap(TextureManager.createTextureFromImage(img, { flipY: true }));
+	decal.getMaterial().setColorMap(TextureManager.createTextureFromImage({
+		webgpuDescriptor: {
+			size: {
+				width: img.naturalWidth,
+				height: img.naturalHeight,
+			},
+			format: 'rgba8unorm',
+			usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+		},
+		image: img,
+		flipY: true,
+	}));
 	decal.getMaterial().polygonOffset = true;
 	decal.position = [1, 0, 0];
 	decal.refreshGeometry();

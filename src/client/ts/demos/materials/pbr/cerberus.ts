@@ -1,5 +1,5 @@
 import { vec4 } from 'gl-matrix';
-import { ColorBackground, CubeBackground, Graphics, HALF_PI, OBJImporter, PointLight, RemGenerator, RgbeImporter, Scene } from 'harmony-3d';
+import { ColorBackground, CubeBackground, Graphics, HALF_PI, Material, OBJImporter, PointLight, RemGenerator, RgbeImporter, Scene } from 'harmony-3d';
 import { createPbrMaterial } from '../../../utils/pbrmaterials';
 import { registerDemo } from '../../demos';
 import { InitDemoStd } from '../../../utils/utils';
@@ -34,7 +34,7 @@ async function testCerberus(scene: Scene) {
 	mesh.name = 'Cerberus';
 	mesh.rotateX(HALF_PI);
 	mesh.rotateY(-HALF_PI);
-	mesh.setMaterial(createPbrMaterial('cerberus')!);
+	mesh.setMaterial(await createPbrMaterial('cerberus') as Material);
 
 	scene.addChild(mesh);
 
