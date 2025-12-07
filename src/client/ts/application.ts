@@ -31,6 +31,7 @@ class Application {
 	#useDefaultRenderLoop = true;
 	#shaderEditor = new ShaderEditor();
 	#mainCanvas!: CanvasAttributes;
+	#contextType = ContextType.WebGL;
 
 	constructor() {
 		this.#init();
@@ -173,17 +174,16 @@ class Application {
 		//this.#shaderEditor = new ShaderEditor();
 		//this.#sceneExplorer.scene = this.#scene;
 
-		let type = ContextType.WebGL;
-
 		const url = new URL(document.URL);
-		if (url.pathname.startsWith('/@webgpu')) {
-			type = ContextType.WebGPU;
+		//if (url.pathname.startsWith('/@webgpu')) {
+		if (url.hash.substring(1) == 'webgpu') {
+			this.#contextType = ContextType.WebGPU;
 		}
 
 		this.#renderer = await Graphics.initCanvas({
 			useOffscreenCanvas: true,
 			autoResize: true,
-			type,
+			type: this.#contextType,
 			webGL: {
 				alpha: true,
 				//preserveDrawingBuffer: true,
@@ -223,8 +223,11 @@ class Application {
 
 	#loadUri(uri: string) {
 		const url = new URL(uri);
-		const hash = url.hash.substring(1);
-		this.#initDemo(hash);
+		//const hash = url.hash.substring(1);
+
+		if (url.pathname.startsWith('/@')) {
+			this.#initDemo(url.pathname.substring(2));
+		}
 	}
 
 	async #initDemo(path: string): Promise<void> {
@@ -301,7 +304,7 @@ class Application {
 			let demo = createElement('div', { innerText: arr[arr.length - 1] });
 			demo.addEventListener('click', () => {
 				let location = document.location;
-				location.hash = '#' + file;
+				location.pathname = '/@' + file;
 				document.location = location.toString();
 			}
 			);
