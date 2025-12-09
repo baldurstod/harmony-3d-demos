@@ -1,7 +1,7 @@
 import { CanvasAttributes, ContextType, exportToBinaryFBX, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Repositories, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, WebGLStats, WebRepository } from 'harmony-3d';
 import { saveFile } from 'harmony-browser-utils';
 import { themeCSS } from 'harmony-css';
-import { ColorPickerEventData, createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, HTMLHarmonyTabElement, show, toggle } from 'harmony-ui';
+import { ColorPickerEventData, createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, HTMLHarmonyTabElement, I18n, show, toggle } from 'harmony-ui';
 import { CS2_REPOSITORY, DEADLOCK_REPOSITORY, DOTA2_REPOSITORY, HLA_REPOSITORY, TF2_REPOSITORY } from '../constants';
 import applicationCSS from '../css/application.css';
 import htmlCSS from '../css/html.css';
@@ -47,7 +47,7 @@ class Application {
 		this.#loadUri(document.URL);
 		this.#loadDemos();
 		this.#sceneExplorer.setScene(this.#scene);
-
+		I18n.start();
 	}
 
 	#initRepositories() {
