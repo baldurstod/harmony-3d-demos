@@ -307,9 +307,7 @@ class Application {
 			let demo = createElement('div', { innerText: arr[arr.length - 1] });
 			demo.addEventListener('click', () => {
 				let location = new URL(document.location.toString());
-				//new Location().
 				location.pathname = '/@' + file;
-				//document.location = location.toString();
 
 				history.pushState({}, '', location);
 				this.#loadUri(location.toString());
@@ -317,7 +315,11 @@ class Application {
 			);
 			currentLevel[0].append(demo);
 		}
-		this.#expand(new URL(document.URL).hash.substring(1));
+
+		const url = new URL(document.URL);
+		if (url.pathname.startsWith('/@')) {
+			this.#expand(url.pathname.substring(2));
+		}
 	}
 }
 new Application();
