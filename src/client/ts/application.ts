@@ -188,6 +188,9 @@ class Application {
 				alpha: true,
 				//preserveDrawingBuffer: true,
 				premultipliedAlpha: false
+			},
+			webGPU: {
+				alphaMode: 'premultiplied',
 			}
 		});
 
@@ -303,9 +306,13 @@ class Application {
 			}
 			let demo = createElement('div', { innerText: arr[arr.length - 1] });
 			demo.addEventListener('click', () => {
-				let location = document.location;
+				let location = new URL(document.location.toString());
+				//new Location().
 				location.pathname = '/@' + file;
-				document.location = location.toString();
+				//document.location = location.toString();
+
+				history.pushState({}, '', location);
+				this.#loadUri(location.toString());
 			}
 			);
 			currentLevel[0].append(demo);
