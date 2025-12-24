@@ -136,6 +136,7 @@ class Application {
 								}),
 								this.#shaderEditorTab = createElement('harmony-tab', {
 									'data-i18n': '#shader_editor',
+									style: 'width: 50rem;',
 									events: {
 										activated: () => {
 											this.#shaderEditor.initEditor({ aceUrl: '/assets/js/ace-builds/src-min/ace.js', displayCustomShaderButtons: false });
