@@ -58,8 +58,8 @@ export async function createTextureFromUrl(url: string): Promise<Texture> {
 		promiseResolve = resolve;
 	});
 
-	image.onload = () => {
-		const texture = TextureManager.createTextureFromImage({
+	image.onload = async () => {
+		const texture = await TextureManager.createTextureFromImage({
 			webgpuDescriptor: {
 				format: 'rgba8unorm',
 				usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,

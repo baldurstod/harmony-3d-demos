@@ -28,14 +28,14 @@ async function testTexturedBox(scene: Scene) {
 	await img.decode();
 
 
-	material.setColorMap(TextureManager.createTextureFromImage({
+	material.setColorMap(await TextureManager.createTextureFromImage({
 		webgpuDescriptor: {
 			size: {
 				width: img.naturalWidth,
 				height: img.naturalHeight,
 			},
 			format: 'rgba8unorm',
-			usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+			usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
 		},
 		image: img,
 		flipY: true,
@@ -52,14 +52,14 @@ async function testTexturedBox(scene: Scene) {
 	//box.set = true;
 	//decal.visible = true;
 
-	decal.getMaterial().setColorMap(TextureManager.createTextureFromImage({
+	decal.getMaterial().setColorMap(await TextureManager.createTextureFromImage({
 		webgpuDescriptor: {
 			size: {
 				width: img.naturalWidth,
 				height: img.naturalHeight,
 			},
 			format: 'rgba8unorm',
-			usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST,
+			usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
 		},
 		image: img,
 		flipY: true,

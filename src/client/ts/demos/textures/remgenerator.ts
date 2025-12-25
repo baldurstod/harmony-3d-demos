@@ -31,7 +31,7 @@ class RemGeneratorDemo implements Demo {
 		const img = new Image(2048, 2048);
 		img.src = './assets/textures/ldr/equirectangular/atlas1.jpg';
 		await img.decode();
-		const earthTexture = TextureManager.createTextureFromImage({
+		const earthTexture = await TextureManager.createTextureFromImage({
 			webgpuDescriptor: {
 				size: {
 					width: img.naturalWidth,
