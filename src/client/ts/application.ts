@@ -221,7 +221,7 @@ class Application {
 		WebGLStats.tick();
 		if (this.#useDefaultRenderLoop && this.#scene.activeCamera) {
 			//this.#renderer.render(this.#scene, this.#scene.activeCamera, event.detail.delta, {});
-			Graphics.renderMultiCanvas(event.detail.delta);
+			Graphics.renderMultiCanvas(event.detail.delta, event.detail.context);
 		}
 	}
 

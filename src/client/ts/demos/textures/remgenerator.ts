@@ -52,7 +52,7 @@ class RemGeneratorDemo implements Demo {
 
 		const renderTargetViewer = new RenderTargetViewer(renderTarget);
 		function animate(event: Event) {
-			Graphics.render(scene, scene.activeCamera!, (event as CustomEvent<GraphicTickEvent>).detail.delta, {});
+			Graphics.render(scene, scene.activeCamera!, (event as CustomEvent<GraphicTickEvent>).detail.delta, (event as CustomEvent<GraphicTickEvent>).detail.context);
 			renderTargetViewer.render();
 		}
 		GraphicsEvents.addEventListener(GraphicsEvent.Tick, animate);
