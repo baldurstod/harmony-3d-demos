@@ -59,9 +59,9 @@ async function renderUnusuals(scene: Scene, demoContentTab: HTMLElement, perspec
 
 	Source1ParticleSystem.setSimulationSteps(5);
 	let start = Date.now() / 1000;
-	//await renderUnusualList(EffectList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
+	await renderUnusualList(EffectList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
 	//await renderUnusualList(KillstreakList, scene.addChild(new KeepOnlyLastChild()), scene, demoContentTab);
-	await renderUnusualList(UnusualTauntList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
+	//await renderUnusualList(UnusualTauntList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
 	let end = Date.now() / 1000;
 
 	console.log(`Finished in ${Math.round(end - start)}s`)
@@ -150,7 +150,7 @@ async function renderUnusual(unusual: Effect, parent: Entity, scene: Scene, pers
 }
 
 
-const EffectList: Effect[] = [
+const EffectList: Effect[] = [/*
 	{ system: 'superrare_confetti_green', name: 'Green Confetti', fov: 60, position: [30, 0, 0], target: [0, 0, 0], wait: 2200 },
 	{ system: 'superrare_confetti_purple', name: 'Purple Confetti', fov: 60, position: [30, 0, 0], target: [0, 0, 0], wait: 2200 },
 	{ system: 'superrare_ghosts', name: 'Haunted Ghosts', fov: 50, position: [30, 0, 0], target: [0, 0, 0], wait: 1500 },
@@ -536,9 +536,9 @@ const EffectList: Effect[] = [
 
 	/*
 	// Smissmas 2025 Unusual
-	{ system: 'unusual_ombre_parent_purple', fov: 30, position: [55, 0, 0], target: [0, 0, 9], wait: 2000, setQuaternion: true },
-	{ system: 'unusual_ombre_parent_teal', fov: 30, position: [55, 0, 0], target: [0, 0, 9], wait: 2000, setQuaternion: true },
-	{ system: 'unusual_ombre_parent_spectrum', fov: 30, position: [55, 0, 0], target: [0, 0, 9], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_ombre_parent_purple', fov: 30, position: [0, 55, 0], target: [0, 0, 9], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_ombre_parent_teal', fov: 30, position: [0, 55, 0], target: [0, 0, 9], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_ombre_parent_spectrum', fov: 30, position: [0, 55, 0], target: [0, 0, 9], wait: 2000, setQuaternion: true },
 	{ system: 'unusual_calmsnowfall_parent', fov: 30, position: [50, 0, 0], target: [0, 0, 7], wait: 2000, setQuaternion: true },
 	{ system: 'unusual_team_recognition_teamcolor_red', fov: 30, position: [50, 0, 0], target: [0, 0, 5], wait: 2000, setQuaternion: true },
 	{ system: 'unusual_team_recognition_teamcolor_blue', fov: 30, position: [50, 0, 0], target: [0, 0, 5], wait: 2000, setQuaternion: true },
