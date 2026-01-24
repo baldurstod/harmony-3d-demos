@@ -155,7 +155,7 @@ async function testUberSaw(scene: Scene, htmlDemoContentTab: HTMLHarmonyTabEleme
 
 	let { name: outputTextureName, texture: outputTexture } = Source1TextureManager.addInternalTexture('tf2');
 	//window.outputTexture = outputTexture;
-	finalNode.getOutput('output')!._value = outputTexture;
+	finalNode.getOutput('output')!._value = outputTexture.frames[0];
 
 	outputTexture.texImage2D(Graphics.glContext, GL_TEXTURE_2D, 1, 1, TextureFormat.Rgba, TextureType.UnsignedByte, new Uint8Array([255, 255, 255, 255]));
 
