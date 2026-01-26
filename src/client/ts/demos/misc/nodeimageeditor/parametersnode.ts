@@ -1,4 +1,4 @@
-import { ApplySticker, CombineLerp, GL_TEXTURE_2D, Graphics, IntArrayNode, Multiply, NodeImageEditor, NodeImageEditorGui, Plane, Scene, Select, Source1MaterialManager, Source1TextureManager, TextureFormat, TextureLookup, TextureType } from 'harmony-3d';
+import { AnimatedTexture, ApplySticker, CombineLerp, IntArrayNode, Multiply, NodeImageEditor, NodeImageEditorGui, Plane, Scene, Select, Source1MaterialManager, Source1TextureManager, Texture, TextureLookup } from 'harmony-3d';
 import { HTMLHarmonyTabElement } from 'harmony-ui';
 import { AddSource1Model } from '../../../utils/source1';
 import { InitDemoStd } from '../../../utils/utils';
@@ -157,16 +157,24 @@ async function testUberSaw(scene: Scene, htmlDemoContentTab: HTMLHarmonyTabEleme
 	//window.outputTexture = outputTexture;
 	finalNode.getOutput('output')!._value = outputTexture.frames[0];
 
-	outputTexture.texImage2D(Graphics.glContext, GL_TEXTURE_2D, 1, 1, TextureFormat.Rgba, TextureType.UnsignedByte, new Uint8Array([255, 255, 255, 255]));
+	//outputTexture.texImage2D(Graphics.glContext, GL_TEXTURE_2D, 1, 1, TextureFormat.Rgba, TextureType.UnsignedByte, new Uint8Array([255, 255, 255, 255]));
 
 
 	//texImage2D(glContext, target, width, height, format, type, pixels = null, level = 0) {
 
-	setInterval(() => {
+	setInterval(async () => {
 		if (!finalNode.isValid()) {
-			finalNode.redraw();
-			c_ubersaw.materialsParams['WeaponSkin'] = outputTextureName;
-			planeMesh.materialsParams['WeaponSkin'] = outputTextureName;
+			await finalNode.redraw();
+
+			const texture = new AnimatedTexture();
+			texture.addFrame(0, finalNode.getOutput('output')!._value as Texture);
+
+			//let { name: outputTextureName, texture: outputTexture } = Source1TextureManager.addInternalTexture('tf2', undefined, texture);
+			Source1TextureManager.setTexture('tf2', 'test', texture);
+			//			finalNode.getOutput('output')!._value = outputTexture.frames[0];
+
+			c_ubersaw.materialsParams['WeaponSkin'] = 'test';
+			planeMesh.materialsParams['WeaponSkin'] = 'test';
 		}
 	}, 100);
 }
