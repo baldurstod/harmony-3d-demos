@@ -1,5 +1,5 @@
 import { vec4 } from 'gl-matrix';
-import { Camera, ChoreographiesManager, ColorBackground, OrbitControl, Scene } from 'harmony-3d';
+import { ChoreographiesManager, ColorBackground, Scene } from 'harmony-3d';
 import { AddSource1Model } from '../../../../../utils/source1';
 import { InitDemoStd } from '../../../../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../../../../demos';
@@ -18,9 +18,9 @@ class ChoreographyDemo implements Demo {
 
 		scene.background = new ColorBackground({ color: vec4.fromValues(0., 0., 0., 1) });
 
-		await new ChoreographiesManager().init('tf2', './scenes/scenes.image');
+		await ChoreographiesManager.init('tf2', './scenes/scenes.image');
 		let medic = (await AddSource1Model('tf2', 'models/player/medic', scene))!;
-		await new ChoreographiesManager().playChoreography('scenes\\player\\scout\\low\\taunt_brutalLegend.vcd', [medic]);
+		await ChoreographiesManager.playChoreography('tf2', 'scenes\\player\\scout\\low\\taunt_brutalLegend.vcd', [medic]);
 	}
 }
 

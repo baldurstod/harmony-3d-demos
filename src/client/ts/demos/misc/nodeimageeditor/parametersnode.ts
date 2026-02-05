@@ -164,7 +164,7 @@ async function testUberSaw(scene: Scene, htmlDemoContentTab: HTMLHarmonyTabEleme
 
 	setInterval(async () => {
 		if (!finalNode.isValid()) {
-			await finalNode.redraw();
+			await finalNode.redraw({});
 
 			const texture = new AnimatedTexture();
 			texture.addFrame(0, finalNode.getOutput('output')!._value as Texture);

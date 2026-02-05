@@ -1,5 +1,5 @@
 import { vec4 } from 'gl-matrix';
-import { Camera, ColorBackground, OrbitControl, Scene, Source1ModelInstance } from 'harmony-3d';
+import { Camera, ColorBackground, MeshBasicMaterial, OrbitControl, Scene, Source1ModelInstance } from 'harmony-3d';
 import { createElement, defineHarmonySwitch, HarmonySwitchChange, HTMLHarmonySwitchElement } from 'harmony-ui';
 import { AddSource1Model } from '../../../../utils/source1';
 import { InitDemoStd } from '../../../../utils/utils';
@@ -26,16 +26,20 @@ registerDemo(Source1AnimationsDemo);
 async function testAnimations(scene: Scene, htmlDemoContent: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
 	perspectiveCamera.position = [500, 0, 80];
 	orbitCameraControl.target.position = [0, 0, 80];
+	orbitCameraControl.target.position = [0, 0, 0];
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 10;
 	perspectiveCamera.verticalFov = 10;
 
 	scene.background = new ColorBackground({ color: vec4.fromValues(0.1, 0.1, 0.1, 1) });
 
-	testMedic(scene);
+
+	//await AddSource1Model('tf2', 'models/weapons/c_models/c_scattergun', scene);return;
+
+	//testMedic(scene);
 	testScout(scene);
-	testEngie(scene);
-	testDemo(scene);
+	//testEngie(scene);
+	//testDemo(scene);
 
 	defineHarmonySwitch();
 
@@ -62,11 +66,12 @@ async function testMedic(scene: Scene) {
 	//await medic.addAnimation(1, 'a_flinch01');
 
 	medic.playSequence('reloadstand_primary');
+	//medic.setMaterialOverride(new MeshBasicMaterial());
 }
 
 async function testScout(scene: Scene) {
 	const scout = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
-	await AddSource1Model('tf2', 'models/weapons/c_models/c_scattergun', scout);
+	const scattergun = (await AddSource1Model('tf2', 'models/weapons/c_models/c_scattergun', scout))!;
 
 	await scout.setAnimation(0, 'stand_primary', 1);
 	await scout.setAnimation(1, 'primary_reload_loop', 1);
@@ -74,7 +79,10 @@ async function testScout(scene: Scene) {
 	//await scout.addAnimation(1, 'ref');
 	//await scout.addAnimation(1, 'a_flinch01');
 
+	scattergun.sheen = [1, 0, 0];
+
 	scout.playSequence('stand_primary');
+	//scout.setMaterialOverride(new MeshBasicMaterial());
 }
 
 async function testEngie(scene: Scene) {

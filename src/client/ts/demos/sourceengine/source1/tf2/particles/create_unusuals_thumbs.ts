@@ -59,9 +59,9 @@ async function renderUnusuals(scene: Scene, demoContentTab: HTMLElement, perspec
 
 	Source1ParticleSystem.setSimulationSteps(5);
 	let start = Date.now() / 1000;
-	await renderUnusualList(EffectList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
+	//await renderUnusualList(EffectList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
 	//await renderUnusualList(KillstreakList, scene.addChild(new KeepOnlyLastChild()), scene, demoContentTab);
-	//await renderUnusualList(UnusualTauntList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
+	await renderUnusualList(UnusualTauntList, scene.addChild(new KeepOnlyLastChild()) as KeepOnlyLastChild, scene, demoContentTab, perspectiveCamera, orbitCameraControl, scout, heavy);
 	let end = Date.now() / 1000;
 
 	console.log(`Finished in ${Math.round(end - start)}s`)
@@ -575,7 +575,7 @@ const KillstreakList = [
 ]
 
 const UnusualTauntList: Effect[] = [
-
+	/*
 	{ system: 'utaunt_disco_party', name: '\'72', fov: 25, position: [30, 0, 0], target: [0, 0, 100], wait: 800 },
 	{ system: 'utaunt_hearts_glow_parent', name: 'Fountain of Delight', fov: 60, position: [100, 0, 0], target: [0, 0, 50], wait: 1000 },
 	{ system: 'utaunt_beams_yellow', name: 'Holy Grail', fov: 60, position: [100, 0, 0], target: [0, 0, 30], wait: 1500 },
@@ -796,8 +796,10 @@ const UnusualTauntList: Effect[] = [
 	{ system: 'utaunt_phantasam_green_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_phantasam_grey_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_phantasam_purple_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	//*/
 	{ system: 'utaunt_multicurse_teamcolor_red', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_multicurse_teamcolor_blue', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
+	/*
 	{ system: 'utaunt_voidcrawlers_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_tarpit_dinos_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_tarpit_people_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },

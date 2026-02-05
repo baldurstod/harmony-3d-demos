@@ -1,5 +1,5 @@
 import { vec4 } from 'gl-matrix';
-import { AmbientLight, Box, Camera, CanvasLayout, CanvasView, ColorBackground, Graphics, MeshFlatMaterial, OrbitControl, Scene, Sphere } from 'harmony-3d';
+import { AmbientLight, Box, Camera, CanvasLayout, CanvasView, ColorBackground, Graphics, MeshFlatMaterial, OrbitControl, Scene, Sphere, Viewport } from 'harmony-3d';
 import { createElement, defineHarmonySwitch, HarmonySwitchChange } from 'harmony-ui';
 import { exportFBX } from '../../utils/fbx';
 import { InitDemoStd } from '../../utils/utils';
@@ -107,7 +107,7 @@ async function testMultiView(htmlDemoContent: HTMLElement, perspectiveCamera: Ca
 			name: String(i),
 			scene: scene,
 			camera: perspectiveCamera,
-			viewport: { x: Math.random(), y: Math.random(), width: Math.random() * 0.2 + 0.1, height: Math.random() * 0.2 + 0.1 },
+			viewport: new Viewport({ x: Math.random() * 0.7, y: Math.random() * 0.7, width: Math.random() * 0.2 + 0.1, height: Math.random() * 0.2 + 0.1 }),
 
 		}));
 
