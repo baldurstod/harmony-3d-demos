@@ -33,6 +33,10 @@ class Application {
 	#mainCanvas!: CanvasAttributes;
 	#contextType = ContextType.WebGL;
 
+	static {
+		I18n.start();
+	}
+
 	constructor() {
 		this.#init();
 	}
@@ -47,7 +51,6 @@ class Application {
 		this.#loadUri(document.URL);
 		this.#loadDemos();
 		this.#sceneExplorer.setScene(this.#scene);
-		I18n.start();
 	}
 
 	#initRepositories() {
@@ -129,10 +132,7 @@ class Application {
 								}),
 								createElement('harmony-tab', {
 									'data-i18n': '#scene_explorer',
-									child: this.#sceneExplorerTab = createElement('div', {
-										style: 'height:100%;',
-										child: this.#sceneExplorer.htmlElement,
-									}),
+									child: this.#sceneExplorer.htmlElement,
 								}),
 								this.#shaderEditorTab = createElement('harmony-tab', {
 									'data-i18n': '#shader_editor',

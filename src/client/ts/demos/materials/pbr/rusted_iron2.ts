@@ -26,9 +26,10 @@ class RustedIron2Demo implements Demo {
 registerDemo(RustedIron2Demo);
 
 
-async function  createCustomMaterial(name: string): Promise<Material> {
+async function createCustomMaterial(name: string): Promise<Material> {
 	const material = new ShaderMaterial({
-		vertex: `
+		glsl: {
+			vertex: `
 layout (location = 0) in vec3 aVertexPosition;
 layout (location = 1) in vec3 aVertexNormal;
 layout (location = 2) in vec2 aTextureCoord;
@@ -65,7 +66,7 @@ void main()
 	#include compute_vertex_standard
 }
 		`,
-		fragment: `
+			fragment: `
 in vec2 TexCoords;
 in vec3 WorldPos;
 in vec3 Normal;
@@ -235,6 +236,7 @@ void main()
 	//fragColor = vec4(1.0);
 }
 `,
+		},
 	});
 
 	const prefix = '/assets/textures/pbr/';
