@@ -87,7 +87,9 @@ async function testExportFireBell(scene: Scene) {
 	/*let fire_bell01 = await AddSource1Model('tf2', 'models/props_spytech/fire_bell01', renderer, scene);
 	fire_bell01.quaternion = [0, 0, 0.7, -0.7];
 	fire_bell01.playSequence('idle');*/
-	await setTimeoutPromise(1000);
+	await setTimeoutPromise(200);
+	bot_worker.setPlaying(false);
+	bot_worker.frame = 0.5;
 	//exportFBX(scene);
 }
 /*
