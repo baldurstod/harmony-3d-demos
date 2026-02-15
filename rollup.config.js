@@ -1,9 +1,10 @@
 import json from '@rollup/plugin-json';
 import { nodeResolve } from '@rollup/plugin-node-resolve';
-import copy from 'rollup-plugin-copy';
-import css from 'rollup-plugin-import-css';
 import typescript from '@rollup/plugin-typescript';
 import wasm from '@rollup/plugin-wasm';
+import copy from 'rollup-plugin-copy';
+import css from 'rollup-plugin-import-css';
+import { string as plugin_string } from 'rollup-plugin-string'
 
 const isExamples = process.env.BUILD === 'examples';
 
@@ -18,6 +19,9 @@ export default [
 			css(),
 			json({
 				compact: true,
+			}),
+			plugin_string({
+				include: "**/*.wgsl",
 			}),
 			wasm(
 				{
