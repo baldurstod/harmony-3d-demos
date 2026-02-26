@@ -16,7 +16,7 @@ const CHANNEL_B = 2u;
 @vertex
 fn vertex_main(model: VertexInput) -> VertexOutput {
 	return VertexOutput(
-		vertexUniforms.viewProjectionMatrix * vertexUniforms.modelMatrix * vec4<f32>(model.position, 0.0, 1.0),
+		vertexUniforms.modelMatrix * vec4<f32>(model.position, 0.0, 1.0),
 		model.texCoord
 	);
 }
@@ -115,7 +115,7 @@ fn samplePixel(x: u32, y: u32, rngState: ptr<function, u32>) -> vec3<f32> {
 		let u = (f32(x) + rngNextFloat(rngState)) * invWidth;
 		let v = (f32(y) + rngNextFloat(rngState)) * invHeight;
 
-		let primaryRay = cameraMakeRay(camera, rngState, u, 1f - v);
+		let primaryRay = cameraMakeRay(camera, rngState, u, v);
 		color += rayColor(primaryRay, rngState);
 	}
 
