@@ -270,8 +270,7 @@ const materials = [
 		new HdrImageData(new Float32Array([0.9, 0.9, 0.9]), 1, 1),
 	),
 	lambertian(
-		new HdrImageData(new Float32Array([0.9, 0.9, 0.9]), 1, 1),
-		// albedo: Texture::new_from_image("assets/moon.jpeg")
+		await loadTexture('assets/textures/ldr/equirectangular/moon.jpeg'),
 	),
 	metal(
 		new HdrImageData(new Float32Array([1, 0.85, 0.57]), 1, 1),
@@ -281,12 +280,10 @@ const materials = [
 		1.5,
 	),
 	lambertian(
-		new HdrImageData(new Float32Array([0.9, 0.9, 0.9]), 1, 1),
-		//albedo: Texture::new_from_image("assets/earthmap.jpeg")
+		await loadTexture('assets/textures/ldr/equirectangular/earth.jpg'),
 	),
 	emissive(
-		new HdrImageData(new Float32Array([0.9, 0.9, 0.9]), 1, 1),
-		//emit: Texture::new_from_scaled_image("assets/sun.jpeg", 50.0)
+		await loadTexture('assets/textures/ldr/equirectangular/sun.jpeg', 50),
 	),
 	lambertian(
 		new HdrImageData(new Float32Array([0.3, 0.9, 0.9]), 1, 1),
@@ -301,3 +298,28 @@ const materials = [
 		new HdrImageData(new Float32Array([0, 0., 50.]), 1, 1),
 	),
 ];
+
+async function loadTexture(path: string, scale: number = 1): Promise<HdrImageData> {
+	const img = new Image();
+	img.src = path;
+	await img.decode();
+	const canvas = createElement('canvas', { width: img.naturalWidth, height: img.naturalHeight }) as HTMLCanvasElement;
+	const context = canvas.getContext('2d')!;
+	context.drawImage(img, 0, 0);
+	const datas = context.getImageData(0, 0, img.naturalWidth, img.naturalHeight).data;
+
+	const texture = new Float32Array(img.naturalWidth * img.naturalHeight * 3);
+
+	let k = 0;
+	let l = 0;
+	for (let j = 0; j < img.naturalHeight; ++j) {
+		for (let i = 0; i < img.naturalWidth; ++i) {
+			texture[k++] = datas[l++]! / 255 * scale;
+			texture[k++] = datas[l++]! / 255 * scale;
+			texture[k++] = datas[l++]! / 255 * scale;
+			l++;
+		}
+	}
+
+	return new HdrImageData(texture, img.naturalWidth, img.naturalHeight);
+}
