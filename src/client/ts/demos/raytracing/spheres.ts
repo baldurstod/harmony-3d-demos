@@ -1,5 +1,5 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { AmbientLight, ColorBackground, DEG_TO_RAD, FullScreenQuad, Graphics, GraphicsEvent, GraphicsEvents, PointLight, Scene, ShaderMaterial, UniformValue } from 'harmony-3d';
+import { AmbientLight, Camera, ColorBackground, DEG_TO_RAD, FullScreenQuad, Graphics, GraphicsEvent, GraphicsEvents, PointLight, Scene, ShaderMaterial, UniformValue } from 'harmony-3d';
 import { InitDemoStd } from '../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../demos';
 
@@ -30,7 +30,7 @@ class RaytracingSphereDemo implements Demo {
 		perspectiveCamera.verticalFov = 30;
 		perspectiveCamera.farPlane = 10000;
 		perspectiveCamera.aperture = 0.;
-		orbitCameraControl.enabled = false;
+		//orbitCameraControl.enabled = false;
 		perspectiveCamera.rotateGlobalX(90 * DEG_TO_RAD);
 		perspectiveCamera.rotateX(25 * DEG_TO_RAD);
 		perspectiveCamera.rotateY(-10 * DEG_TO_RAD);
@@ -55,39 +55,12 @@ class RaytracingSphereDemo implements Demo {
 			parent: params.htmlDemoContent,
 			innerHTML: 'reset',
 			events: {
-				click: () => {
-					accumulatedSamplesPerPixel = 0;
-					frameId = 0;
-					clearAccumulatedSamples = 1;
-				}
+				click: () => reset(),
 			}
 		});
 
 		const imageBuffer = new Uint8Array(WIDTH * HEIGHT * 4 * 3);
 
-		let lensRadius = 0.5 * perspectiveCamera.aperture;
-		let aspect = mainCanvas.width! / mainCanvas.height!;
-		let halfHeight = perspectiveCamera.focus * perspectiveCamera.getTanHalfVerticalFov();
-		let halfWidth = aspect * halfHeight;
-
-		const forwardVector = perspectiveCamera.getViewDirection();
-
-		const w = vec3.normalize(forwardVector, forwardVector);
-		const world_up = vec3.fromValues(0.0, 1.0, 0.0);
-
-		const right = vec3.cross(vec3.create(), forwardVector, world_up);
-		const upVector = vec3.cross(vec3.create(), right, forwardVector);
-
-		const v = vec3.normalize(vec3.create(), upVector);
-		const u = vec3.cross(vec3.create(), w, v);
-
-		const lowerLeftCorner = perspectiveCamera.getWorldPosition();
-		vec3.scaleAndAdd(lowerLeftCorner, lowerLeftCorner, w, perspectiveCamera.focus);
-		vec3.scaleAndAdd(lowerLeftCorner, lowerLeftCorner, u, -halfWidth);
-		vec3.scaleAndAdd(lowerLeftCorner, lowerLeftCorner, v, -halfHeight);
-
-		const horizontal = vec3.scale(vec3.create(), u, 2 * halfWidth);
-		const vertical = vec3.scale(vec3.create(), v, 2 * halfHeight);
 
 		const raytracerMat = new ShaderMaterial({
 			wgsl: raytracer,
@@ -98,15 +71,7 @@ class RaytracingSphereDemo implements Demo {
 					numBounces: 5,// TODO: param
 					clearAccumulatedSamples: 0,
 				},
-				camera: {
-					eye: perspectiveCamera.getPosition(),
-					horizontal,
-					vertical,
-					u,
-					v,
-					lensRadius,
-					lowerLeftCorner,
-				},
+				camera: computeCamera(perspectiveCamera),
 				frameData: [mainCanvas.width!, mainCanvas.height!, 1, 0],
 			},
 			storages: {
@@ -126,14 +91,28 @@ class RaytracingSphereDemo implements Demo {
 
 		new FullScreenQuad({ parent: scene, material: raytracerMat, });
 
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => {
+		let pos = perspectiveCamera.getWorldPosition();
+
+		GraphicsEvents.addEventListener(GraphicsEvent.Tick, () => {
+			let pos2 = perspectiveCamera.getWorldPosition();
+			if (pos[0]!= pos2[0] || pos[1]!= pos2[1] || pos[2]!= pos2[2]) {
+				reset();
+			}
+			pos = pos2;
 			++accumulatedSamplesPerPixel;// TODO: increment by the sample per pixel value
 			++frameId;// TODO: increment by the sample per pixel value
 			(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).accumulatedSamplesPerPixel = accumulatedSamplesPerPixel;
 			(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).clearAccumulatedSamples = clearAccumulatedSamples;
 			raytracerMat.uniforms['frameData'] = [mainCanvas.width!, mainCanvas.height!, frameId, 0];
+			raytracerMat.uniforms['camera'] = computeCamera(perspectiveCamera);
 			clearAccumulatedSamples = 0;
 		});
+
+		function reset() {
+			accumulatedSamplesPerPixel = 0;
+			frameId = 0;
+			clearAccumulatedSamples = 1;
+		}
 	}
 }
 registerDemo(RaytracingSphereDemo);
@@ -322,4 +301,43 @@ async function loadTexture(path: string, scale: number = 1): Promise<HdrImageDat
 	}
 
 	return new HdrImageData(texture, img.naturalWidth, img.naturalHeight);
+}
+
+
+function computeCamera(perspectiveCamera: Camera) {
+	const mainCanvas = Graphics.getCanvas('main_canvas')!;
+
+	let lensRadius = 0.5 * perspectiveCamera.aperture;
+	let aspect = mainCanvas.width! / mainCanvas.height!;
+	let halfHeight = perspectiveCamera.focus * perspectiveCamera.getTanHalfVerticalFov();
+	let halfWidth = aspect * halfHeight;
+
+	const forwardVector = perspectiveCamera.getViewDirection();
+
+	const w = vec3.normalize(forwardVector, forwardVector);
+	const world_up = vec3.fromValues(0.0, 1.0, 0.0);
+
+	const right = vec3.cross(vec3.create(), forwardVector, world_up);
+	const upVector = vec3.cross(vec3.create(), right, forwardVector);
+
+	const v = vec3.normalize(vec3.create(), upVector);
+	const u = vec3.cross(vec3.create(), w, v);
+
+	const lowerLeftCorner = perspectiveCamera.getWorldPosition();
+	vec3.scaleAndAdd(lowerLeftCorner, lowerLeftCorner, w, perspectiveCamera.focus);
+	vec3.scaleAndAdd(lowerLeftCorner, lowerLeftCorner, u, -halfWidth);
+	vec3.scaleAndAdd(lowerLeftCorner, lowerLeftCorner, v, -halfHeight);
+
+	const horizontal = vec3.scale(vec3.create(), u, 2 * halfWidth);
+	const vertical = vec3.scale(vec3.create(), v, 2 * halfHeight);
+
+	return {
+		eye: perspectiveCamera.getPosition(),
+		horizontal,
+		vertical,
+		u,
+		v,
+		lensRadius,
+		lowerLeftCorner,
+	};
 }
