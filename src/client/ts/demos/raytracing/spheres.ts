@@ -104,9 +104,6 @@ class RaytracingSphereDemo implements Demo {
 			],
 		});
 
-		const imageBuffer = new Uint8Array(WIDTH * HEIGHT * 4 * 3);
-
-
 		const raytracerMat = new ShaderMaterial({
 			wgsl: raytracer,
 			uniforms: {
@@ -120,7 +117,7 @@ class RaytracingSphereDemo implements Demo {
 				frameData: [mainCanvas.width!, mainCanvas.height!, 1, 0],
 			},
 			storages: {
-				imageBuffer,
+				imageBuffer: WIDTH * HEIGHT * 4 * 3,
 				skyState: {
 					// TODO: do a proper Hosek-Wilkie computation
 					params: new Float32Array([-1.146293, -0.19404611, 0.6892759, 0.9089986, -2.0779164, 0.68428886, 0.21258523, 1.7967614, 0.6864839, -1.1500875, -0.22125047, 0.3443094, 0.37174478, -0.9696021, 0.64278126, 0.11194256, 2.956004, 0.6878244, -1.2532278, -0.4073885, -1.0929729, 1.48517, -0.056945086, 0.46961704, 0.019326262, 2.5557024, 0.6794679]),

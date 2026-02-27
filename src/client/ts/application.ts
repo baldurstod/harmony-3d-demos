@@ -191,7 +191,9 @@ class Application {
 				premultipliedAlpha: false
 			},
 			webGPU: {
-				alphaMode: 'premultiplied',
+				configuration: {
+					alphaMode: 'premultiplied',
+				},
 			}
 		});
 
