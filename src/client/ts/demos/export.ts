@@ -6,5 +6,6 @@ export * from './materials/export';
 export * from './misc/export';
 export * from './postprocessing/export';
 export * from './primitives/export';
-export * from './textures/export';
+export * from './raytracing/export';
 export * from './sourceengine/export';
+export * from './textures/export';
