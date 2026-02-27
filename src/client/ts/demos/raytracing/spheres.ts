@@ -51,12 +51,57 @@ class RaytracingSphereDemo implements Demo {
 		let clearAccumulatedSamples = 0;
 		let frameId = 0;
 
-		createElement('button', {
+		createElement('div', {
 			parent: params.htmlDemoContent,
-			innerHTML: 'reset',
-			events: {
-				click: () => reset(),
-			}
+			style: 'display:flex;flex-direction:column;',
+			childs: [
+				createElement('button', {
+					innerHTML: 'reset',
+					$click: () => reset(),
+				}),
+				createElement('label', {
+					innerText: 'fov',
+					child: createElement('input', {
+						type: 'range',
+						min: 1,
+						max: 90,
+						value: '30',
+						step: 0.01,
+						$input: (event: InputEvent) => {
+							perspectiveCamera.verticalFov = Number((event.target as HTMLInputElement).value);
+							reset();
+						},
+					}),
+				}),
+				createElement('label', {
+					innerText: 'aperture',
+					child: createElement('input', {
+						type: 'range',
+						min: 0,
+						max: 1,
+						value: '0',
+						step: 0.01,
+						$input: (event: InputEvent) => {
+							perspectiveCamera.aperture = Number((event.target as HTMLInputElement).value);
+							reset();
+						},
+					}),
+				}),
+				createElement('label', {
+					innerText: 'focus',
+					child: createElement('input', {
+						type: 'range',
+						min: 1,
+						max: 20,
+						value: '10',
+						step: 0.01,
+						$input: (event: InputEvent) => {
+							perspectiveCamera.focus = Number((event.target as HTMLInputElement).value);
+							reset();
+						},
+					}),
+				}),
+			],
 		});
 
 		const imageBuffer = new Uint8Array(WIDTH * HEIGHT * 4 * 3);
@@ -95,7 +140,7 @@ class RaytracingSphereDemo implements Demo {
 
 		GraphicsEvents.addEventListener(GraphicsEvent.Tick, () => {
 			let pos2 = perspectiveCamera.getWorldPosition();
-			if (pos[0]!= pos2[0] || pos[1]!= pos2[1] || pos[2]!= pos2[2]) {
+			if (pos[0] != pos2[0] || pos[1] != pos2[1] || pos[2] != pos2[2]) {
 				reset();
 			}
 			pos = pos2;
