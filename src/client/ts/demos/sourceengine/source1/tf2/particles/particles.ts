@@ -1,6 +1,7 @@
 import { ColorBackground, Entity, Scene, Source1ParticleControler } from 'harmony-3d';
 import { InitDemoStd } from '../../../../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../../../../demos';
+import { AddSource1Model } from '../../../../../utils/source1';
 
 class ParticlesDemo implements Demo {
 	static readonly path = 'sourceengine/source1/tf2/particles/particles';
@@ -46,6 +47,7 @@ class ParticlesDemo implements Demo {
 		systemName = 'unusual_mayor_balloonicorn_teamcolor_red';
 		systemName = 'unusual_zap_yellow';
 		systemName = 'utaunt_multicurse_teamcolor_red';
+		systemName = 'unusual_uber_gold_parent';
 		//systemName = 'unusual_pumpkin_moon_smoke1';
 		//systemName = 'unusual_pumpkin_moon_sparkles';
 		//systemName = 'unusual_conductor_teamc_red_lightning_trail1';
@@ -53,12 +55,16 @@ class ParticlesDemo implements Demo {
 		//systemName = 'unusual_icrown_gradient_red';
 		//systemName = 'unusual_icrown_rays_red';
 
+		const scout = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
+		scout.playSequence('stand_PRIMARY');
+
 		let sys2 = await Source1ParticleControler.createSystem('tf2', systemName);
 		sys2.start();
 		scene.addChild(sys2);
 		let entity2 = new Entity();
 		scene.addChild(entity2);
-		entity2.addChild(sys2.getControlPoint(0));
+		scout.addChild(sys2.getControlPoint(0));
+		scout.attachSystem(sys2, 'bip_head', 0);
 		return;
 
 		let sys = await Source1ParticleControler.createSystem('tf2', 'unusual_pumpkin_moon_smoke1');
