@@ -1,13 +1,20 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { AmbientLight, Camera, ColorBackground, DEG_TO_RAD, FullScreenQuad, Graphics, GraphicsEvent, GraphicsEvents, PointLight, Scene, ShaderMaterial, UniformValue } from 'harmony-3d';
+import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, DEG_TO_RAD, getCurrentTexture, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, PointLight, RayTracingPass, Scene, ShaderMaterial, TextureManager, UniformValue } from 'harmony-3d';
 import { float32, uint32 } from 'harmony-types';
-import { createElement } from 'harmony-ui';
+import { createElement, defineHarmonyToggleButton, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
 import { InitDemoStd } from '../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../demos';
-import raytracer from './raytracer.wgsl';
+import { RayTracingCamera } from './rt/Camera';
+import { RayTracingScene } from './rt/Scene';
+
+const COMPUTE_WORKGROUP_SIZE_X = 16;
+const COMPUTE_WORKGROUP_SIZE_Y = 16;
+const MAX_BOUNCES_INTERACTING = 1;
 
 class RaytracingSphereDemo implements Demo {
-	static readonly path = 'raytracing/spheres';
+	static readonly path = 'raytracing/meshes';
+	//readonly useCustomRenderLoop = true;
+	#renderFrames = Infinity;
 
 	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		if (Graphics.isWebGLAny) {
@@ -37,8 +44,8 @@ class RaytracingSphereDemo implements Demo {
 
 		perspectiveCamera.focus = vec3.distance(cameraPosition, cameraLookAt);
 
-		const WIDTH = 800;
-		const HEIGHT = 600;
+		const WIDTH = 400;
+		const HEIGHT = 300;
 
 		const mainCanvas = Graphics.getCanvas('main_canvas')!;
 		mainCanvas.autoResize = false;
@@ -50,6 +57,8 @@ class RaytracingSphereDemo implements Demo {
 		let clearAccumulatedSamples = 0;
 		let frameId = 0;
 
+		defineHarmonyToggleButton();
+
 		createElement('div', {
 			parent: params.htmlDemoContent,
 			style: 'display:flex;flex-direction:column;',
@@ -57,6 +66,29 @@ class RaytracingSphereDemo implements Demo {
 				createElement('button', {
 					innerHTML: 'reset',
 					$click: () => reset(),
+				}),
+				createElement('button', {
+					innerHTML: 'render one frame',
+					$click: () => this.#renderFrames = 1,
+				}),
+				createElement('harmony-toggle-button', {
+					childs: [
+						createElement('div', {
+							slot: 'on',
+							innerHTML: 'on',
+						}),
+						createElement('div', {
+							slot: 'off',
+							innerHTML: 'off',
+						}),
+					],
+					$change: (event: Event) => {
+						if ((event.target as HTMLHarmonyToggleButtonElement).state) {
+							this.#renderFrames = Infinity;
+						} else {
+							this.#renderFrames = 0;
+						}
+					},
 				}),
 				createElement('label', {
 					innerText: 'fov',
@@ -103,8 +135,22 @@ class RaytracingSphereDemo implements Demo {
 			],
 		});
 
+		const camera = new RayTracingCamera(
+			mainCanvas.canvas,
+			vec3.fromValues(0, 0, 3.5),
+			60,
+			mainCanvas.canvas.width / mainCanvas.canvas.height,
+		);
+		const rayTracingScene = new RayTracingScene();
+		const { materials, faces, aabbs } = await rayTracingScene.loadModels();
+
+		const rngState = new Uint32Array(WIDTH * HEIGHT);
+		for (let i = 0; i < WIDTH * HEIGHT; i++) {
+			rngState[i] = i;
+		}
+
 		const raytracerMat = new ShaderMaterial({
-			wgsl: raytracer,
+			shaderSource: 'raytracer',
 			uniforms: {
 				samplingParams: {
 					numSamplesPerPixel: 1,// TODO: param
@@ -113,10 +159,36 @@ class RaytracingSphereDemo implements Demo {
 					clearAccumulatedSamples: 0,
 				},
 				camera: computeCamera(perspectiveCamera),
-				frameData: [mainCanvas.width!, mainCanvas.height!, 1, 0],
+				//frameData: [mainCanvas.width!, mainCanvas.height!, 1, 0],
+				commonUniforms: {
+					seed: new Uint32Array([Math.random() * 0xffffff, Math.random() * 0xffffff, Math.random() * 0xffffff,]),
+					frameCounter: 0,
+					maxBounces: 4,
+					flatShading: 0,
+					debugNormals: 0,
+				},
+				cameraUniforms: {
+					viewportSize: new Uint32Array([WIDTH, HEIGHT]),
+					imageWidth: WIDTH,
+					imageHeight: HEIGHT,
+					pixel00Loc: vec3.create(),// Fake value
+					pixelDeltaU: vec3.create(),// Fake value
+					pixelDeltaV: vec3.create(),// Fake value
+					aspectRatio: WIDTH / HEIGHT,
+					center: vec3.create(),// Fake value
+					vfov: 60,
+					lookFrom: vec3.fromValues(0, 0, 2),
+					lookAt: vec3.create(),
+					vup: vec3.fromValues(0, 1, 0),
+					defocusAngle: 0,
+					focusDist: 3.4,
+					defocusDiscU: vec3.create(),
+					defocusDiscV: vec3.create(),
+				},
 			},
 			storages: {
-				imageBuffer: WIDTH * HEIGHT * 4 * 3,
+				raytraceImageBuffer: WIDTH * HEIGHT * 4 * 4,// 4 elements * 4 bytes per element
+				rngStateBuffer: rngState,// WIDTH * HEIGHT * 4,// 4 bytes per element
 				skyState: {
 					// TODO: do a proper Hosek-Wilkie computation
 					params: new Float32Array([-1.146293, -0.19404611, 0.6892759, 0.9089986, -2.0779164, 0.68428886, 0.21258523, 1.7967614, 0.6864839, -1.1500875, -0.22125047, 0.3443094, 0.37174478, -0.9696021, 0.64278126, 0.11194256, 2.956004, 0.6878244, -1.2532278, -0.4073885, -1.0929729, 1.48517, -0.056945086, 0.46961704, 0.019326262, 2.5557024, 0.6794679]),
@@ -125,16 +197,60 @@ class RaytracingSphereDemo implements Demo {
 				},
 				spheres,
 				materials,
+				faces: {
+					value: faces,
+					raw: true,
+				},
+				AABBs: {
+					value: aabbs,
+					raw: true,
+				},
 				textures,
 				lights: new Uint32Array([1, 2, 3, 9]),
+			},
+			gpuConstants: {
+				WORKGROUP_SIZE_X: COMPUTE_WORKGROUP_SIZE_X,
+				WORKGROUP_SIZE_Y: COMPUTE_WORKGROUP_SIZE_Y,
+				OBJECTS_COUNT_IN_SCENE: RayTracingScene.MODELS_COUNT,
+				MAX_BVs_COUNT_PER_MESH: RayTracingScene.MAX_NUM_BVs_PER_MESH,
+				MAX_FACES_COUNT_PER_MESH: RayTracingScene.MAX_NUM_FACES_PER_MESH,
 			}
 		});
 
-		new FullScreenQuad({ parent: scene, material: raytracerMat, });
+		//new FullScreenQuad({ parent: scene, material: raytracerMat, });
 
 		let pos = perspectiveCamera.getWorldPosition();
 
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, () => {
+
+		const tempTexture = TextureManager.createTexture({
+			webgpuDescriptor: {
+				size: {
+					width: WIDTH,
+					height: HEIGHT,
+				},
+				format: 'rgba8unorm',
+				usage: GPUTextureUsage.TEXTURE_BINDING | GPUTextureUsage.COPY_DST | GPUTextureUsage.RENDER_ATTACHMENT,
+
+			}
+		});
+
+		let composer = new Composer();
+		let clearPass = new ClearPass(vec4.fromValues(0.2, 0.2, 0.2, 1), 1, 0);
+		let renderPass = new RayTracingPass(scene, perspectiveCamera);
+		renderPass.material = raytracerMat;
+		composer.addPass(clearPass);
+		composer.addPass(renderPass);
+
+		//const mainCanvas = Graphics.getCanvas('main_canvas')!;
+
+		mainCanvas.useLayout = 'default';
+		mainCanvas.addLayout(new CanvasLayout('default', [
+			new CanvasView({ name: 'view', scene, composer }),
+			//new CanvasView({ name: 'view', scene, composer, viewport: new Viewport({ width: 0.5, }) }),
+			//new CanvasView({ name: 'view', scene, viewport: new Viewport({ x: 0.5, width: 0.5, }) }),
+		]));
+
+		GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event: CustomEvent<GraphicTickEvent>) => {
 			let pos2 = perspectiveCamera.getWorldPosition();
 			if (pos[0] != pos2[0] || pos[1] != pos2[1] || pos[2] != pos2[2]) {
 				reset();
@@ -142,11 +258,28 @@ class RaytracingSphereDemo implements Demo {
 			pos = pos2;
 			++accumulatedSamplesPerPixel;// TODO: increment by the sample per pixel value
 			++frameId;// TODO: increment by the sample per pixel value
-			(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).accumulatedSamplesPerPixel = accumulatedSamplesPerPixel;
-			(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).clearAccumulatedSamples = clearAccumulatedSamples;
-			raytracerMat.uniforms['frameData'] = [mainCanvas.width!, mainCanvas.height!, frameId, 0];
+			//(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).accumulatedSamplesPerPixel = accumulatedSamplesPerPixel;
+			//(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).clearAccumulatedSamples = clearAccumulatedSamples;
+			(raytracerMat.uniforms['commonUniforms'] as Record<string, UniformValue>).frameCounter = frameId;
+			//raytracerMat.uniforms['frameData'] = [mainCanvas.width!, mainCanvas.height!, frameId, 0];
 			raytracerMat.uniforms['camera'] = computeCamera(perspectiveCamera);
+			//raytracerMat.uniforms['outTexture'] = tempTexture;
+			//raytracerMat.uniforms['outTexture'] = getCurrentTexture();
+			raytracerMat.setDefine('OUTPUT_FORMAT', 'rgba8unorm'/*WebGPUInternal.format*/);
+			raytracerMat.storage.get('rngStateBuffer').value = null;
+
 			clearAccumulatedSamples = 0;
+
+			if (false && this.#renderFrames > 0) {
+				Graphics.renderMultiCanvas(event.detail.delta, event.detail.context);
+				raytracerMat.uniforms['outTexture'] = getCurrentTexture();
+				Graphics.compute(raytracerMat, {
+					width: WIDTH,
+					height: HEIGHT,
+				}, WIDTH, HEIGHT);
+
+				--this.#renderFrames;
+			}
 		});
 
 		function reset() {
@@ -283,8 +416,15 @@ class HdrImageData {
 		this.height = height;
 	}
 }
-
+/*
 const materials = [
+	{
+		materialType: 0,
+		reflectionRatio: 0,
+		reflectionGloss: 1,
+		refractionIndex: 1,
+		albedo: vec3.fromValues(0.5, 0.5, 0.5),
+	},
 	checkerboard(
 		new HdrImageData(new Float32Array([0.5, 0.7, 0.8]), 1, 1),
 		new HdrImageData(new Float32Array([0.9, 0.9, 0.9]), 1, 1),
@@ -318,6 +458,7 @@ const materials = [
 		new HdrImageData(new Float32Array([0, 0., 50.]), 1, 1),
 	),
 ];
+*/
 
 async function loadTexture(path: string, scale: number = 1): Promise<HdrImageData> {
 	const img = new Image();
