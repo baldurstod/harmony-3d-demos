@@ -246,10 +246,12 @@ class Application {
 
 			const demo = getDemo(path);
 			if (demo) {
-				demo.initDemo(this.#scene, {
+				this.#useDefaultRenderLoop = !(demo.useCustomRenderLoop === true);
+				await demo.initDemo(this.#scene, {
 					htmlDemoContentTab: this.#htmlDemoContentTab,
 					htmlDemoContent: this.#htmlDemoContent,
 				});
+
 			}
 			/*
 			import('./demos/' + path + '.js').then(

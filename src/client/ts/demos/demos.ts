@@ -9,6 +9,8 @@ export type InitDemoParams = {
 export class Demo {
 	static readonly path: string;
 	static readonly name: string;
+	/** Use custom render loop. Defaults to false */
+	readonly useCustomRenderLoop?: boolean;
 	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> { };
 }
 
