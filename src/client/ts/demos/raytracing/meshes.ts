@@ -214,7 +214,8 @@ class RaytracingSphereDemo implements Demo {
 				OBJECTS_COUNT_IN_SCENE: RayTracingScene.MODELS_COUNT,
 				MAX_BVs_COUNT_PER_MESH: RayTracingScene.MAX_NUM_BVs_PER_MESH,
 				MAX_FACES_COUNT_PER_MESH: RayTracingScene.MAX_NUM_FACES_PER_MESH,
-			}
+			},
+			workgroupSize:vec3.fromValues(COMPUTE_WORKGROUP_SIZE_X, COMPUTE_WORKGROUP_SIZE_Y, 1),
 		});
 
 		//new FullScreenQuad({ parent: scene, material: raytracerMat, });
@@ -236,10 +237,10 @@ class RaytracingSphereDemo implements Demo {
 
 		let composer = new Composer();
 		let clearPass = new ClearPass(vec4.fromValues(0.2, 0.2, 0.2, 1), 1, 0);
-		let renderPass = new RayTracingPass(scene, perspectiveCamera);
-		renderPass.material = raytracerMat;
+		let rayTracingPass = new RayTracingPass(scene, perspectiveCamera);
+		rayTracingPass.material = raytracerMat;
 		composer.addPass(clearPass);
-		composer.addPass(renderPass);
+		composer.addPass(rayTracingPass);
 
 		//const mainCanvas = Graphics.getCanvas('main_canvas')!;
 

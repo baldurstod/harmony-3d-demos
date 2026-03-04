@@ -304,7 +304,7 @@ export class RayTracingScene {
 
 	public async loadModels(): Promise<{ materials: Material1[], faces: Uint8ClampedArray, aabbs: Uint8ClampedArray }> {
 		const [objFileContents, mtlFileContents] = await Promise.all([
-			RayTracingScene.loadObjFileContents("./assets/models/obj/raytraced-scene.obj"),
+			RayTracingScene.loadObjFileContents("./assets/models/obj/raytracing.obj"),
 			RayTracingScene.loadMtlFileContents("./assets/models/obj/raytraced-scene.mtl"),
 		]);
 
