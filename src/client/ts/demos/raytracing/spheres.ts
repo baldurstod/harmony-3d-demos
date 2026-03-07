@@ -42,7 +42,6 @@ class RaytracingSphereDemo implements Demo {
 
 		const mainCanvas = Graphics.getCanvas('main_canvas')!;
 		mainCanvas.autoResize = false;
-		mainCanvas.autoResize = false;
 		mainCanvas.width = WIDTH;
 		mainCanvas.height = HEIGHT;
 

@@ -1,5 +1,5 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, DEG_TO_RAD, getCurrentTexture, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, PointLight, RayTracingPass, Scene, ShaderMaterial, TextureManager, UniformValue } from 'harmony-3d';
+import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, DEG_TO_RAD, getCurrentTexture, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, PixelatePass, PointLight, RayTracingPass, Scene, ShaderMaterial, TextureManager, UniformValue } from 'harmony-3d';
 import { float32, uint32 } from 'harmony-types';
 import { createElement, defineHarmonyToggleButton, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
 import { InitDemoStd } from '../../utils/utils';
@@ -11,7 +11,7 @@ const COMPUTE_WORKGROUP_SIZE_X = 16;
 const COMPUTE_WORKGROUP_SIZE_Y = 16;
 const MAX_BOUNCES_INTERACTING = 1;
 
-class RaytracingSphereDemo implements Demo {
+class RaytracingMeshesDemo implements Demo {
 	static readonly path = 'raytracing/meshes';
 	//readonly useCustomRenderLoop = true;
 	#renderFrames = Infinity;
@@ -33,7 +33,7 @@ class RaytracingSphereDemo implements Demo {
 		perspectiveCamera.position = cameraPosition;
 		//perspectiveCamera.lookAt([0, 1, 0]);
 		orbitCameraControl.target.setPosition([0, 1, 0]);
-		perspectiveCamera.verticalFov = 30;
+		perspectiveCamera.verticalFov = 60;
 		perspectiveCamera.farPlane = 10000;
 		perspectiveCamera.aperture = 0.;
 		//orbitCameraControl.enabled = false;
@@ -144,11 +144,6 @@ class RaytracingSphereDemo implements Demo {
 		const rayTracingScene = new RayTracingScene();
 		const { materials, faces, aabbs } = await rayTracingScene.loadModels();
 
-		const rngState = new Uint32Array(WIDTH * HEIGHT);
-		for (let i = 0; i < WIDTH * HEIGHT; i++) {
-			rngState[i] = i;
-		}
-
 		const raytracerMat = new ShaderMaterial({
 			shaderSource: 'raytracer',
 			uniforms: {
@@ -176,7 +171,7 @@ class RaytracingSphereDemo implements Demo {
 					pixelDeltaV: vec3.create(),// Fake value
 					aspectRatio: WIDTH / HEIGHT,
 					center: vec3.create(),// Fake value
-					vfov: 60,
+					vfov: perspectiveCamera.getVerticalFov(),
 					lookFrom: vec3.fromValues(0, 0, 2),
 					lookAt: vec3.create(),
 					vup: vec3.fromValues(0, 1, 0),
@@ -188,7 +183,7 @@ class RaytracingSphereDemo implements Demo {
 			},
 			storages: {
 				raytraceImageBuffer: WIDTH * HEIGHT * 4 * 4,// 4 elements * 4 bytes per element
-				rngStateBuffer: rngState,// WIDTH * HEIGHT * 4,// 4 bytes per element
+				rngStateBuffer: WIDTH * HEIGHT * 4,// 4 bytes per element
 				skyState: {
 					// TODO: do a proper Hosek-Wilkie computation
 					params: new Float32Array([-1.146293, -0.19404611, 0.6892759, 0.9089986, -2.0779164, 0.68428886, 0.21258523, 1.7967614, 0.6864839, -1.1500875, -0.22125047, 0.3443094, 0.37174478, -0.9696021, 0.64278126, 0.11194256, 2.956004, 0.6878244, -1.2532278, -0.4073885, -1.0929729, 1.48517, -0.056945086, 0.46961704, 0.019326262, 2.5557024, 0.6794679]),
@@ -215,7 +210,7 @@ class RaytracingSphereDemo implements Demo {
 				MAX_BVs_COUNT_PER_MESH: RayTracingScene.MAX_NUM_BVs_PER_MESH,
 				MAX_FACES_COUNT_PER_MESH: RayTracingScene.MAX_NUM_FACES_PER_MESH,
 			},
-			workgroupSize:vec3.fromValues(COMPUTE_WORKGROUP_SIZE_X, COMPUTE_WORKGROUP_SIZE_Y, 1),
+			workgroupSize: vec3.fromValues(COMPUTE_WORKGROUP_SIZE_X, COMPUTE_WORKGROUP_SIZE_Y, 1),
 		});
 
 		//new FullScreenQuad({ parent: scene, material: raytracerMat, });
@@ -241,6 +236,11 @@ class RaytracingSphereDemo implements Demo {
 		rayTracingPass.material = raytracerMat;
 		composer.addPass(clearPass);
 		composer.addPass(rayTracingPass);
+		/*
+		const pixelatePass = new PixelatePass(perspectiveCamera);
+		pixelatePass.horizontalTiles = 80;
+		composer.addPass(pixelatePass);
+		*/
 
 		//const mainCanvas = Graphics.getCanvas('main_canvas')!;
 
@@ -267,7 +267,7 @@ class RaytracingSphereDemo implements Demo {
 			//raytracerMat.uniforms['outTexture'] = tempTexture;
 			//raytracerMat.uniforms['outTexture'] = getCurrentTexture();
 			raytracerMat.setDefine('OUTPUT_FORMAT', 'rgba8unorm'/*WebGPUInternal.format*/);
-			raytracerMat.storage.get('rngStateBuffer').value = null;
+			//raytracerMat.storage.get('rngStateBuffer').value = null;
 
 			clearAccumulatedSamples = 0;
 
@@ -290,7 +290,7 @@ class RaytracingSphereDemo implements Demo {
 		}
 	}
 }
-registerDemo(RaytracingSphereDemo);
+registerDemo(RaytracingMeshesDemo);
 
 
 class RayTracer {

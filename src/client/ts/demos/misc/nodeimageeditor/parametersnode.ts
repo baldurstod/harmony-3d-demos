@@ -1,4 +1,4 @@
-import { AnimatedTexture, ApplySticker, CombineLerp, IntArrayNode, Multiply, NodeImageEditor, NodeImageEditorGui, Plane, Scene, Select, Source1MaterialManager, Source1TextureManager, Texture, TextureLookup } from 'harmony-3d';
+import { AnimatedTexture, ApplySticker, CombineLerp, IntArrayNode, Multiply, NodeImageEditor, NodeImageEditorGui, NodeParamOrigin, Plane, Scene, Select, Source1MaterialManager, Source1TextureManager, Texture, TextureLookup } from 'harmony-3d';
 import { HTMLHarmonyTabElement } from 'harmony-ui';
 import { AddSource1Model } from '../../../utils/source1';
 import { InitDemoStd } from '../../../utils/utils';
@@ -149,9 +149,9 @@ async function testUberSaw(scene: Scene, htmlDemoContentTab: HTMLHarmonyTabEleme
 
 	let p_paintkit_tool_wearblend = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
 	p_paintkit_tool_wearblend.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'models/items/paintkit_tool/p_paintkit_tool_wearblend', 0, false);
-	p_paintkit_tool_wearblend.setParam('adjust black', 0.27);
-	p_paintkit_tool_wearblend.setParam('adjust white', 1);
-	p_paintkit_tool_wearblend.setParam('adjust gamma', 1.1);
+	p_paintkit_tool_wearblend.setParam(NodeParamOrigin.Code, 'adjust black', 0.27);
+	p_paintkit_tool_wearblend.setParam(NodeParamOrigin.Code, 'adjust white', 1);
+	p_paintkit_tool_wearblend.setParam(NodeParamOrigin.Code, 'adjust gamma', 1.1);
 
 	let { name: outputTextureName, texture: outputTexture } = Source1TextureManager.addInternalTexture('tf2');
 	//window.outputTexture = outputTexture;
