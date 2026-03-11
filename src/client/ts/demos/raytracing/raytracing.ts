@@ -1,11 +1,10 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, DEG_TO_RAD, FullScreenQuad, getCurrentTexture, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, PointLight, Raytracer, RayTracingPass, Scene, ShaderMaterial, TextureManager, UniformValue } from 'harmony-3d';
-import { float32, uint32 } from 'harmony-types';
-import { createElement, defineHarmonyToggleButton, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
+import { AmbientLight, ColorBackground, DEG_TO_RAD, EmissiveMaterial, FullScreenQuad, Graphics, Plane, PointLight, Raytracer, Scene, ShaderMaterial } from 'harmony-3d';
+import { createElement } from 'harmony-ui';
+import { setTimeoutPromise } from 'harmony-utils';
+import { AddSource1Model } from '../../utils/source1';
 import { InitDemoStd } from '../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../demos';
-import { RayTracingCamera } from './rt/Camera';
-import { RayTracingScene } from './rt/Scene';
 
 class RaytracingDemo implements Demo {
 	static readonly path = 'raytracing/raytracing';
@@ -40,8 +39,21 @@ class RaytracingDemo implements Demo {
 		perspectiveCamera.focus = vec3.distance(cameraPosition, cameraLookAt);
 		//perspectiveCamera.focus = 3.4;
 
-		const WIDTH = 400;
-		const HEIGHT = 300;
+		createElement('div', {
+			parent: params.htmlDemoContent,
+			style: 'display:flex;flex-direction:column;',
+			childs: [
+				createElement('button', {
+					innerHTML: 'reset',
+					$click: () => reset(),
+				}),
+			]
+		});
+
+		const scale = 1;
+
+		const WIDTH = 800 / scale;
+		const HEIGHT = 600 / scale;
 
 		const mainCanvas = Graphics.getCanvas('main_canvas')!;
 		mainCanvas.autoResize = false;
@@ -50,13 +62,34 @@ class RaytracingDemo implements Demo {
 
 		const raytracer = new Raytracer();
 
+		const rtScene = new Scene({ camera: perspectiveCamera });
+		const rocketLauncherPath = '/models/weapons/c_models/c_rocketlauncher/c_rocketlauncher.mdl';
+		const rocketLauncher = await AddSource1Model('tf2', rocketLauncherPath, rtScene);
+		rocketLauncher.playAnimation('idle');
+		rocketLauncher.scale = vec3.fromValues(0.04, 0.04, 0.04);
+		rocketLauncher.translateX(0.5);
+		rocketLauncher.translateY(-0.25);
+		rocketLauncher.rotateGlobalX(-90 * DEG_TO_RAD);
 
-		const rayTracingScene = new RayTracingScene();
-		const { materials, faces, aabbs } = await rayTracingScene.loadModels();
+		const rtCanvas = Graphics.addCanvas({
+			name: 'rt_canvas',
+			scene: rtScene,
+			autoResize: false,
+			width: 256,
+			height: 256,
+		});
 
-		raytracer.configure(scene, WIDTH, HEIGHT,
-			materials, faces, aabbs,
-			RayTracingScene.MODELS_COUNT, RayTracingScene.MAX_NUM_BVs_PER_MESH, RayTracingScene.MAX_NUM_FACES_PER_MESH);
+		mainCanvas.canvas.parentElement.append(rtCanvas.canvas);
+
+		await setTimeoutPromise(1000);//TODO use an actual promise to wait for materials
+
+		const emissiveMaterial = new EmissiveMaterial();
+
+		//new Box({ parent: rtScene, size: 1, material: emissiveMaterial });
+		const plane = new Plane({ parent: rtScene, width: 10, position: [0, 3, 0], material: emissiveMaterial });
+		plane.rotateX(90 * DEG_TO_RAD);
+
+		raytracer.configure(rtScene, WIDTH, HEIGHT);
 		raytracer.play();
 
 		const raytracerMat = new ShaderMaterial({
@@ -68,6 +101,10 @@ class RaytracingDemo implements Demo {
 
 
 		new FullScreenQuad({ parent: scene, material: raytracerMat, });
+
+		function reset() {
+			raytracer.configure(rtScene, WIDTH, HEIGHT,);
+		}
 
 	}
 }
