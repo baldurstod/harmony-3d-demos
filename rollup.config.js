@@ -30,7 +30,7 @@ export default [
 			),
 			typescript(),
 			nodeResolve({
-				dedupe: ['gl-matrix', 'harmony-ui', 'harmony-browser-utils'],
+				dedupe: ['gl-matrix', 'harmony-ui', 'harmony-browser-utils', 'harmony-3d-utils', 'harmony-3d'],
 				extensions: ['.js', '.ts'],
 			}),
 			copy({
