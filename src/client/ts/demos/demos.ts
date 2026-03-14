@@ -1,9 +1,11 @@
 import { Scene } from 'harmony-3d';
 import { HTMLHarmonyTabElement } from 'harmony-ui';
+import { Application } from '../application';
 
 export type InitDemoParams = {
 	htmlDemoContentTab: HTMLHarmonyTabElement,
 	htmlDemoContent: HTMLElement,
+	application: Application,
 }
 
 export class Demo {

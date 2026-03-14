@@ -14,7 +14,7 @@ documentStyle(themeCSS);
 documentStyle(varsCSS);
 documentStyle(applicationCSS)
 
-class Application {
+export class Application {
 	#htmlElement!: HTMLElement;
 	#htmlCanvas!: HTMLCanvasElement;
 	#htmlCanvasContainer!: HTMLElement;
@@ -32,6 +32,7 @@ class Application {
 	#shaderEditor = new ShaderEditor();
 	#mainCanvas!: CanvasAttributes;
 	#contextType = ContextType.WebGL;
+	#openShader?: string;
 
 	static {
 		I18n.start();
@@ -139,7 +140,11 @@ class Application {
 									style: 'width: 50rem;',
 									events: {
 										activated: () => {
-											this.#shaderEditor.initEditor({ aceUrl: '/assets/js/ace-builds/src-min/ace.js', displayCustomShaderButtons: false });
+											this.#shaderEditor.initEditor({
+												aceUrl: '/assets/js/ace-builds/src-min/ace.js',
+												displayCustomShaderButtons: false,
+												defaultShader: this.#openShader,
+											});
 											this.#shaderEditorTab.append(this.#shaderEditor);
 										}
 									},
@@ -254,6 +259,7 @@ class Application {
 				await demo.initDemo(this.#scene, {
 					htmlDemoContentTab: this.#htmlDemoContentTab,
 					htmlDemoContent: this.#htmlDemoContent,
+					application: this,
 				});
 
 			}
@@ -329,6 +335,11 @@ class Application {
 		if (url.pathname.startsWith('/@')) {
 			this.#expand(url.pathname.substring(2));
 		}
+	}
+
+	openShader(name: string): void {
+		this.#shaderEditor.openShader(name);
+		this.#openShader = name;
 	}
 }
 new Application();
