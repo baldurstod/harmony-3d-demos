@@ -1,4 +1,4 @@
-import { CanvasAttributes, ContextType, defineShaderEditor, exportToBinaryFBX, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Repositories, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, WebGLStats, WebRepository } from 'harmony-3d';
+import { CanvasAttributes, ContextType, exportToBinaryFBX, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Repositories, Scene, SceneExplorer, ShaderEditor, Source1ModelManager, WebGLStats, WebRepository } from 'harmony-3d';
 import { saveFile } from 'harmony-browser-utils';
 import { themeCSS } from 'harmony-css';
 import { ColorPickerEventData, createElement, defineHarmonyColorPicker, defineHarmonyTab, defineHarmonyTabGroup, documentStyle, hide, HTMLHarmonyTabElement, I18n, show, toggle } from 'harmony-ui';
@@ -13,7 +13,6 @@ documentStyle(htmlCSS);
 documentStyle(themeCSS);
 documentStyle(varsCSS);
 documentStyle(applicationCSS)
-defineShaderEditor();
 
 class Application {
 	#htmlElement!: HTMLElement;
@@ -195,6 +194,10 @@ class Application {
 				configuration: {
 					alphaMode: 'premultiplied',
 				},
+				requiredLimits: {
+					maxStorageBufferBindingSize: 4294967292,
+					maxBufferSize: 4294967296,
+				}
 			}
 		});
 
