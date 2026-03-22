@@ -14,7 +14,7 @@ class CpCloackDemo implements Demo {
 		perspectiveCamera.farPlane = 100000;
 		perspectiveCamera.nearPlane = 100;
 		perspectiveCamera.verticalFov = 50;
-		Graphics.setIncludeCode('test', '#define PHYSICALLY_CORRECT_LIGHTS');
+		Graphics.setDefine('PHYSICALLY_CORRECT_LIGHTS');
 
 		//WORKING
 		//cp_dustbowl

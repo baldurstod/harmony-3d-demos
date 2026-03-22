@@ -1,6 +1,6 @@
 import { vec3, vec4 } from 'gl-matrix';
 import { AmbientLight, Box, ColorBackground, DEG_TO_RAD, EmissiveMaterial, FullScreenQuad, Graphics, Plane, PointLight, Raytracer, RenderFace, Scene, SceneExplorer, ShaderMaterial, Source1BspLoader, SourceBSP, UniformValue } from 'harmony-3d';
-import { createElement } from 'harmony-ui';
+import { createElement, defineHarmonySwitch, defineHarmonyToggleButton, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
 import { setTimeoutPromise } from 'harmony-utils';
 import { AddSource1Model } from '../../utils/source1';
 import { InitDemoStd } from '../../utils/utils';
@@ -45,6 +45,9 @@ class RaytracingDemo implements Demo {
 		//perspectiveCamera.focus = 3.4;
 
 		const raytracer = new Raytracer();
+		defineHarmonySwitch();
+
+		let htmlPlay: HTMLHarmonyToggleButtonElement;
 
 		createElement('div', {
 			parent: params.htmlDemoContent,
@@ -54,13 +57,46 @@ class RaytracingDemo implements Demo {
 					innerHTML: 'reset',
 					$click: () => reset(),
 				}),
+				htmlPlay = createElement('harmony-switch', {
+					'data-i18n': '#play',
+					state: '1',
+					$change: (event: Event) => {
+						if ((event.target as HTMLHarmonyToggleButtonElement).state) {
+							play();
+						} else {
+							pause();
+						}
+					},
+				}) as HTMLHarmonyToggleButtonElement,
+				createElement('label', {
+					innerText: 'debug color',
+					child: createElement('input', {
+						type: 'checkbox',
+						$input: (event: InputEvent) => {
+							(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).debugColor = (event.target as HTMLInputElement).checked ? 1 : 0;
+							reset();
+						},
+					}),
+				}),
 				createElement('label', {
 					innerText: 'debug normals',
 					child: createElement('input', {
 						type: 'checkbox',
 						$input: (event: InputEvent) => {
-							//perspectiveCamera.verticalFov = Number((event.target as HTMLInputElement).value);
 							(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).debugNormals = (event.target as HTMLInputElement).checked ? 1 : 0;
+							reset();
+						},
+					}),
+				}),
+				createElement('label', {
+					innerText: 'bounces',
+					child: createElement('input', {
+						type: 'range',
+						min: 0,
+						max: 4,
+						value: '1',
+						$input: (event: InputEvent) => {
+							(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).maxBounces = Number((event.target as HTMLInputElement).value);
 							reset();
 						},
 					}),
@@ -104,6 +140,8 @@ class RaytracingDemo implements Demo {
 		mainCanvas.canvas.style.width = `${WIDTH}px`;
 		mainCanvas.canvas.style.height = `${HEIGHT}px`;
 
+		params.application.openShader('raytracer.wgsl');
+
 		const mapName = 'maps/sfm_photostudio_lite.bsp';
 
 		let map = (await (new Source1BspLoader()).load('tf2', mapName)) as SourceBSP;
@@ -123,7 +161,7 @@ class RaytracingDemo implements Demo {
 		plane.rotateX(180 * DEG_TO_RAD);
 
 		await raytracer.configure(rtScene, WIDTH / downScale, HEIGHT / downScale);
-		raytracer.play();
+		play();
 
 		const raytracerMat = new ShaderMaterial({
 			shaderSource: 'presentation',
@@ -135,12 +173,23 @@ class RaytracingDemo implements Demo {
 
 		new FullScreenQuad({ parent: scene, material: raytracerMat, });
 
-		function reset() {
-			raytracer.configure(rtScene, WIDTH / downScale, HEIGHT / downScale);
+		async function reset() {
+			await raytracer.configure(rtScene, WIDTH / downScale, HEIGHT / downScale);
+			play();
+		}
+
+		function play() {
+			raytracer.play();
+			htmlPlay.state = true;
+		}
+		function pause() {
+			raytracer.pause();
+			htmlPlay.state = false;
 		}
 
 		//await initMtt(rtScene);
-		await initWarpaint(rtScene);
+		//await initWarpaint(rtScene);
+		await initAustralium(rtScene);
 
 	}
 }
@@ -203,6 +252,24 @@ async function initWarpaint(scene: Scene): Promise<void> {
 		textureSize: 1024,
 		updatePreview: false,
 	});
+}
+
+async function initAustralium(scene: Scene): Promise<void> {
+	const soldier = await AddSource1Model('tf2', `models/player/soldier`, scene);
+	soldier.playSequence('stand_primary');
+	const rocketLauncherPath = '/models/weapons/c_models/c_rocketlauncher/c_rocketlauncher.mdl';
+	const rocketLauncher = await AddSource1Model('tf2', rocketLauncherPath, scene);
+	rocketLauncher.playAnimation('idle');
+	rocketLauncher.setSkin('8');
+
+	await setTimeoutPromise(1000);
+
+	const TF2_REPOSITORY = 'https://tf2content.loadout.tf/';
+	const TF2_WARPAINT_DEFINITIONS_URL = TF2_REPOSITORY + 'generated/warpaint_definitions.json';
+
+	WarpaintDefinitions.setWarpaintDefinitionsURL(TF2_WARPAINT_DEFINITIONS_URL);
+
+	soldier.setPoseParameter('body_pitch', 0.5);
 }
 
 const mtt = [
