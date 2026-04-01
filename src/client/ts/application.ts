@@ -201,7 +201,7 @@ export class Application {
 				},
 				requiredLimits: {
 					maxStorageBufferBindingSize: 4294967292,
-					maxBufferSize: 4294967296,
+					maxBufferSize: 4294967292,
 				}
 			}
 		});

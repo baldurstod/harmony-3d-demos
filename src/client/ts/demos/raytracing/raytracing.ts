@@ -1,12 +1,13 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { AmbientLight, Box, ColorBackground, DEG_TO_RAD, EmissiveMaterial, FullScreenQuad, Graphics, Plane, PointLight, Raytracer, RenderFace, Scene, SceneExplorer, ShaderMaterial, Source1BspLoader, SourceBSP, UniformValue } from 'harmony-3d';
-import { createElement, defineHarmonySwitch, defineHarmonyToggleButton, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
+import { AmbientLight, Box, ColorBackground, DEG_TO_RAD, EmissiveMaterial, FullScreenQuad, Graphics, Plane, PointLight, Raytracer, RenderFace, Scene, SceneExplorer, ShaderMaterial, Source1BspLoader, Source2ModelInstance, SourceBSP, UniformValue } from 'harmony-3d';
+import { WeaponManager } from 'harmony-3d-utils';
+import { WarpaintDefinitions } from 'harmony-tf2-utils';
+import { createElement, defineHarmonySwitch, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
 import { setTimeoutPromise } from 'harmony-utils';
 import { AddSource1Model } from '../../utils/source1';
+import { addSource2Model } from '../../utils/source2';
 import { InitDemoStd } from '../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../demos';
-import { WarpaintDefinitions } from 'harmony-tf2-utils';
-import { WeaponManager } from 'harmony-3d-utils';
 
 class RaytracingDemo implements Demo {
 	static readonly path = 'raytracing/raytracing';
@@ -49,6 +50,18 @@ class RaytracingDemo implements Demo {
 
 		let htmlPlay: HTMLHarmonyToggleButtonElement;
 
+		let htmlDebugColor: HTMLInputElement;
+		let htmlDebugNormal: HTMLInputElement;
+
+		function debugColor(debug: boolean): void {
+			(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).debugColor = debug ? 1 : 0;
+		}
+
+		function debugNormals(debug: boolean): void {
+			(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).debugNormals = debug ? 1 : 0;
+
+		}
+
 		createElement('div', {
 			parent: params.htmlDemoContent,
 			style: 'display:flex;flex-direction:column;',
@@ -70,21 +83,40 @@ class RaytracingDemo implements Demo {
 				}) as HTMLHarmonyToggleButtonElement,
 				createElement('label', {
 					innerText: 'debug color',
-					child: createElement('input', {
+					child: htmlDebugColor = createElement('input', {
 						type: 'checkbox',
 						$input: (event: InputEvent) => {
-							(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).debugColor = (event.target as HTMLInputElement).checked ? 1 : 0;
+							const debug = (event.target as HTMLInputElement).checked;
+							debugColor(debug);
+							if (debug) {
+								debugNormals(false);
+								htmlDebugNormal.checked = false;
+							}
 							reset();
 						},
-					}),
+					}) as HTMLInputElement,
 				}),
 				createElement('label', {
 					innerText: 'debug normals',
+					child: htmlDebugNormal = createElement('input', {
+						type: 'checkbox',
+						$input: (event: InputEvent) => {
+							const debug = (event.target as HTMLInputElement).checked;
+							debugNormals(debug);
+							if (debug) {
+								debugColor(false);
+								htmlDebugColor.checked = false;
+							}
+							reset();
+						},
+					}) as HTMLInputElement,
+				}),
+				createElement('label', {
+					innerText: 'debug bhv',
 					child: createElement('input', {
 						type: 'checkbox',
 						$input: (event: InputEvent) => {
-							(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).debugNormals = (event.target as HTMLInputElement).checked ? 1 : 0;
-							reset();
+							raytracer.debugBvh((event.target as HTMLInputElement).checked);
 						},
 					}),
 				}),
@@ -104,7 +136,7 @@ class RaytracingDemo implements Demo {
 			]
 		});
 
-		const downScale = 1;
+		const downScale = 4;
 
 		const WIDTH = 800;
 		const HEIGHT = 600;
@@ -189,7 +221,8 @@ class RaytracingDemo implements Demo {
 
 		//await initMtt(rtScene);
 		//await initWarpaint(rtScene);
-		await initAustralium(rtScene);
+		//await initAustralium(rtScene);
+		await initSource2(rtScene);
 
 	}
 }
@@ -270,6 +303,28 @@ async function initAustralium(scene: Scene): Promise<void> {
 	WarpaintDefinitions.setWarpaintDefinitionsURL(TF2_WARPAINT_DEFINITIONS_URL);
 
 	soldier.setPoseParameter('body_pitch', 0.5);
+}
+
+async function initSource2(scene: Scene): Promise<void> {
+	//const dawnbreaker = await addSource2Model('dota2', `models/heroes/dawnbreaker/dawnbreaker.vmdl_c`, scene);
+	//dawnbreaker.playSequence('stand_primary');
+
+
+	const items = [
+		'models/heroes/dawnbreaker/dawnbreaker_arms',
+		'models/heroes/dawnbreaker/dawnbreaker_armor',
+		'models/heroes/dawnbreaker/dawnbreaker_weapon',
+		'models/heroes/dawnbreaker/dawnbreaker_head',
+	]
+
+	const hero = await addSource2Model('dota2', 'models/heroes/dawnbreaker/dawnbreaker', scene) as Source2ModelInstance;
+	hero.playSequence('ACT_DOTA_IDLE');
+	hero.animationSpeed = 0.;
+
+	for (const item of items) {
+		const itemModel = await addSource2Model('dota2', item, hero) as Source2ModelInstance;
+		itemModel.playSequence('ACT_DOTA_IDLE');
+	}
 }
 
 const mtt = [

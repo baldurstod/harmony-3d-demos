@@ -3,8 +3,8 @@ import { addSource2Model } from '../../../../../utils/source2';
 import { InitDemoStd } from '../../../../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../../../../demos';
 
-class Dota2MarsDemo implements Demo {
-	static readonly path = 'sourceengine/source2/dota2/heroes/mars';
+class Dota2WispDemo implements Demo {
+	static readonly path = 'sourceengine/source2/dota2/heroes/wisp';
 
 	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
@@ -14,15 +14,12 @@ class Dota2MarsDemo implements Demo {
 		perspectiveCamera.nearPlane = 1;
 		perspectiveCamera.verticalFov = 50;
 
-		params.application.openShader('source2_hero.wgsl');
-
 		const items = [
-			'models/heroes/mars/mars_spear',
+			//'models/heroes/mars/mars_spear',
 		]
 
-		const hero = await addSource2Model('dota2', 'models/heroes/mars/mars', scene) as Source2ModelInstance;
+		const hero = await addSource2Model('dota2', 'models/heroes/wisp/wisp', scene) as Source2ModelInstance;
 		hero.playSequence('ACT_DOTA_IDLE');
-		hero.animationSpeed = 0.;
 
 		for (const item of items) {
 			const itemModel = await addSource2Model('dota2', item, hero) as Source2ModelInstance;
@@ -31,4 +28,4 @@ class Dota2MarsDemo implements Demo {
 	}
 }
 
-registerDemo(Dota2MarsDemo);
+registerDemo(Dota2WispDemo);
