@@ -1,5 +1,5 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, DEG_TO_RAD, getCurrentTexture, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, PixelatePass, PointLight, RayTracingPass, Scene, ShaderMaterial, TextureManager, UniformValue } from 'harmony-3d';
+import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, DEG_TO_RAD, getCurrentTexture, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, PointLight, RayTracingPass, Scene, ShaderMaterial, TextureManager } from 'harmony-3d';
 import { float32, uint32 } from 'harmony-types';
 import { createElement, defineHarmonyToggleButton, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
 import { InitDemoStd } from '../../utils/utils';
@@ -263,9 +263,9 @@ class RaytracingMeshesDemo implements Demo {
 			++frameId;// TODO: increment by the sample per pixel value
 			//(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).accumulatedSamplesPerPixel = accumulatedSamplesPerPixel;
 			//(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).clearAccumulatedSamples = clearAccumulatedSamples;
-			(raytracerMat.uniforms['commonUniforms'] as Record<string, UniformValue>).frameCounter = frameId;
+			raytracerMat.setSubUniformValue('commonUniforms.frameCounter', frameId);
 			//raytracerMat.uniforms['frameData'] = [mainCanvas.width!, mainCanvas.height!, frameId, 0];
-			raytracerMat.uniforms['camera'] = computeCamera(perspectiveCamera);
+			raytracerMat.setUniformValue('camera', computeCamera(perspectiveCamera));
 			//raytracerMat.uniforms['outTexture'] = tempTexture;
 			//raytracerMat.uniforms['outTexture'] = getCurrentTexture();
 			raytracerMat.setDefine('OUTPUT_FORMAT', 'rgba8unorm'/*WebGPUInternal.format*/);
@@ -275,7 +275,7 @@ class RaytracingMeshesDemo implements Demo {
 
 			if (false && this.#renderFrames > 0) {
 				Graphics.renderMultiCanvas(event.detail.delta, event.detail.context);
-				raytracerMat.uniforms['outTexture'] = getCurrentTexture();
+				raytracerMat.setUniformValue('outTexture', getCurrentTexture());
 				Graphics.compute(raytracerMat, {
 					width: WIDTH,
 					height: HEIGHT,

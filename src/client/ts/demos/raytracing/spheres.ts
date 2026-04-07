@@ -143,10 +143,10 @@ class RaytracingSphereDemo implements Demo {
 			pos = pos2;
 			++accumulatedSamplesPerPixel;// TODO: increment by the sample per pixel value
 			++frameId;// TODO: increment by the sample per pixel value
-			(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).accumulatedSamplesPerPixel = accumulatedSamplesPerPixel;
-			(raytracerMat.uniforms['samplingParams'] as Record<string, UniformValue>).clearAccumulatedSamples = clearAccumulatedSamples;
-			raytracerMat.uniforms['frameData'] = [mainCanvas.width!, mainCanvas.height!, frameId, 0];
-			raytracerMat.uniforms['camera'] = computeCamera(perspectiveCamera);
+			raytracerMat.setSubUniformValue('samplingParams.accumulatedSamplesPerPixel', accumulatedSamplesPerPixel);
+			raytracerMat.setSubUniformValue('samplingParams.clearAccumulatedSamples', clearAccumulatedSamples);
+			raytracerMat.setUniformValue('frameData', [mainCanvas.width!, mainCanvas.height!, frameId, 0]);
+			raytracerMat.setUniformValue('camera', computeCamera(perspectiveCamera));
 			clearAccumulatedSamples = 0;
 		});
 

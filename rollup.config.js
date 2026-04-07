@@ -4,7 +4,7 @@ import typescript from '@rollup/plugin-typescript';
 import wasm from '@rollup/plugin-wasm';
 import copy from 'rollup-plugin-copy';
 import css from 'rollup-plugin-import-css';
-import { string as plugin_string } from 'rollup-plugin-string'
+import { string as plugin_string } from 'rollup-plugin-string';
 
 const isExamples = process.env.BUILD === 'examples';
 
@@ -30,7 +30,7 @@ export default [
 			),
 			typescript(),
 			nodeResolve({
-				dedupe: ['gl-matrix', 'harmony-ui', 'harmony-browser-utils', 'harmony-3d-utils', 'harmony-3d'],
+				dedupe: ['gl-matrix', 'harmony-ui', 'harmony-browser-utils', 'harmony-3d-utils', 'harmony-3d', 'amandine', 'harmony-utils'],
 				extensions: ['.js', '.ts'],
 			}),
 			copy({

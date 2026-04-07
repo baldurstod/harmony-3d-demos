@@ -54,11 +54,11 @@ class RaytracingDemo implements Demo {
 		let htmlDebugNormal: HTMLInputElement;
 
 		function debugColor(debug: boolean): void {
-			(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).debugColor = debug ? 1 : 0;
+			raytracer.getMaterial().setSubUniformValue('commonUniforms.debugColor', debug ? 1 : 0);
 		}
 
 		function debugNormals(debug: boolean): void {
-			(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).debugNormals = debug ? 1 : 0;
+			raytracer.getMaterial().setSubUniformValue('commonUniforms.debugNormals', debug ? 1 : 0);
 
 		}
 
@@ -128,7 +128,7 @@ class RaytracingDemo implements Demo {
 						max: 4,
 						value: '1',
 						$input: (event: InputEvent) => {
-							(raytracer.getMaterial().uniforms.commonUniforms as Record<string, UniformValue>).maxBounces = Number((event.target as HTMLInputElement).value);
+							raytracer.getMaterial().setSubUniformValue('commonUniforms.maxBounces', Number((event.target as HTMLInputElement).value));
 							reset();
 						},
 					}),

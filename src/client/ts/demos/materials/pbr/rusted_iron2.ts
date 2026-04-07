@@ -242,8 +242,8 @@ void main()
 	const prefix = '/assets/textures/pbr/';
 
 	material.addParameter('color', MateriaParameterType.Color4, null, newValue => material.setColor4Uniform('uColor', newValue ?? vec4.fromValues(1.0, 1.0, 1.0, 1.0)));
-	material.addParameter('metalness', MateriaParameterType.NormalizedFloat, 0, newValue => { material.uniforms['uMetalness'] = newValue });
-	material.addParameter('roughness', MateriaParameterType.NormalizedFloat, 0, newValue => { material.uniforms['uRoughness'] = newValue });
+	material.addParameter('metalness', MateriaParameterType.NormalizedFloat, 0, newValue => { material.setUniformValue('uMetalness', newValue) });
+	material.addParameter('roughness', MateriaParameterType.NormalizedFloat, 0, newValue => { material.setUniformValue('uRoughness', newValue) });
 	material.addParameter('color_texture', MateriaParameterType.Texture, null, newValue => material.setTexture('uColorTexture', newValue, 'USE_COLOR_TEXTURE'));
 	material.addParameter('normal_texture', MateriaParameterType.Texture, null, newValue => material.setTexture('uNormalTexture', newValue, 'USE_NORMAL_TEXTURE'));
 	material.addParameter('metalness_texture', MateriaParameterType.Texture, null, newValue => material.setTexture('uMetalnessTexture', newValue, 'USE_METALNESS_TEXTURE'));

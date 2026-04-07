@@ -6,7 +6,6 @@ export async function addSource2Model(repository: string, fileName: string, pare
 		return;
 	}
 
-	console.error(model);
 	parent.addChild(model);
 
 	GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => {
