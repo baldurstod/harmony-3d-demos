@@ -54,6 +54,7 @@ func initEngine() *gin.Engine {
 	}
 
 	r.Use(rewriteURL(r))
+	r.Use(setHeaders())
 	r.StaticFS("/static", http.FS(useFS))
 	r.GET("/list", func(c *gin.Context) { listHandler(c, useFS) })
 
@@ -101,4 +102,12 @@ func listHandler(c *gin.Context, f fs.FS) {
 	})
 
 	jsonSuccess(c, map[string]interface{}{"files": files})
+}
+
+func setHeaders() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
+		c.Writer.Header().Set("Cross-Origin-Embedder-Policy", "require-corp")
+		c.Next()
+	}
 }
