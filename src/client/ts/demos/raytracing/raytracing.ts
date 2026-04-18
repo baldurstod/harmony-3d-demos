@@ -1,9 +1,9 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { AmbientLight, Box, ColorBackground, DEG_TO_RAD, EmissiveMaterial, FullScreenQuad, Graphics, Plane, PointLight, Raytracer, RenderFace, Scene, SceneExplorer, ShaderMaterial, Source1BspLoader, Source2ModelInstance, SourceBSP, UniformValue } from 'harmony-3d';
+import { AmbientLight, Box, CanvasUi, CanvasUiType, ColorBackground, DEG_TO_RAD, EmissiveMaterial, FullScreenQuad, Graphics, GraphicsEvent, GraphicsEvents, Plane, PointLight, Raytracer, RenderFace, Scene, SceneExplorer, ShaderMaterial, Source1BspLoader, Source2ModelInstance, SourceBSP } from 'harmony-3d';
 import { WeaponManager } from 'harmony-3d-utils';
 import { WarpaintDefinitions } from 'harmony-tf2-utils';
 import { createElement, defineHarmonySwitch, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
-import { setTimeoutPromise } from 'harmony-utils';
+import { FpsCounter, setTimeoutPromise, toHumanReadable } from 'harmony-utils';
 import { AddSource1Model } from '../../utils/source1';
 import { addSource2Model } from '../../utils/source2';
 import { InitDemoStd } from '../../utils/utils';
@@ -14,10 +14,12 @@ class RaytracingDemo implements Demo {
 	#renderFrames = Infinity;
 
 	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
+		/*
 		if (Graphics.isWebGLAny) {
 			alert('This demo is only available in WebGPU mode');
 			return;
 		}
+		*/
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		scene.background = new ColorBackground({ color: vec4.fromValues(0., 0., 0., 1) });//.setColor(vec4.fromValues(0., 0., 0., 1));
 
@@ -59,7 +61,6 @@ class RaytracingDemo implements Demo {
 
 		function debugNormals(debug: boolean): void {
 			raytracer.getMaterial().setSubUniformValue('commonUniforms.debugNormals', debug ? 1 : 0);
-
 		}
 
 		createElement('div', {
@@ -67,7 +68,11 @@ class RaytracingDemo implements Demo {
 			style: 'display:flex;flex-direction:column;',
 			childs: [
 				createElement('button', {
-					innerHTML: 'reset',
+					innerText: 'reset scene',
+					$click: () => resetScene(),
+				}),
+				createElement('button', {
+					innerText: 'reset',
 					$click: () => reset(),
 				}),
 				htmlPlay = createElement('harmony-switch', {
@@ -92,7 +97,7 @@ class RaytracingDemo implements Demo {
 								debugNormals(false);
 								htmlDebugNormal.checked = false;
 							}
-							reset();
+							resetScene();
 						},
 					}) as HTMLInputElement,
 				}),
@@ -107,17 +112,27 @@ class RaytracingDemo implements Demo {
 								debugColor(false);
 								htmlDebugColor.checked = false;
 							}
-							reset();
+							resetScene();
 						},
 					}) as HTMLInputElement,
 				}),
 				createElement('label', {
-					innerText: 'debug bhv',
+					innerText: 'debug bvh',
 					child: createElement('input', {
 						type: 'checkbox',
 						$input: (event: InputEvent) => {
 							raytracer.debugBvh((event.target as HTMLInputElement).checked);
 						},
+					}),
+				}),
+				createElement('label', {
+					innerText: 'new bvh method',
+					child: createElement('input', {
+						type: 'checkbox',
+						$input: (event: InputEvent) => {
+							raytracer.useNewBvh((event.target as HTMLInputElement).checked);
+						},
+						checked: true,
 					}),
 				}),
 				createElement('label', {
@@ -129,14 +144,14 @@ class RaytracingDemo implements Demo {
 						value: '1',
 						$input: (event: InputEvent) => {
 							raytracer.getMaterial().setSubUniformValue('commonUniforms.maxBounces', Number((event.target as HTMLInputElement).value));
-							reset();
+							resetScene();
 						},
 					}),
 				}),
 			]
 		});
 
-		const downScale = 4;
+		const downScale = 2;
 
 		const WIDTH = 800;
 		const HEIGHT = 600;
@@ -146,6 +161,84 @@ class RaytracingDemo implements Demo {
 		mainCanvas.width = WIDTH;
 		mainCanvas.height = HEIGHT;
 
+		const ui = new CanvasUi({
+			canvas: 'main_canvas',
+			params: [
+				{
+					name: 'invocations',
+					label: 'invocations',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'fps',
+					label: 'fps',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'rps',
+					label: 'rps',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'counter 0',
+					label: 'counter 0',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'counter 1',
+					label: 'counter 1',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'counter 2',
+					label: 'counter 2',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'counter 3',
+					label: 'counter 3',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'counter 4',
+					label: 'counter 4',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'counter 5',
+					label: 'counter 5',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'counter 6',
+					label: 'counter 6',
+					type: CanvasUiType.Float,
+				},
+				{
+					name: 'counter 7',
+					label: 'counter 7',
+					type: CanvasUiType.Float,
+				},
+			],
+		});
+
+		const fpsCounter = new FpsCounter();
+
+		GraphicsEvents.addEventListener(GraphicsEvent.Tick, () => {
+			ui.setValue('invocations', `${toHumanReadable(raytracer.getInvocations(), 1)} invocations`);
+			ui.setValue('rps', `${toHumanReadable(raytracer.getRps(), 1)} ray/s`);
+			fpsCounter.addFrame();
+			ui.setValue('fps', `${fpsCounter.getFps()} fps`);
+			//ui.setValue('counter 0', `${raytracer.getUint32Counter(0) / raytracer.getInvocations()} c0 / invocation`);
+			ui.setValue('counter 0', `${raytracer.getFloat32Counter(0)} c0`);
+			ui.setValue('counter 1', `${raytracer.getFloat32Counter(1)} c1`);
+			ui.setValue('counter 2', `${raytracer.getFloat32Counter(2)} c2`);
+			ui.setValue('counter 3', `${raytracer.getFloat32Counter(3)} c3`);
+			ui.setValue('counter 4', `${raytracer.getFloat32Counter(4)} c4`);
+			ui.setValue('counter 5', `${raytracer.getFloat32Counter(5)} c5`);
+			ui.setValue('counter 6', `${raytracer.getUint32Counter(6)} c6`);
+			ui.setValue('counter 7', `${raytracer.getUint32Counter(7)} c7`);
+		});
 
 		const rtScene = new Scene({ camera: perspectiveCamera, childs: [perspectiveCamera] });
 
@@ -172,7 +265,7 @@ class RaytracingDemo implements Demo {
 		mainCanvas.canvas.style.width = `${WIDTH}px`;
 		mainCanvas.canvas.style.height = `${HEIGHT}px`;
 
-		params.application.openShader('raytracer.wgsl');
+		params.application.openShader('raytracer_v2.wgsl');
 
 		const mapName = 'maps/sfm_photostudio_lite.bsp';
 
@@ -187,8 +280,8 @@ class RaytracingDemo implements Demo {
 
 		const emissiveMaterial = new EmissiveMaterial({ renderFace: RenderFace.Both });
 
-		new Box({ parent: rtScene, size: 10, material: emissiveMaterial, position: [0, 150, 50] });
-		const plane = new Plane({ parent: rtScene, width: 500, position: [0, 0, 300], material: emissiveMaterial });
+		new Box({ parent: rtScene, size: 10, material: emissiveMaterial, position: [0, 150, 50], visible: false });
+		const plane = new Plane({ parent: rtScene, width: 500, position: [0, 0, 300], material: emissiveMaterial, visible: false });
 		new AmbientLight({ parent: rtScene });
 		plane.rotateX(180 * DEG_TO_RAD);
 
@@ -205,8 +298,13 @@ class RaytracingDemo implements Demo {
 
 		new FullScreenQuad({ parent: scene, material: raytracerMat, });
 
-		async function reset() {
+		async function resetScene() {
 			await raytracer.configure(rtScene, WIDTH / downScale, HEIGHT / downScale);
+			play();
+		}
+
+		async function reset() {
+			await raytracer.reset();
 			play();
 		}
 
@@ -219,11 +317,12 @@ class RaytracingDemo implements Demo {
 			htmlPlay.state = false;
 		}
 
-		//await initMtt(rtScene);
+		await initMtt(rtScene);
 		//await initWarpaint(rtScene);
 		//await initAustralium(rtScene);
-		await initSource2(rtScene);
+		//await initSource2(rtScene);
 
+		//new PointLight({ parent: rtScene, position: [0, 0, 50], intensity: 100 });
 	}
 }
 
