@@ -1,4 +1,4 @@
-import { AnimatedTexture, AnimatedTextureProxy, ApplySticker, CombineLerp, createTexture, GL_TEXTURE_2D, Graphics, IntArrayNode, Multiply, NodeImageEditor, NodeImageEditorGui, Plane, Scene, Select, Source1MaterialManager, Source1TextureManager, Texture, TextureFormat, TextureLookup, TextureType } from 'harmony-3d';
+import { AnimatedTexture, IntArrayNode, Multiply, NodeImageEditor, NodeImageEditorGui, Plane, Scene, Select, Source1MaterialManager, Source1TextureManager, Texture, TextureLookup } from 'harmony-3d';
 import { HTMLHarmonyTabElement } from 'harmony-ui';
 import { AddSource1Model } from '../../../utils/source1';
 import { InitDemoStd } from '../../../utils/utils';
@@ -43,10 +43,10 @@ async function testUberSaw(scene: Scene, htmlDemoContentTab: HTMLHarmonyTabEleme
 	nodeImageEditor.textureSize = 1024;
 
 	let groupsLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	groupsLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_groups', 0, false);
+	groupsLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_groups', 0, false));
 
 	let aoLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	aoLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_ao', 0, false);
+	aoLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_ao', 0, false));
 
 
 	let selectParametersNode2 = nodeImageEditor.addNode('int array', { length: 16 }) as IntArrayNode;
@@ -82,7 +82,7 @@ async function testUberSaw(scene: Scene, htmlDemoContentTab: HTMLHarmonyTabEleme
 
 			//let { name: outputTextureName, texture: outputTexture } = Source1TextureManager.addInternalTexture('tf2', undefined, texture);
 			Source1TextureManager.setTexture('tf2', 'test', texture);
-//			finalNode.getOutput('output')!._value = outputTexture.frames[0];
+			//			finalNode.getOutput('output')!._value = outputTexture.frames[0];
 
 			c_ubersaw.materialsParams['WeaponSkin'] = 'test';
 			planeMesh.materialsParams['WeaponSkin'] = 'test';

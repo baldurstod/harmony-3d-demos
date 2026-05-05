@@ -43,30 +43,30 @@ async function testUberSaw(scene: Scene, htmlDemoContentTab: HTMLHarmonyTabEleme
 	nodeImageEditor.textureSize = 1024;
 
 	//let stickerNode = nodeImageEditor.addNode('sticker');
-	//stickerNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'patterns/autumn/sticker_a_bomb', 0);
+	//stickerNode.setInputTexture( await Source1TextureManager.getTextureAsync('tf2', 'patterns/autumn/sticker_a_bomb', 0);
 
 	let applyStickerNode = nodeImageEditor.addNode('apply_sticker', { textureSize: 1024 }) as ApplySticker;
 	//applyStickerNode.setPredecessor('input0', stickerNode, 'output');
-	applyStickerNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'patterns/autumn/sticker_a_bomb', 0, false);
+	applyStickerNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'patterns/autumn/sticker_a_bomb', 0, false));
 
 
 
 	let groupsLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	groupsLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_groups', 0, false);
+	groupsLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_groups', 0, false));
 	let aoLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	aoLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_ao', 0, false);
+	aoLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_ao', 0, false));
 	let blankLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	blankLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'patterns/blank_white', 0, false);
+	blankLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'patterns/blank_white', 0, false));
 	let albedoLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	albedoLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_albedo', 0, false);
+	albedoLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_albedo', 0, false));
 	let techLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	techLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'patterns/workshop/smissmas_2017/1181727321/1181727321_tech', 0, false);
+	techLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'patterns/workshop/smissmas_2017/1181727321/1181727321_tech', 0, false));
 	let techBlackLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	techBlackLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'patterns/workshop/smissmas_2017/1181727321/1181727321_tech_solid_black', 0, false);
+	techBlackLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'patterns/workshop/smissmas_2017/1181727321/1181727321_tech_solid_black', 0, false));
 	let techGreenLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	techGreenLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'patterns/workshop/smissmas_2017/1181727321/1181727321_tech_solid_green', 0, false);
+	techGreenLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'patterns/workshop/smissmas_2017/1181727321/1181727321_tech_solid_green', 0, false));
 	let wearLookupNode = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	wearLookupNode.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_wearblend', 0, false);
+	wearLookupNode.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'models/weapons/c_models/c_ubersaw/p_ubersaw_wearblend', 0, false));
 
 
 	let multiplyNode = nodeImageEditor.addNode('multiply', { textureSize: 1024 }) as Multiply;
@@ -148,7 +148,7 @@ async function testUberSaw(scene: Scene, htmlDemoContentTab: HTMLHarmonyTabEleme
 	//window.finalNode = finalNode;
 
 	let p_paintkit_tool_wearblend = nodeImageEditor.addNode('texture lookup', { textureSize: 1024 }) as TextureLookup;
-	p_paintkit_tool_wearblend.inputTexture = await Source1TextureManager.getTextureAsync('tf2', 'models/items/paintkit_tool/p_paintkit_tool_wearblend', 0, false);
+	p_paintkit_tool_wearblend.setInputTexture(await Source1TextureManager.getTextureAsync('tf2', 'models/items/paintkit_tool/p_paintkit_tool_wearblend', 0, false));
 	p_paintkit_tool_wearblend.setParam(NodeParamOrigin.Code, 'adjust black', 0.27);
 	p_paintkit_tool_wearblend.setParam(NodeParamOrigin.Code, 'adjust white', 1);
 	p_paintkit_tool_wearblend.setParam(NodeParamOrigin.Code, 'adjust gamma', 1.1);
