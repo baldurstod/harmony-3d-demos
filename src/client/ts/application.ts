@@ -257,6 +257,7 @@ export class Application {
 			if (demo) {
 				this.#useDefaultRenderLoop = !(demo.useCustomRenderLoop === true);
 				await demo.initDemo(this.#scene, {
+					htmlDemoView: this.#htmlCanvasContainer,
 					htmlDemoContentTab: this.#htmlDemoContentTab,
 					htmlDemoContent: this.#htmlDemoContent,
 					application: this,

@@ -3,6 +3,7 @@ import { HTMLHarmonyTabElement } from 'harmony-ui';
 import { Application } from '../application';
 
 export type InitDemoParams = {
+	htmlDemoView: HTMLElement,
 	htmlDemoContentTab: HTMLHarmonyTabElement,
 	htmlDemoContent: HTMLElement,
 	application: Application,
