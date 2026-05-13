@@ -8,7 +8,7 @@ export class OBJFile {
   filePath
   lineNumber
 
-  constructor(fileContents, defaultModelName?) {
+  constructor(fileContents, defaultModelName?: string) {
     this._reset();
     this.fileContents = fileContents;
     this.defaultModelName = (defaultModelName || 'untitled');
@@ -165,11 +165,21 @@ export class OBJFile {
     const totalVertices = (lineItems.length - 1);
     if (totalVertices < 3) { throw (`Face statement has less than 3 vertices${this.filePath}${this.lineNumber}`); }
 
-    const face = {
+    const face: {
+      material: any,
+      group: any,
+      smoothingGroup: any,
+      vertices: {
+        vertexIndex: number,
+        textureCoordsIndex: number,
+        vertexNormalIndex: number,
+      }[],
+
+    } = {
       material: this.currentMaterial,
       group: this.currentGroup,
       smoothingGroup: this.smoothingGroup,
-      vertices: []
+      vertices: [],
     };
 
     for (let i = 0; i < totalVertices; i += 1) {

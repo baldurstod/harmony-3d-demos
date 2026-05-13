@@ -2,7 +2,7 @@ import { AmbientLight, MeshFlatMaterial, PointLight, Scene, Sphere } from 'harmo
 import { InitDemoStd } from '../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../demos';
 
-class DecalDemo implements Demo {
+class SphereDemo implements Demo {
 	static readonly path = 'primitives/sphere';
 
 	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
@@ -25,4 +25,4 @@ class DecalDemo implements Demo {
 	}
 }
 
-registerDemo(DecalDemo);
+registerDemo(SphereDemo);

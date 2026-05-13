@@ -1,5 +1,5 @@
 import { vec4 } from 'gl-matrix';
-import { Camera, ColorBackground, MeshBasicMaterial, OrbitControl, Scene, Source1ModelInstance } from 'harmony-3d';
+import { Camera, ColorBackground, OrbitControl, Scene, Source1ModelInstance } from 'harmony-3d';
 import { createElement, defineHarmonySwitch, HarmonySwitchChange, HTMLHarmonySwitchElement } from 'harmony-ui';
 import { AddSource1Model } from '../../../../utils/source1';
 import { InitDemoStd } from '../../../../utils/utils';
@@ -25,8 +25,8 @@ registerDemo(Source1AnimationsDemo);
 
 async function testAnimations(scene: Scene, htmlDemoContent: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
 	perspectiveCamera.position = [500, 0, 80];
-	orbitCameraControl.target.position = [0, 0, 80];
-	orbitCameraControl.target.position = [0, 0, 0];
+	orbitCameraControl.target.setPosition([0, 0, 80]);
+	orbitCameraControl.target.setPosition([0, 0, 0]);
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 10;
 	perspectiveCamera.verticalFov = 10;

@@ -131,9 +131,7 @@ class SheetViewerDemo implements Demo {
 		console.log(vtf.sheet)
 		let sequenceId = 0;
 		for (const sequence of vtf.sheet.sequences) {
-			const lineMaterial = new LineMaterial();
-			lineMaterial.lineWidth = LINE_WIDTH;
-			lineMaterial.setColorMode(MaterialColorMode.PerMesh);
+			const lineMaterial = new LineMaterial({ lineWidth: LINE_WIDTH, colorMode: MaterialColorMode.PerMesh });
 			lineMaterial.color = getColor();
 			let frameId = 0;
 			for (const sample of sequence.frames) {

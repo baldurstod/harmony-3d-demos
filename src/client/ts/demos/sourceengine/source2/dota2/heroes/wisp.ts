@@ -14,7 +14,7 @@ class Dota2WispDemo implements Demo {
 		perspectiveCamera.nearPlane = 1;
 		perspectiveCamera.verticalFov = 50;
 
-		const items = [
+		const items: string[] = [
 			//'models/heroes/mars/mars_spear',
 		]
 
