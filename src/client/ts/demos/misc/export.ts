@@ -1,3 +1,4 @@
+export * from './animations/export';
 export * from './curves';
 export * from './multiview';
 export * from './nodeimageeditor/export';
