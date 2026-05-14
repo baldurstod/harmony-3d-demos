@@ -1,5 +1,5 @@
 import { mat3, quat, vec3, vec4 } from 'gl-matrix';
-import { Bone, Camera, ColorBackground, Cylinder, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Grid, Group, OrbitControl, Scene, SkeletonHelper, Text2D } from 'harmony-3d';
+import { Bone, Camera, ColorBackground, Cylinder, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Grid, Group, OrbitControl, Scene, Skeleton, SkeletonHelper, Text2D } from 'harmony-3d';
 import { createElement, display } from 'harmony-ui';
 import { createSOMASkeleton77, SOMASkeleton77 } from '../../../utils/somaskeleton';
 import { AddSource1Model } from '../../../utils/source1';
@@ -29,7 +29,7 @@ registerDemo(KimodoDemo);
 const LOCAL_POS = true;
 
 async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoContent: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
-	perspectiveCamera.position = [200, 200, 200];
+	perspectiveCamera.position = [0, 0, 500];
 	orbitCameraControl.target.setPosition([0, 0, 80]);
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 10;
@@ -75,15 +75,24 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 	scene.addChild(new Grid({ spacing: 200, size: 4000 }));
 
 
-	const somaSkeleton77 = createSOMASkeleton77();
-	scene.addChild(somaSkeleton77);
+	const somaSkeleton77 = createSOMASkeleton77({ name: 'SOMA rigged', parent: scene });
+	const somaSkeleton77RefPose = createSOMASkeleton77({ name: 'SOMA ref', parent: scene });
 	somaSkeleton77.addChild(new SkeletonHelper());
+	somaSkeleton77RefPose.addChild(new SkeletonHelper());
+
+
+	somaSkeleton77RefPose.setPosition([100, 0, 0]);
+	somaSkeleton77RefPose.setScale(0.45);
 
 	const scout = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
+	const scoutRef = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
+	scoutRef.name = 'Scout ref';
+	scoutRef.setPosition([100, 0, 0]);
 
 	let speed = 0;
 
 	const timeline = createElement('input', {
+		class: 'large-range',
 		parent: htmlDemoContent,
 		type: 'range',
 		min: 0,
@@ -153,20 +162,17 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 		timeline.value = String(t);
 
 		let frame = Math.floor(t);
-		//frame = 38;
-
-		const pos = vec3.create();
-		const globalRot = quat.create();
-		const parentPos = vec3.create();
 
 		let rootPos = vec3.create();
 		for (let joint = 0; joint < 77; joint++) {
 			const somaBone = somaSkeleton77.getBoneById(joint)!;
+			const somaBoneRef = somaSkeleton77RefPose.getBoneById(joint)!;
 			if (joint === 0) {
 				vec3.copy(rootPos, rootPositions[frame]!);
 				vec3.scale(rootPos, rootPos, 100);
 				vec3.scale(rootPos, rootPos, 0.5);
 				//somaBone.setPosition(rootPos);
+				//somaBoneRef.setPosition([100, 0, 0]);
 			}
 
 			const j = frame * 77 * 3 * 3 + joint * 3 * 3;
@@ -203,79 +209,93 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 
 				vec3.sub(neutral, neutral, parentNeutral);
 				somaBone.setPosition(neutral);
+				somaBoneRef.setPosition(neutral);
 			}
 			somaBone.setOrientation(q);
 		}
 
-		for (const boneTf2 in scoutToSOMA) {
-			const tf2Bone = scout.skeleton?.getBoneByName(boneTf2);
-			tf2Bone?.setOrientation(tf2Bone._initialQuaternion);
-			tf2Bone?.setPosition(tf2Bone._initialPosition);
-		}
+		retargetPose(somaSkeleton77, scout.skeleton!);
+		retargetPose(somaSkeleton77RefPose, scoutRef.skeleton!);
+	}
+	GraphicsEvents.addEventListener(GraphicsEvent.Tick, animate);
+}
 
-		for (let joint = 0; joint < 77; joint++) {
-			const parent = SOMASkeleton77.getParentBone(joint);
-			const somaBone = somaSkeleton77.getBoneById(joint)!;
-			if (parent !== null) {
-				const parentNeutralIndex = parent * 3;
-				const parentNeutral = vec3.fromValues(
-					neutrals[parentNeutralIndex + 0]! * 100,
-					neutrals[parentNeutralIndex + 1]! * 100,
-					neutrals[parentNeutralIndex + 2]! * 100,
-				);
+/**
+ * Transfert rig from soma skeleton to tf2 skeleton
+ * @param source Soma skeleton
+ * @param target Tf2 skeleton
+ */
+function retargetPose(source: Skeleton, target: Skeleton): void {
+	for (const boneTf2 in scoutToSOMA) {
+		const tf2Bone = target.getBoneByName(boneTf2);
+		tf2Bone?.setOrientation(tf2Bone._initialQuaternion);
+		tf2Bone?.setPosition(tf2Bone._initialPosition);
+	}
 
-				const neutralIndex = joint * 3;
-				const neutral = vec3.fromValues(
-					neutrals[neutralIndex + 0]! * 100,
-					neutrals[neutralIndex + 1]! * 100,
-					neutrals[neutralIndex + 2]! * 100,
-				)
+	for (let joint = 0; joint < 77; joint++) {
+		const parent = SOMASkeleton77.getParentBone(joint);
+		const somaBone = source.getBoneById(joint)!;
+		if (parent !== null) {
+			const parentNeutralIndex = parent * 3;
+			const parentNeutral = vec3.fromValues(
+				neutrals[parentNeutralIndex + 0]! * 100,
+				neutrals[parentNeutralIndex + 1]! * 100,
+				neutrals[parentNeutralIndex + 2]! * 100,
+			);
 
-				const deltaPos = vec3.sub(vec3.create(), neutral, parentNeutral);
-				vec3.normalize(deltaPos, deltaPos);
-				const neutralQuat = quat.rotationTo(quat.create(), [0, 0, 1], deltaPos);
+			const neutralIndex = joint * 3;
+			const neutral = vec3.fromValues(
+				neutrals[neutralIndex + 0]! * 100,
+				neutrals[neutralIndex + 1]! * 100,
+				neutrals[neutralIndex + 2]! * 100,
+			)
 
-				for (const boneTf2 in scoutToSOMA) {
-					const boneSOMA = scoutToSOMA[boneTf2];
-					if (somaBone.name !== boneSOMA) {
-						continue;
-					}
+			const deltaPos = vec3.sub(vec3.create(), neutral, parentNeutral);
+			vec3.normalize(deltaPos, deltaPos);
+			const neutralQuat = quat.rotationTo(quat.create(), [0, 0, 1], deltaPos);
 
-					const tf2Bone = scout.skeleton?.getBoneByName(boneTf2);
-					const tf2ParentBone = (tf2Bone?.parent as Bone);
-					if (tf2ParentBone.isBone) {
-						if (tf2Bone) {
-							const neutralQuatInv = quat.invert(quat.create(), quat.create());
-							const initialQuaternionInv = quat.invert(quat.create(), tf2Bone._initialQuaternion);
-
-							const parentQuat = tf2ParentBone.getWorldOrientation();
-							const parentQuatInv = quat.invert(quat.create(), parentQuat);
-
-							const q = quat.mul(quat.create(), parentQuatInv, somaBone.getOrientation());
-							quat.mul(q, q, parentQuat);
-							quat.mul(q, q, tf2Bone._initialQuaternion);
-							tf2Bone.setOrientation(q);
-							tf2Bone.setPosition(tf2Bone._initialPosition);
-						}
-					}
-					break;
+			for (const boneTf2 in scoutToSOMA) {
+				const boneSOMA = scoutToSOMA[boneTf2];
+				if (somaBone.name !== boneSOMA) {
+					continue;
 				}
-			} else {
-				for (const boneTf2 in scoutToSOMA) {
-					const boneSOMA = scoutToSOMA[boneTf2];
-					if (somaBone.name !== boneSOMA) {
-						continue;
-					}
 
-					const tf2Bone = scout.skeleton?.getBoneByName(boneTf2);
-					//const pos = vec3.scale(vec3.create(), somaBone.getPosition(), 0.5);
-					tf2Bone?.setPosition(somaBone.getPosition());
-					break;
+				const tf2Bone = target.getBoneByName(boneTf2);
+				const tf2ParentBone = (tf2Bone?.parent as Bone);
+				if (tf2ParentBone.isBone) {
+					if (tf2Bone) {
+						const neutralQuatInv = quat.invert(quat.create(), quat.create());
+						const initialQuaternionInv = quat.invert(quat.create(), tf2Bone._initialQuaternion);
+
+						const parentQuat = tf2ParentBone.getWorldOrientation();
+						const parentQuatInv = quat.invert(quat.create(), parentQuat);
+
+						const q = quat.mul(quat.create(), parentQuatInv, somaBone.getOrientation());
+						quat.mul(q, q, parentQuat);
+						quat.mul(q, q, tf2Bone._initialQuaternion);
+						tf2Bone.setOrientation(q);
+						tf2Bone.setPosition(tf2Bone._initialPosition);
+					}
 				}
+				break;
+			}
+		} else {
+			for (const boneTf2 in scoutToSOMA) {
+				const boneSOMA = scoutToSOMA[boneTf2];
+				if (somaBone.name !== boneSOMA) {
+					continue;
+				}
+
+				const tf2Bone = target?.getBoneByName(boneTf2);
+				//const pos = vec3.scale(vec3.create(), somaBone.getPosition(), 0.5);
+				tf2Bone?.setPosition(somaBone.getPosition());
+				break;
 			}
 		}
 	}
-	GraphicsEvents.addEventListener(GraphicsEvent.Tick, animate);
+
+
+
 }
 
 //const bvhValues = '0.0 0.0 0.0 0.0 -0.0 0.0 1.629961 96.97271 -1.985737 90.102058 0.53253 89.901894 5.331744 -2.066237 -0.324806 -8.729674 -0.442499 -0.097988 10.092705 1.921463 -1.580149 14.009806 0.6035 2.500792 -2.599058 -0.208628 2.193261 -35.615711 0.806875 1.678157 8e-06 -0.0 -1e-06 -0.012655 -0.011404 -0.022138 0.176527 -0.051689 -0.043397 0.166702 0.028791 0.008823 -125.366051 -73.191216 136.74942 41.134819 -52.812756 18.48889 30.882277 0.290572 -0.203956 -6.529357 -1.141459 -1.842246 17.636648 -26.322758 52.41124 -19.466686 -14.395613 29.410423 1e-06 -8.774832 -1e-06 15.951199 -18.147911 6.088283 -0.609777 -1.795656 -3.88933 -4.807096 -11.046823 -2.937852 1e-06 -20.97604 -3e-06 -5.01998 -25.033588 -4.031888 5e-06 -1e-06 -0.0 -10.634545 -5.686979 -3.565591 10.573286 -17.922972 -3.113905 3e-06 -13.821225 -1e-06 -0.501783 -31.181549 -4.027025 -11.114958 -59.5994 6.888416 -13.982732 -7.150209 -2.875041 13.772747 -8.401501 -3.218248 0.34773 -34.211597 0.771653 -0.963034 -17.733391 2.621022 1e-06 0.0 -2e-06 -17.346443 -20.095243 -4.201782 21.757586 -1.638375 3.86643 -0.0 -6.33883 1e-06 -1.697594 -22.591774 -6.194013 1e-06 -4e-06 -1e-06 38.600197 -75.339615 152.963547 41.069069 -52.451759 17.173632 24.319546 -0.585372 -0.098052 -4.724624 3.12762 -4.050257 22.182131 -20.375904 49.933353 -16.701832 -16.743538 28.476559 -1e-06 -12.690612 -1e-06 16.099844 -17.465403 2.614387 -0.10592 -1.513859 -4.275882 -5.039045 -5.612881 -2.953557 3e-06 -11.020536 -4e-06 -6.111305 -15.895351 -3.840478 -0.0 -0.0 -1e-06 -10.283381 -5.680295 -4.34184 11.028303 -11.302418 -2.372636 -1.384271 -14.238599 -6.320124 -0.625438 -26.924221 -3.827608 -4.323201 -49.867031 -3.474459 -13.708538 -7.363486 -3.720941 18.141167 -14.052753 -3.242679 5e-06 -18.787289 -4e-06 -0.42971 -8.456056 2.555502 2e-06 -1e-06 -1e-06 -15.923553 -20.094511 -5.473585 30.419239 -7.19083 1.73593 3e-06 -8.162932 -4e-06 -1.861902 -22.861504 -6.167954 0.0 -1e-06 1e-06 172.755157 1.529133 -9.162424 31.166546 -0.182658 0.079537 -92.948593 -3.505377 -0.81852 -6.708745 1.432053 2.042389 -0.999999 0.0 0.0 -10.734017 -11.678623 -10.144008 34.767586 -0.0818 0.076429 -85.891388 2.931441 -6.021354 -8.776689 0.605993 1.624977 -1.000003 0.0 -0.0'.split(' ');
