@@ -1,12 +1,12 @@
 import { mat3, quat, vec3, vec4 } from 'gl-matrix';
-import { Bone, Camera, ColorBackground, Cylinder, DEG_TO_RAD, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Grid, Group, OrbitControl, Scene, SkeletonHelper, Text2D } from 'harmony-3d';
+import { Bone, Camera, ColorBackground, Cylinder, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Grid, Group, OrbitControl, Scene, SkeletonHelper, Text2D } from 'harmony-3d';
 import { createElement, display } from 'harmony-ui';
 import { createSOMASkeleton77, SOMASkeleton77 } from '../../../utils/somaskeleton';
 import { AddSource1Model } from '../../../utils/source1';
 import { scoutToSOMA } from '../../../utils/tf2skeletons/scout';
 import { InitDemoStd } from '../../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../../demos';
-import { globalRotMats, localRotMats, positions, rootPositions } from './datas';
+import { localRotMats, rootPositions } from './datas';
 
 class KimodoDemo implements Demo {
 	static readonly path = 'misc/animations/kimodo';
@@ -44,7 +44,7 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 
 	let t = 0;
 	let previousT = -1;
-	let pos = vec3.create();
+	//let pos = vec3.create();
 
 	const group = scene.addChild(new Group({ name: 'Spheres', visible: false, }))!;
 	const group2 = scene.addChild(new Group({ name: 'Cylinders' }))!;
@@ -159,349 +159,15 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 		const globalRot = quat.create();
 		const parentPos = vec3.create();
 
-
-		// Populate global matrice for this frame
-		for (let joint = 0; joint < 77; joint++) {
-			const i = frame * 77 * 3 + joint * 3;
-			const j = frame * 77 * 3 * 3 + joint * 3 * 3;
-
-			mat3.set(globalRotMat[joint]!,
-				globalRotMats[j + 0]!,
-				globalRotMats[j + 3]!,
-				globalRotMats[j + 6]!,
-				globalRotMats[j + 1]!,
-				globalRotMats[j + 4]!,
-				globalRotMats[j + 7]!,
-				globalRotMats[j + 2]!,
-				globalRotMats[j + 5]!,
-				globalRotMats[j + 8]!,
-			)
-
-			mat3.transpose(globalRotMatInv[joint]!, globalRotMat[joint]!);
-			vec3.set(globalPos[joint]!,
-				-positions[i + 0]! * 100,
-				positions[i + 2]! * 100,
-				positions[i + 1]! * 100,
-			)
-		}
-
-
-		for (let joint = 0; joint < 77; joint++) {
-			let parentMat: mat3;
-
-			const [name,] = SOMASkeleton77.boneOrderNamesWithParents[joint]!;
-			let count = 0;
-			const accu = vec3.create();
-			for (let childJoint = 0; childJoint < 77; childJoint++) {
-				if (SOMASkeleton77.boneOrderNamesWithParents[childJoint]![1] === name) {
-					vec3.add(accu, accu, globalPos[childJoint]!)
-					parentMat = globalRotMatInv[childJoint]!;
-					++count;
-				}
-			}
-
-			if (count) {
-				vec3.scale(restPos[joint]!, accu, 1 / count);
-			} else {
-				vec3.copy(restPos[joint]!, globalPos[joint]!);
-
-			}
-
-			if (parentMat!) {
-				mat3.mul(localRotMat[joint]!, parentMat, globalRotMat[joint]!);
-			}
-		}
-
-		// Populate local matrices for this frame
-		for (let joint = 0; joint < 77; joint++) {
-			//const j = frame * 77 * 3 * 3 + joint * 3 * 3;
-
-
-			let parentMat: mat3;
-
-			const [, parentName] = SOMASkeleton77.boneOrderNamesWithParents[joint]!;
-			for (let parentJoint = 0; parentJoint < 77; parentJoint++) {
-				if (SOMASkeleton77.boneOrderNamesWithParents[parentJoint]![0] === parentName) {
-					parentMat = globalRotMatInv[parentJoint]!;
-					break;
-				}
-			}
-
-			if (parentMat!) {
-				mat3.mul(localRotMat[joint]!, parentMat, globalRotMat[joint]!);
-			}
-		}
-
-		for (let joint = 0; joint < 77; joint++) {
-			//spheres.push(new Sphere({ parent: scene }));
-
-			const i = frame * 77 * 3 + joint * 3;
-			//const j = frame * 77 * 3 * 3 + joint * 3 * 3;
-			/*
-			vec3.set(pos,
-				-positions[i + 0]! * 100,
-				positions[i + 2]! * 100,
-				positions[i + 1]! * 100,
-			)
-				*/
-			vec3.copy(pos, globalPos[joint]!);
-
-			/*
-			mat3.set(globalRotMat[joint],
-				globalRotMats[j + 0]!,
-				globalRotMats[j + 3]!,
-				globalRotMats[j + 6]!,
-				globalRotMats[j + 1]!,
-				globalRotMats[j + 4]!,
-				globalRotMats[j + 7]!,
-				globalRotMats[j + 2]!,
-				globalRotMats[j + 5]!,
-				globalRotMats[j + 8]!,
-			)
-			*/
-
-			/*
-			mat3.set(globalRotMat,
-				globalRotMats[j + 0]!,
-				globalRotMats[j + 1]!,
-				globalRotMats[j + 2]!,
-				globalRotMats[j + 3]!,
-				globalRotMats[j + 4]!,
-				globalRotMats[j + 5]!,
-				globalRotMats[j + 6]!,
-				globalRotMats[j + 7]!,
-				globalRotMats[j + 8]!,
-			)
-			*/
-
-
-			spheres[joint]!.setPosition(pos);
-
-			if (joint === 0) {
-				//orbitCameraControl.setTargetPosition(pos);
-			}
-
-			const somaBone = somaSkeleton77.getBoneById(joint);
-			if (somaBone) {
-				const parent = somaBone.parent;
-				if (parent === somaSkeleton77) {
-					somaBone.setPosition(pos);
-				} else {
-					//(parent as Bone).boneId;
-					spheres[(parent as Bone).boneId]!.getPosition(parentPos);
-
-					vec3.sub(pos, pos, parentPos);
-					somaBone.setPosition(pos);
-				}
-
-				for (const boneTf2 in scoutToSOMA) {
-					const boneSOMA = scoutToSOMA[boneTf2];
-					if (somaBone.name !== boneSOMA) {
-						continue;
-					}
-
-					const tf2Bone = scout.skeleton?.getBoneByName(boneTf2);
-					if (!(tf2Bone?.parent as Bone).isBone) {
-						tf2Bone?.setPosition(pos);
-						tf2Bone?.setOrientation(tf2Bone._initialQuaternion);
-					} else {
-						//tf2Bone?.setPosition(tf2Bone._initialPosition);
-						//quat.fromMat3(globalRot, localRotMat[joint]!);
-						quat.fromMat3(globalRot, globalRotMat[joint]!);
-						//tf2Bone?.setOrientation(globalRot);
-						//quat.mul(quat.create(), globalRot, tf2Bone._initialQuaternion)
-						spheres[joint]!.setOrientation(globalRot);
-					}
-				}
-			}
-		}
-
-		const globalBvhRot: quat[] = [];
-		const localBvhRot: quat[] = [];
-		const bvhValues2 = bvhValues[frame]!.split(' ');
-		for (let joint = 0; joint < 77; joint++) {
-			//const i = frame * 77 * 3 + joint * 3;
-			const j = frame * 77 * 3 * 3 + joint * 3 * 3;
-
-
-			const bvhIndex = joint * 3 + 9;
-			const bvhQuat = quat.create();
-
-
-
-			quat.rotateZ(bvhQuat, bvhQuat, Number(bvhValues2[bvhIndex + 0]) * DEG_TO_RAD);
-			quat.rotateY(bvhQuat, bvhQuat, Number(bvhValues2[bvhIndex + 1]) * DEG_TO_RAD);
-			quat.rotateX(bvhQuat, bvhQuat, Number(bvhValues2[bvhIndex + 2]) * DEG_TO_RAD);
-
-
-			const localRotMat = mat3.set(mat3.create(),
-				localRotMats[j + 0]!,
-				localRotMats[j + 3]!,
-				localRotMats[j + 6]!,
-				localRotMats[j + 1]!,
-				localRotMats[j + 4]!,
-				localRotMats[j + 7]!,
-				localRotMats[j + 2]!,
-				localRotMats[j + 5]!,
-				localRotMats[j + 8]!,
-			)
-			const localRotQuat = quat.fromMat3(quat.create(), localRotMat);
-			//quat.rotateX(bvhQuat, bvhQuat, 90 * DEG_TO_RAD);
-
-			//quat.mul(bvhQuat, bvhQuat, localRotQuat);
-
-			localBvhRot.push(bvhQuat);
-			globalBvhRot.push(quat.clone(bvhQuat));
-			//globalBvhRot.push(localRotQuat);
-
-			/*
-			const parentQuat = globalBvhRot[SOMASkeleton77.getParentBone(joint) ?? -1];
-			if (parentQuat) {
-				const parentInv = quat.invert(quat.create(), parentQuat);
-				quat.mul(bvhQuat, parentInv, bvhQuat);
-			}
-			*/
-		}
-
-
-		for (let joint = 0; joint < 77; joint++) {
-			const i = joint * 3 + 9;
-
-			const q = quat.create();
-			quat.rotateZ(q, q, Number(bvhValues[i + 0]) * DEG_TO_RAD);
-			quat.rotateY(q, q, Number(bvhValues[i + 1]) * DEG_TO_RAD);
-			quat.rotateX(q, q, Number(bvhValues[i + 2]) * DEG_TO_RAD);
-
-			spheres[joint]!.setOrientation(q);
-			spheres[joint]!.setPosition(globalPos[joint]!);
-
-			const restV = vec3.sub(vec3.create(), restPos[joint]!, globalPos[joint]!);
-			vec3.normalize(restV, restV);
-
-			const restQ = quat.rotationTo(restQuat[joint], [0, 0, 1], restV);
-			spheres[joint]!.setOrientation(restQ);
-
-			const [, parentName] = SOMASkeleton77.boneOrderNamesWithParents[joint]!;
-			const parentQ = quat.create();
-			const deltaQ = quat.create();
-			for (let parentJoint = 0; parentJoint < 77; parentJoint++) {
-				if (SOMASkeleton77.boneOrderNamesWithParents[parentJoint]![0] === parentName) {
-					//parentMat = globalRotMatInv[parentJoint]!;
-					quat.invert(parentQ, restQuat[parentJoint]!);
-
-					const parentPos = spheres[joint]!.getPosition(vec3.create());
-					const parentQuat = spheres[joint]!.getOrientation(quat.create());
-
-					const offsets = bvhOffsets[joint]?.split(' ') as [string, string, string];
-
-					const pos = vec3.fromValues(Number(offsets[0]), Number(offsets[1]), Number(offsets[2]));
-
-					//vec3.transformQuat(pos, pos, parentQuat);
-					//vec3.add(pos, pos, parentPos);
-
-					//spheres[joint]!.setPosition(pos);
-					break;
-				}
-			}
-
-			quat.mul(deltaQ, parentQ, restQ);
-
-			const somaBone = somaSkeleton77.getBoneById(joint)!;
-
-			for (const boneTf2 in scoutToSOMA) {
-				const boneSOMA = scoutToSOMA[boneTf2];
-				if (somaBone.name !== boneSOMA) {
-					continue;
-				}
-
-				const tf2Bone = scout.skeleton?.getBoneByName(boneTf2);
-				if (!(tf2Bone?.parent as Bone).isBone) {
-					//tf2Bone?.setPosition(pos);
-					//tf2Bone?.setWorldOrientation(tf2Bone._initialQuaternion);
-					//tf2Bone?.setOrientation(deltaQ);
-				} else {
-					//tf2Bone?.setPosition(tf2Bone._initialPosition);
-					//quat.fromMat3(globalRot, localRotMat[joint]!);
-					//quat.fromMat3(globalRot, globalRotMat[joint]!);
-					if (tf2Bone) {
-						const m = mat3.fromMat4(mat3.create(), tf2Bone.poseToBone);
-						const refQuat = quat.create();
-						quat.fromMat3(refQuat, m);
-						quat.mul(refQuat, refQuat, deltaQ);
-
-						//tf2Bone?.setOrientation(deltaQ);
-						//tf2Bone?.setWorldOrientation(restQ);
-					}
-					//tf2Bone?.setWorldOrientation(restQ);
-					//tf2Bone?.setWorldPosition(globalPos[joint]!);
-					//quat.mul(quat.create(), globalRot, tf2Bone._initialQuaternion)
-					//spheres[joint]!.setOrientation(globalRot);
-				}
-			}
-			//spheres[joint]!.translateZ(-5);
-		}
-
-		for (let joint = 0; joint < 77; joint++) {
-			const offsets = bvhOffsets[joint]?.split(' ') as [string, string, string];
-			//const pos = vec3.fromValues(-Number(offsets[0]), Number(offsets[2]), Number(offsets[1]));
-			const pos = vec3.fromValues(Number(offsets[0]), Number(offsets[1]), Number(offsets[2]));
-			//vec3.transformQuat(pos, pos, [0, -1, 0, 0]);
-			spheres[joint]!.setOrientation(globalBvhRot[joint]!);
-			spheres[joint]!.setPosition(pos);
-
-
-			const worldOrientation = spheres[joint]!.getWorldOrientation();
-			quat.rotateY(worldOrientation, worldOrientation, 90 * DEG_TO_RAD);
-			cylinders[joint]!.setOrientation(worldOrientation);
-			cylinders[joint]!.setPosition(spheres[joint]!.getWorldPosition());
-
-
-			const somaBone = somaSkeleton77.getBoneById(joint)!;
-			//somaBone.setOrientation(globalBvhRot[joint]!);
-			somaBone.setPosition(pos);
-
-
-
-
-			const neutralIndex = joint * 3;
-			cylinders[joint]!.setPosition(vec3.fromValues(
-				neutrals[neutralIndex + 0]! * 100,
-				neutrals[neutralIndex + 1]! * 100,
-				neutrals[neutralIndex + 2]! * 100,
-			));
-
-			/*
-			for (const boneTf2 in scoutToSOMA) {
-				const boneSOMA = scoutToSOMA[boneTf2];
-				if (somaBone.name !== boneSOMA) {
-					continue;
-				}
-
-				const tf2Bone = scout.skeleton?.getBoneByName(boneTf2);
-				if (!(tf2Bone?.parent as Bone).isBone) {
-					tf2Bone?.setWorldOrientation(tf2Bone._initialQuaternion);
-				} else {
-					if (tf2Bone) {
-						tf2Bone?.setOrientation(globalBvhRot[joint]!);
-						tf2Bone?.setOrientation(quat.create());
-						tf2Bone?.setOrientation(quat.mul(quat.create(), globalBvhRot[joint]!, quat.invert(quat.create(), tf2Bone._initialQuaternion)));
-						tf2Bone?.setOrientation(tf2Bone._initialQuaternion);
-					}
-				}
-			}
-			*/
-		}
-
-
 		let rootPos = vec3.create();
 		for (let joint = 0; joint < 77; joint++) {
 			const somaBone = somaSkeleton77.getBoneById(joint)!;
 			if (joint === 0) {
 				vec3.copy(rootPos, rootPositions[frame]!);
 				vec3.scale(rootPos, rootPos, 100);
-				somaBone.setPosition(rootPos);
+				vec3.scale(rootPos, rootPos, 0.5);
+				//somaBone.setPosition(rootPos);
 			}
-
 
 			const j = frame * 77 * 3 * 3 + joint * 3 * 3;
 
@@ -538,7 +204,6 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 				vec3.sub(neutral, neutral, parentNeutral);
 				somaBone.setPosition(neutral);
 			}
-			//somaBone.setWorldOrientation(q);
 			somaBone.setOrientation(q);
 		}
 
@@ -578,46 +243,24 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 
 					const tf2Bone = scout.skeleton?.getBoneByName(boneTf2);
 					const tf2ParentBone = (tf2Bone?.parent as Bone);
-					if (!tf2ParentBone.isBone) {
-						//tf2Bone?.setWorldOrientation(tf2Bone._initialQuaternion);
-						//tf2Bone?.setPosition(somaBone.getPosition());
-					} else {
+					if (tf2ParentBone.isBone) {
 						if (tf2Bone) {
-							//const neutralQuatInv = quat.invert(quat.create(), neutralQuat);
 							const neutralQuatInv = quat.invert(quat.create(), quat.create());
 							const initialQuaternionInv = quat.invert(quat.create(), tf2Bone._initialQuaternion);
 
 							const parentQuat = tf2ParentBone.getWorldOrientation();
 							const parentQuatInv = quat.invert(quat.create(), parentQuat);
 
-							//const q = quat.mul(quat.create(), somaBone.getOrientation(), neutralQuatInv);
 							const q = quat.mul(quat.create(), parentQuatInv, somaBone.getOrientation());
 							quat.mul(q, q, parentQuat);
 							quat.mul(q, q, tf2Bone._initialQuaternion);
-							//quat.mul(q, q, tf2Bone._initialQuaternion);
 							tf2Bone.setOrientation(q);
 							tf2Bone.setPosition(tf2Bone._initialPosition);
-							//tf2Bone.setOrientation(tf2Bone._initialQuaternion);
-
-							/*
-							const m = mat3.fromMat4(mat3.create(), tf2Bone.poseToBone);
-							const refQuat = quat.create();
-							quat.fromMat3(refQuat, m);
-							quat.mul(refQuat, refQuat, deltaQ);
-
-							tf2Bone?.setOrientation(deltaQ);
-							tf2Bone?.setWorldOrientation(restQ);
-							*/
 						}
 					}
 					break;
 				}
 			} else {
-				/*
-				const tf2Bone = scout.skeleton?.getBoneByName('bip_pelvis');
-				tf2Bone?.setPosition([0, 0, 0]);
-				somaBone.setPosition([0, 0, 0]);
-				*/
 				for (const boneTf2 in scoutToSOMA) {
 					const boneSOMA = scoutToSOMA[boneTf2];
 					if (somaBone.name !== boneSOMA) {
@@ -625,8 +268,8 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 					}
 
 					const tf2Bone = scout.skeleton?.getBoneByName(boneTf2);
-					const pos = vec3.scale(vec3.create(), somaBone.getPosition(), 0.5);
-					tf2Bone?.setPosition(pos);
+					//const pos = vec3.scale(vec3.create(), somaBone.getPosition(), 0.5);
+					tf2Bone?.setPosition(somaBone.getPosition());
 					break;
 				}
 			}
