@@ -3,7 +3,7 @@ import { Bone, Camera, ColorBackground, Cylinder, GraphicsEvent, GraphicsEvents,
 import { createElement, display } from 'harmony-ui';
 import { createSOMASkeleton77, SOMASkeleton77 } from '../../../utils/somaskeleton';
 import { AddSource1Model } from '../../../utils/source1';
-import { scoutToSOMA } from '../../../utils/tf2skeletons/scout';
+import { scoutToSOMA, somaToScout } from '../../../utils/tf2skeletons/scout';
 import { InitDemoStd } from '../../../utils/utils';
 import { Demo, InitDemoParams, registerDemo } from '../../demos';
 import { localRotMats, rootPositions } from './datas';
@@ -27,10 +27,13 @@ class KimodoDemo implements Demo {
 registerDemo(KimodoDemo);
 
 const LOCAL_POS = true;
+const refPos = [60, 0, 0];
+let conv = false;
 
 async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoContent: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
-	perspectiveCamera.position = [0, 0, 500];
-	orbitCameraControl.target.setPosition([0, 0, 80]);
+	perspectiveCamera.position = [60, 0, 100];
+	orbitCameraControl.target.setPosition([60, 0, 0]);
+	//orbitCameraControl.upVector = [0, 1, 0];
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 10;
 	perspectiveCamera.verticalFov = 70;
@@ -72,7 +75,7 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 		}
 
 	}
-	scene.addChild(new Grid({ spacing: 200, size: 4000 }));
+	scene.addChild(new Grid({ spacing: 200, size: 4000, visible: false }));
 
 
 	const somaSkeleton77 = createSOMASkeleton77({ name: 'SOMA rigged', parent: scene });
@@ -81,13 +84,19 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 	somaSkeleton77RefPose.addChild(new SkeletonHelper());
 
 
-	somaSkeleton77RefPose.setPosition([100, 0, 0]);
+	somaSkeleton77RefPose.setPosition(refPos);
 	somaSkeleton77RefPose.setScale(0.45);
 
 	const scout = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
 	const scoutRef = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
+	//const scoutRef2 = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
 	scoutRef.name = 'Scout ref';
-	scoutRef.setPosition([100, 0, 0]);
+	scoutRef.setPosition(refPos);
+	scoutRef.addChild(new SkeletonHelper());
+	//scoutRef2.setPosition([-40, -47, 0]);
+	//scoutRef2.playAnimation('ref');
+	//scoutRef2.rotateGlobalY(-90*DEG_TO_RAD);
+	//scoutRef2.rotateGlobalZ(-90*DEG_TO_RAD);
 
 	let speed = 0;
 
@@ -131,7 +140,43 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 			$change: (event: Event) => display(textContainer, (event?.target as HTMLInputElement).checked),
 		}),
 	});
+	createElement('label', {
+		innerText: 'convert',
+		parent: htmlDemoContent,
+		child: createElement('input', {
+			type: 'checkbox',
+			innerText: 'bone names',
+			$change: (event: Event) => {
+				conv = (event?.target as HTMLInputElement).checked;
+				previousT = -1;
+			},
+		}),
+	});
+	createElement('button', {
+		parent: htmlDemoContent,
+		innerText: 'export ref pose',
+		$click: () => exportRefPose(),
+	});
 
+	function exportRefPose() {
+		const rig: Record<string, [number, number, number, number,]> = {};
+
+		for (const bone of scoutRef.skeleton!.bones) {
+			const q = bone.getOrientation();
+			rig[bone.name] = [
+				Number(q[0].toFixed(4)),
+				Number(q[1].toFixed(4)),
+				Number(q[2].toFixed(4)),
+				Number(q[3].toFixed(4)),
+			];
+		}
+
+		try {
+			navigator.clipboard.writeText(JSON.stringify(rig));
+		} catch (e) {
+			console.error('failed to paste to clipboard', e);
+		}
+	}
 
 	const restPos: vec3[] = [];
 	const restQuat: quat[] = [];
@@ -216,6 +261,13 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 
 		retargetPose(somaSkeleton77, scout.skeleton!);
 		retargetPose(somaSkeleton77RefPose, scoutRef.skeleton!);
+
+		if (conv) {
+			convert(scoutRef.skeleton!);
+		}
+
+
+		scoutRef.setPosition(refPos);
 	}
 	GraphicsEvents.addEventListener(GraphicsEvent.Tick, animate);
 }
@@ -226,10 +278,10 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
  * @param target Tf2 skeleton
  */
 function retargetPose(source: Skeleton, target: Skeleton): void {
-	for (const boneTf2 in scoutToSOMA) {
-		const tf2Bone = target.getBoneByName(boneTf2);
-		tf2Bone?.setOrientation(tf2Bone._initialQuaternion);
-		tf2Bone?.setPosition(tf2Bone._initialPosition);
+	for (const bone of target.bones) {
+		//const tf2Bone = target.getBoneByName(boneTf2);
+		bone?.setOrientation(bone._initialQuaternion);
+		bone?.setPosition(bone._initialPosition);
 	}
 
 	for (let joint = 0; joint < 77; joint++) {
@@ -264,15 +316,19 @@ function retargetPose(source: Skeleton, target: Skeleton): void {
 				const tf2ParentBone = (tf2Bone?.parent as Bone);
 				if (tf2ParentBone.isBone) {
 					if (tf2Bone) {
-						const neutralQuatInv = quat.invert(quat.create(), quat.create());
-						const initialQuaternionInv = quat.invert(quat.create(), tf2Bone._initialQuaternion);
+						const initialQuaternion = quat.clone(tf2Bone._initialQuaternion);
+
+						const riggedQuat = scoutRig[boneTf2];
+						if (riggedQuat) {
+							quat.copy(initialQuaternion, riggedQuat);
+						}
 
 						const parentQuat = tf2ParentBone.getWorldOrientation();
 						const parentQuatInv = quat.invert(quat.create(), parentQuat);
 
 						const q = quat.mul(quat.create(), parentQuatInv, somaBone.getOrientation());
 						quat.mul(q, q, parentQuat);
-						quat.mul(q, q, tf2Bone._initialQuaternion);
+						quat.mul(q, q, initialQuaternion);
 						tf2Bone.setOrientation(q);
 						tf2Bone.setPosition(tf2Bone._initialPosition);
 					}
@@ -289,13 +345,12 @@ function retargetPose(source: Skeleton, target: Skeleton): void {
 				const tf2Bone = target?.getBoneByName(boneTf2);
 				//const pos = vec3.scale(vec3.create(), somaBone.getPosition(), 0.5);
 				tf2Bone?.setPosition(somaBone.getPosition());
+				const q = quat.mul(quat.create(), somaBone.getOrientation(), tf2Bone!._initialQuaternion);
+				tf2Bone?.setOrientation(q);
 				break;
 			}
 		}
 	}
-
-
-
 }
 
 //const bvhValues = '0.0 0.0 0.0 0.0 -0.0 0.0 1.629961 96.97271 -1.985737 90.102058 0.53253 89.901894 5.331744 -2.066237 -0.324806 -8.729674 -0.442499 -0.097988 10.092705 1.921463 -1.580149 14.009806 0.6035 2.500792 -2.599058 -0.208628 2.193261 -35.615711 0.806875 1.678157 8e-06 -0.0 -1e-06 -0.012655 -0.011404 -0.022138 0.176527 -0.051689 -0.043397 0.166702 0.028791 0.008823 -125.366051 -73.191216 136.74942 41.134819 -52.812756 18.48889 30.882277 0.290572 -0.203956 -6.529357 -1.141459 -1.842246 17.636648 -26.322758 52.41124 -19.466686 -14.395613 29.410423 1e-06 -8.774832 -1e-06 15.951199 -18.147911 6.088283 -0.609777 -1.795656 -3.88933 -4.807096 -11.046823 -2.937852 1e-06 -20.97604 -3e-06 -5.01998 -25.033588 -4.031888 5e-06 -1e-06 -0.0 -10.634545 -5.686979 -3.565591 10.573286 -17.922972 -3.113905 3e-06 -13.821225 -1e-06 -0.501783 -31.181549 -4.027025 -11.114958 -59.5994 6.888416 -13.982732 -7.150209 -2.875041 13.772747 -8.401501 -3.218248 0.34773 -34.211597 0.771653 -0.963034 -17.733391 2.621022 1e-06 0.0 -2e-06 -17.346443 -20.095243 -4.201782 21.757586 -1.638375 3.86643 -0.0 -6.33883 1e-06 -1.697594 -22.591774 -6.194013 1e-06 -4e-06 -1e-06 38.600197 -75.339615 152.963547 41.069069 -52.451759 17.173632 24.319546 -0.585372 -0.098052 -4.724624 3.12762 -4.050257 22.182131 -20.375904 49.933353 -16.701832 -16.743538 28.476559 -1e-06 -12.690612 -1e-06 16.099844 -17.465403 2.614387 -0.10592 -1.513859 -4.275882 -5.039045 -5.612881 -2.953557 3e-06 -11.020536 -4e-06 -6.111305 -15.895351 -3.840478 -0.0 -0.0 -1e-06 -10.283381 -5.680295 -4.34184 11.028303 -11.302418 -2.372636 -1.384271 -14.238599 -6.320124 -0.625438 -26.924221 -3.827608 -4.323201 -49.867031 -3.474459 -13.708538 -7.363486 -3.720941 18.141167 -14.052753 -3.242679 5e-06 -18.787289 -4e-06 -0.42971 -8.456056 2.555502 2e-06 -1e-06 -1e-06 -15.923553 -20.094511 -5.473585 30.419239 -7.19083 1.73593 3e-06 -8.162932 -4e-06 -1.861902 -22.861504 -6.167954 0.0 -1e-06 1e-06 172.755157 1.529133 -9.162424 31.166546 -0.182658 0.079537 -92.948593 -3.505377 -0.81852 -6.708745 1.432053 2.042389 -0.999999 0.0 0.0 -10.734017 -11.678623 -10.144008 34.767586 -0.0818 0.076429 -85.891388 2.931441 -6.021354 -8.776689 0.605993 1.624977 -1.000003 0.0 -0.0'.split(' ');
@@ -533,7 +588,6 @@ const bvhOffsets = [
 	'-6.660062 0.232574 -2e-06',
 ]
 
-
 const globalPos = [
 	'0.0163,  0.9697, -0.0199',
 	'0.0161,  1.0198, -0.0207',
@@ -614,7 +668,6 @@ const globalPos = [
 	'-0.2434,  0.0029,  0.1122',
 ]
 
-
 const neutrals = [
 	0.0000e+00, 0.0000e+00, 0.0000e+00,
 	-1.3727e-04, 5.0038e-02, -5.3727e-04,
@@ -694,3 +747,87 @@ const neutrals = [
 	-1.0047e-01, -9.8854e-01, 1.1621e-01,
 	-1.0038e-01, -1.0049e+00, 1.8081e-01,
 ]
+
+const scoutRig: Record<string, quat> =
+{"bip_pelvis":[0.9845,0,0,0.1752],"bip_spine_0":[0.0291,0,0,0.9996],"bip_spine_1":[0.093,0,0,0.9957],"bip_spine_2":[0.1236,0,0,0.9923],"bip_spine_3":[0.2107,0,0,0.9775],"bip_neck":[0.1091,0,0,0.994],"bip_head":[-0.2845,0,0,0.9587],"bip_collar_L":[-0.7237,0.6376,-0.2623,-0.0291],"bip_collar_R":[-0.0291,0.2623,0.6376,0.7237],"bip_upperArm_L":[-0.114,-0.1315,-0.6768,0.7153],"bip_upperArm_R":[0.3856,0.5864,0.4252,0.5716],"bip_lowerArm_L":[0.6785,-0.199,0.199,0.6785],"bip_lowerArm_R":[0,0,-0.2814,0.9596],"bip_hip_L":[0.7051,0.6764,0.206,-0.0531],"bip_hip_R":[0.624,0.461,0.5361,0.3326],"bip_knee_L":[0.0009,0.0311,0.0069,0.9995],"bip_knee_R":[0.7061,0.0269,0.0171,0.7074],"bip_foot_L":[-0.4145,-0.325,0.5813,0.6203],"bip_foot_R":[0.5813,0.6203,0.4145,0.325],"bip_hand_L":[-0.5,0.5,0.5,0.5],"bip_hand_R":[-0.5,-0.5,-0.5,0.5],"bip_toe_L":[-0.3717,0,0,0.9283],"bip_toe_R":[-0.3717,0,0,0.9283],"weapon_bone":[-0.5834,0.0502,-0.107,0.8035],"weapon_bone_1":[-0.0079,-0.7071,0.7071,0.0079],"weapon_bone_2":[0,0,0,1],"weapon_bone_3":[0,0,0,1],"weapon_bone_4":[0,0,0,1],"weapon_bone_L":[0.8035,-0.107,-0.0502,0.5834],"medal_bone":[0.9858,0.0094,-0.1385,0.0942],"mvm":[-0.2998,0.2009,-0.9227,0.1356],"effect_hand_L":[0.1087,0.0476,0.9927,0.0221],"effect_hand_R":[-0.0476,0.1087,-0.0221,0.9927],"bip_dogtag_0":[-0.716,0,0,0.6981],"bip_dogtag_1":[-1,0,0,0],"bip_dogtag_2":[-0.0037,0,0,1],"bip_dogtag_3":[0,0,0,1],"bip_packtop":[-0.9037,-0.2843,0.3165,0.0472],"bip_packmiddle":[-0.4182,0,0,0.9083],"bip_thumb_0_L":[0.037,-0.1283,-0.1712,0.9762],"bip_thumb_0_R":[0.0371,-0.1283,-0.1711,0.9762],"bip_index_0_L":[0.2015,0.6267,0.1771,0.7316],"bip_index_0_R":[0.2014,0.6267,0.1771,0.7316],"bip_middle_0_L":[0.2797,0.6462,0.2176,0.6759],"bip_middle_0_R":[0.2797,0.6462,0.2176,0.6759],"bip_ring_0_L":[0.1973,0.6841,0.2006,0.673],"bip_ring_0_R":[0.1973,0.6841,0.2006,0.673],"bip_pinky_0_L":[0.191,0.7047,0.2066,0.6513],"bip_pinky_0_R":[0.191,0.7047,0.2067,0.6513],"bip_thumb_1_L":[0.26,-0.0222,0.0776,0.9622],"bip_thumb_1_R":[0.2599,-0.0222,0.0775,0.9623],"bip_index_1_L":[0.0054,-0.0036,0.013,0.9999],"bip_index_1_R":[0.0054,-0.0036,0.013,0.9999],"bip_middle_1_L":[-0.0369,0.0245,-0.0741,0.9963],"bip_middle_1_R":[-0.0369,0.0245,-0.0741,0.9963],"bip_ring_1_L":[-0.0199,-0.0008,0.0031,0.9998],"bip_ring_1_R":[0,0,0,1],"bip_pinky_1_L":[0.0391,0.0047,-0.018,0.9991],"bip_pinky_1_R":[0.0391,0.0047,-0.018,0.9991],"bip_thumb_2_L":[-0.2094,0,0,0.9778],"bip_thumb_2_R":[-0.2094,0,0,0.9778],"bip_index_2_L":[0.033,0,0,0.9995],"bip_index_2_R":[0.033,0,0,0.9995],"bip_middle_2_L":[0.0507,0,0,0.9987],"bip_middle_2_R":[0.0507,0,0,0.9987],"bip_ring_2_L":[0.1209,0,0,0.9927],"bip_ring_2_R":[0.1209,0,0,0.9927],"bip_pinky_2_L":[0.1573,0,0,0.9875],"bip_pinky_2_R":[0.1573,0,0,0.9875],"prop_bone":[0,0,0,1],"prop_bone_1":[0,0,0,1],"prop_bone_2":[0,0,0,1],"prop_bone_3":[0,0,0,1],"prop_bone_4":[0,0,0,1],"prop_bone_5":[0,0,0,1],"prop_bone_6":[0,0,0,1],"hlp_forearm_L":[-0.5,0.5,0.5,0.5],"hlp_forearm_R":[-0.5,-0.5,-0.5,0.5]}
+/*{
+
+
+	/*
+	bip_hip_L: [0.71, 0.68, 0.18, -0.05],
+	bip_knee_L: [0.0741, 0.1325, 0.0099, 0.9884],
+	bip_hip_R: [0.6257, 0.4416, 0.5275, 0.3677],
+	bip_knee_R: [0.6055, 0.1052, 0.0812, 0.7846],
+
+	bip_collar_L: [-0.7965, 0.5628, -0.0888, -0.2023],
+	bip_upperArm_L: [0.0938, 0.0806, -0.6734, 0.7288],
+	bip_lowerArm_L: [0.6976, -0.0565, 0.0637, 0.7114],
+
+	bip_collar_R: [-0.2191, 0.1157, 0.6153, 0.7484],
+	bip_upperArm_R: [-0.3586, -0.4214, -0.676, -0.4867],
+	bip_lowerArm_R: [0, 0, -0.0287, 0.9996],
+	* /
+}*/
+/*
+
+{"bip_pelvis":[0.9845,0,0,0.1752],"bip_spine_0":[0.0291,0,0,0.9996],"bip_spine_1":[0.047,0,0,0.9989],"bip_spine_2":[0,0,0,1],"bip_spine_3":[0.2107,0,0,0.9775],"bip_neck":[0.1091,0,0,0.994],"bip_head":[-0.2845,0,0,0.9587],"bip_collar_L":[-0.7965,0.5628,-0.0888,-0.2023],
+"bip_collar_R":[-0.2191,0.1157,0.6153,0.7484],
+"bip_upperArm_L":[0.0938,0.0806,-0.6734,0.7288],
+"bip_upperArm_R":[-0.3586,-0.4214,-0.676,-0.4867],
+"bip_lowerArm_L":[0.6976,-0.0565,0.0637,0.7114],
+"bip_lowerArm_R":[0,0,-0.0287,0.9996],"bip_hip_L":[0.7095,0.6795,0.1799,-0.05],"bip_hip_R":[0.6257,0.4416,0.5275,0.3677],"bip_knee_L":[0.0741,0.1325,0.0099,0.9884],"bip_knee_R":[0.6055,0.1052,0.0812,0.7846],"bip_foot_L":[-0.4145,-0.325,0.5813,0.6203],"bip_foot_R":[0.5813,0.6203,0.4145,0.325],"bip_hand_L":[-0.5,0.5,0.5,0.5],"bip_hand_R":[-0.5,-0.5,-0.5,0.5],"bip_toe_L":[-0.3717,0,0,0.9283],"bip_toe_R":[-0.3717,0,0,0.9283],"weapon_bone":[-0.5834,0.0502,-0.107,0.8035],"weapon_bone_1":[-0.0079,-0.7071,0.7071,0.0079],"weapon_bone_2":[0,0,0,1],"weapon_bone_3":[0,0,0,1],"weapon_bone_4":[0,0,0,1],"weapon_bone_L":[0.8035,-0.107,-0.0502,0.5834],"medal_bone":[0.9858,0.0094,-0.1385,0.0942],"mvm":[-0.2998,0.2009,-0.9227,0.1356],"effect_hand_L":[0.1087,0.0476,0.9927,0.0221],"effect_hand_R":[-0.0476,0.1087,-0.0221,0.9927],"bip_dogtag_0":[-0.716,0,0,0.6981],"bip_dogtag_1":[-1,0,0,0],"bip_dogtag_2":[-0.0037,0,0,1],"bip_dogtag_3":[0,0,0,1],"bip_packtop":[-0.9037,-0.2843,0.3165,0.0472],"bip_packmiddle":[-0.4182,0,0,0.9083],"bip_thumb_0_L":[-0.1986,-0.0843,-0.1824,0.9593],"bip_thumb_0_R":[-0.1986,-0.0843,-0.1824,0.9593],"bip_index_0_L":[0.1974,0.6687,-0.0266,0.7163],"bip_index_0_R":[0.1974,0.6687,-0.0266,0.7163],"bip_middle_0_L":[0.1783,0.7128,-0.017,0.6781],"bip_middle_0_R":[0.1783,0.7128,-0.017,0.6781],"bip_ring_0_L":[0.1891,0.7297,-0.0196,0.6568],"bip_ring_0_R":[0.1891,0.7297,-0.0196,0.6568],"bip_pinky_0_L":[0.2262,0.7418,0.0397,0.63],"bip_pinky_0_R":[0.2262,0.7418,0.0397,0.63],"bip_thumb_1_L":[0.2751,0,0,0.9614],"bip_thumb_1_R":[0.2751,0,0,0.9614],"bip_index_1_L":[0.2676,0,0,0.9635],"bip_index_1_R":[0.2676,0,0,0.9635],"bip_middle_1_L":[0.3144,0,0,0.9493],"bip_middle_1_R":[0.3144,0,0,0.9493],"bip_ring_1_L":[0.2394,0,0,0.9709],"bip_ring_1_R":[0.2394,0,0,0.9709],"bip_pinky_1_L":[0.2536,0,0,0.9673],"bip_pinky_1_R":[0.2536,0,0,0.9673],"bip_thumb_2_L":[-0.2094,0,0,0.9778],"bip_thumb_2_R":[-0.2094,0,0,0.9778],"bip_index_2_L":[0.033,0,0,0.9995],"bip_index_2_R":[0.033,0,0,0.9995],"bip_middle_2_L":[0.0507,0,0,0.9987],"bip_middle_2_R":[0.0507,0,0,0.9987],"bip_ring_2_L":[0.1209,0,0,0.9927],"bip_ring_2_R":[0.1209,0,0,0.9927],"bip_pinky_2_L":[0.1573,0,0,0.9875],"bip_pinky_2_R":[0.1573,0,0,0.9875],"prop_bone":[0,0,0,1],"prop_bone_1":[0,0,0,1],"prop_bone_2":[0,0,0,1],"prop_bone_3":[0,0,0,1],"prop_bone_4":[0,0,0,1],"prop_bone_5":[0,0,0,1],"prop_bone_6":[0,0,0,1],"hlp_forearm_L":[-0.5,0.5,0.5,0.5],"hlp_forearm_R":[-0.5,-0.5,-0.5,0.5]}
+
+
+*/
+
+function convert(skeleton: Skeleton): void {
+	for (let joint = 0; joint < 77; joint++) {
+		const [boneName, parentName] = SOMASkeleton77.boneOrderNamesWithParents[joint]!;
+		const parent = SOMASkeleton77.getParentBone(joint);
+		if (parent !== null) {
+			const parentNeutralIndex = parent * 3;
+			const parentNeutral = vec3.fromValues(
+				neutrals[parentNeutralIndex + 0]! * 100,
+				neutrals[parentNeutralIndex + 1]! * 100,
+				neutrals[parentNeutralIndex + 2]! * 100,
+			);
+
+			const neutralIndex = joint * 3;
+			const neutral = vec3.fromValues(
+				neutrals[neutralIndex + 0]! * 100,
+				neutrals[neutralIndex + 1]! * 100,
+				neutrals[neutralIndex + 2]! * 100,
+			)
+
+			const deltaPosSoma = vec3.sub(vec3.create(), neutral, parentNeutral);
+			const deltaPosSomaNorm = vec3.normalize(vec3.create(), deltaPosSoma);
+			//const neutralQuat = quat.rotationTo(quat.create(), [0, 0, 1], deltaPosSoma);
+
+			const scoutBoneName = somaToScout(boneName!);
+			if (scoutBoneName) {
+				const scoutBone = skeleton.getBoneByName(scoutBoneName);
+				const scoutParentBone = scoutBone?.parent as Bone;
+				const scoutParentParentBone = scoutParentBone?.parent as Bone;
+
+				// Count direct child bones. Don't do anything if we have more than 1
+				let count = 0;
+				for (const child of scoutParentBone.children) {
+					if ((child as Bone).isBone) {
+						++count;
+					}
+				}
+
+				if (count < 2 && scoutBone && scoutParentBone && scoutParentBone.isBone && scoutParentParentBone.isBone) {
+					const scoutDeltaPos = vec3.sub(vec3.create(), scoutBone.getWorldPosition(), scoutParentBone.getWorldPosition());
+
+					const scoutDeltaPosNorm = vec3.normalize(vec3.create(), scoutDeltaPos);
+					const deltaQuat = quat.rotationTo(quat.create(), scoutDeltaPosNorm, deltaPosSomaNorm);
+					const q = quat.mul(quat.create(), deltaQuat, scoutParentBone.getWorldOrientation());
+					scoutParentBone.setWorldOrientation(q);
+					scoutParentBone.forEach(ent => (ent as Bone).dirty = true);
+					scoutBone.dirty = true;
+				}
+			}
+		}
+	}
+}
