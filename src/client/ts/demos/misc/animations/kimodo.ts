@@ -809,7 +809,11 @@ function convert(skeleton: Skeleton): void {
 				// Count direct child bones. Don't do anything if we have more than 1
 				let count = 0;
 				for (const child of scoutParentBone.children) {
-					if ((child as Bone).isBone && (!child.name.startsWith('hlp'))) {
+					if (
+						(child as Bone).isBone
+						&& (!child.name.startsWith('hlp'))
+						&& (!vec3.equals(child.getPosition(), [0, 0, 0]))
+					) {
 						++count;
 					}
 				}
