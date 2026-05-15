@@ -1,4 +1,4 @@
-import { mat3, quat, vec3, vec4 } from 'gl-matrix';
+import { mat3, quat, ReadonlyVec3, vec3, vec4 } from 'gl-matrix';
 import { Bone, Camera, ColorBackground, Cylinder, GraphicsEvent, GraphicsEvents, GraphicTickEvent, Grid, Group, OrbitControl, Scene, Skeleton, SkeletonHelper, Text2D } from 'harmony-3d';
 import { createElement, display } from 'harmony-ui';
 import { createSOMASkeleton77, SOMASkeleton77 } from '../../../utils/somaskeleton';
@@ -29,6 +29,7 @@ registerDemo(KimodoDemo);
 const LOCAL_POS = true;
 const refPos = [60, 0, 0];
 let conv = false;
+let rotateBones = false;
 
 async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoContent: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
 	perspectiveCamera.position = [60, 0, 100];
@@ -98,6 +99,8 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 	//scoutRef2.rotateGlobalY(-90*DEG_TO_RAD);
 	//scoutRef2.rotateGlobalZ(-90*DEG_TO_RAD);
 
+	SkeletonHelper.displayBonesAsLines(true);
+
 	let speed = 0;
 
 	const timeline = createElement('input', {
@@ -148,6 +151,18 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 			innerText: 'bone names',
 			$change: (event: Event) => {
 				conv = (event?.target as HTMLInputElement).checked;
+				previousT = -1;
+			},
+		}),
+	});
+	createElement('label', {
+		innerText: 'rotate bones',
+		parent: htmlDemoContent,
+		child: createElement('input', {
+			type: 'checkbox',
+			innerText: 'bone names',
+			$change: (event: Event) => {
+				rotateBones = (event?.target as HTMLInputElement).checked;
 				previousT = -1;
 			},
 		}),
@@ -263,19 +278,18 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 		retargetPose(somaSkeleton77, scout.skeleton!);
 		retargetPose(somaSkeleton77RefPose, scoutRef.skeleton!);
 
+
+		const skeleton = scoutRef.skeleton!;
+		for (const bone of skeleton.bones) {
+			if ((bone.parent as Bone).isBone) {
+				bone?.setOrientation(bone._initialQuaternion);
+				bone?.setPosition(bone._initialPosition);
+			}
+		}
+		skeleton.dirty();
 		if (conv) {
 			convert(scoutRef.skeleton!);
-		} else {
-			const skeleton = scoutRef.skeleton!;
-			for (const bone of skeleton.bones) {
-				if ((bone.parent as Bone).isBone) {
-					bone?.setOrientation(bone._initialQuaternion);
-					bone?.setPosition(bone._initialPosition);
-				}
-			}
-			skeleton.dirty();
 		}
-
 
 		scoutRef.setPosition(refPos);
 	}
@@ -760,36 +774,8 @@ const neutrals = [
 
 const scoutRig: Record<string, quat> =
 	//{ "bip_pelvis": [0.9845, 0, 0, 0.1752], "bip_spine_0": [0.0291, 0, 0, 0.9996], "bip_spine_1": [0.093, 0, 0, 0.9957], "bip_spine_2": [0.1236, 0, 0, 0.9923], "bip_spine_3": [0.2107, 0, 0, 0.9775], "bip_neck": [0.1091, 0, 0, 0.994], "bip_head": [-0.2845, 0, 0, 0.9587], "bip_collar_L": [-0.7237, 0.6376, -0.2623, -0.0291], "bip_collar_R": [-0.0291, 0.2623, 0.6376, 0.7237], "bip_upperArm_L": [-0.114, -0.1315, -0.6768, 0.7153], "bip_upperArm_R": [0.3856, 0.5864, 0.4252, 0.5716], "bip_lowerArm_L": [0.6785, -0.199, 0.199, 0.6785], "bip_lowerArm_R": [0, 0, -0.2814, 0.9596], "bip_hip_L": [0.7051, 0.6764, 0.206, -0.0531], "bip_hip_R": [0.624, 0.461, 0.5361, 0.3326], "bip_knee_L": [0.0009, 0.0311, 0.0069, 0.9995], "bip_knee_R": [0.7061, 0.0269, 0.0171, 0.7074], "bip_foot_L": [-0.4145, -0.325, 0.5813, 0.6203], "bip_foot_R": [0.5813, 0.6203, 0.4145, 0.325], "bip_hand_L": [-0.5, 0.5, 0.5, 0.5], "bip_hand_R": [-0.5, -0.5, -0.5, 0.5], "bip_toe_L": [-0.3717, 0, 0, 0.9283], "bip_toe_R": [-0.3717, 0, 0, 0.9283], "weapon_bone": [-0.5834, 0.0502, -0.107, 0.8035], "weapon_bone_1": [-0.0079, -0.7071, 0.7071, 0.0079], "weapon_bone_2": [0, 0, 0, 1], "weapon_bone_3": [0, 0, 0, 1], "weapon_bone_4": [0, 0, 0, 1], "weapon_bone_L": [0.8035, -0.107, -0.0502, 0.5834], "medal_bone": [0.9858, 0.0094, -0.1385, 0.0942], "mvm": [-0.2998, 0.2009, -0.9227, 0.1356], "effect_hand_L": [0.1087, 0.0476, 0.9927, 0.0221], "effect_hand_R": [-0.0476, 0.1087, -0.0221, 0.9927], "bip_dogtag_0": [-0.716, 0, 0, 0.6981], "bip_dogtag_1": [-1, 0, 0, 0], "bip_dogtag_2": [-0.0037, 0, 0, 1], "bip_dogtag_3": [0, 0, 0, 1], "bip_packtop": [-0.9037, -0.2843, 0.3165, 0.0472], "bip_packmiddle": [-0.4182, 0, 0, 0.9083], "bip_thumb_0_L": [0.037, -0.1283, -0.1712, 0.9762], "bip_thumb_0_R": [0.0371, -0.1283, -0.1711, 0.9762], "bip_index_0_L": [0.2015, 0.6267, 0.1771, 0.7316], "bip_index_0_R": [0.2014, 0.6267, 0.1771, 0.7316], "bip_middle_0_L": [0.2797, 0.6462, 0.2176, 0.6759], "bip_middle_0_R": [0.2797, 0.6462, 0.2176, 0.6759], "bip_ring_0_L": [0.1973, 0.6841, 0.2006, 0.673], "bip_ring_0_R": [0.1973, 0.6841, 0.2006, 0.673], "bip_pinky_0_L": [0.191, 0.7047, 0.2066, 0.6513], "bip_pinky_0_R": [0.191, 0.7047, 0.2067, 0.6513], "bip_thumb_1_L": [0.26, -0.0222, 0.0776, 0.9622], "bip_thumb_1_R": [0.2599, -0.0222, 0.0775, 0.9623], "bip_index_1_L": [0.0054, -0.0036, 0.013, 0.9999], "bip_index_1_R": [0.0054, -0.0036, 0.013, 0.9999], "bip_middle_1_L": [-0.0369, 0.0245, -0.0741, 0.9963], "bip_middle_1_R": [-0.0369, 0.0245, -0.0741, 0.9963], "bip_ring_1_L": [-0.0199, -0.0008, 0.0031, 0.9998], "bip_ring_1_R": [0, 0, 0, 1], "bip_pinky_1_L": [0.0391, 0.0047, -0.018, 0.9991], "bip_pinky_1_R": [0.0391, 0.0047, -0.018, 0.9991], "bip_thumb_2_L": [-0.2094, 0, 0, 0.9778], "bip_thumb_2_R": [-0.2094, 0, 0, 0.9778], "bip_index_2_L": [0.033, 0, 0, 0.9995], "bip_index_2_R": [0.033, 0, 0, 0.9995], "bip_middle_2_L": [0.0507, 0, 0, 0.9987], "bip_middle_2_R": [0.0507, 0, 0, 0.9987], "bip_ring_2_L": [0.1209, 0, 0, 0.9927], "bip_ring_2_R": [0.1209, 0, 0, 0.9927], "bip_pinky_2_L": [0.1573, 0, 0, 0.9875], "bip_pinky_2_R": [0.1573, 0, 0, 0.9875], "prop_bone": [0, 0, 0, 1], "prop_bone_1": [0, 0, 0, 1], "prop_bone_2": [0, 0, 0, 1], "prop_bone_3": [0, 0, 0, 1], "prop_bone_4": [0, 0, 0, 1], "prop_bone_5": [0, 0, 0, 1], "prop_bone_6": [0, 0, 0, 1], "hlp_forearm_L": [-0.5, 0.5, 0.5, 0.5], "hlp_forearm_R": [-0.5, -0.5, -0.5, 0.5] }
-	{ "bip_pelvis": [0.9845, 0, 0, 0.1752], "bip_spine_0": [0.0291, 0, 0, 0.9996], "bip_spine_1": [0.093, 0, 0, 0.9957], "bip_spine_2": [0.1236, 0, 0, 0.9923], "bip_spine_3": [0.2107, 0, 0, 0.9775], "bip_neck": [0.1091, 0, 0, 0.994], "bip_head": [-0.2845, 0, 0, 0.9587], "bip_collar_L": [-0.7237, 0.6376, -0.2623, -0.0291], "bip_collar_R": [-0.0291, 0.2623, 0.6376, 0.7237], "bip_upperArm_L": [-0.114, -0.1315, -0.6768, 0.7153], "bip_upperArm_R": [0.3856, 0.5864, 0.4252, 0.5716], "bip_lowerArm_L": [0.7071, -0.0001, 0.0001, 0.7071], "bip_lowerArm_R": [0, 0, -0.0001, 1], "bip_hip_L": [0.7051, 0.6764, 0.206, -0.0531], "bip_hip_R": [0.624, 0.461, 0.5361, 0.3326], "bip_knee_L": [0.0009, 0.0311, 0.0069, 0.9995], "bip_knee_R": [0.7061, 0.0269, 0.0171, 0.7074], "bip_foot_L": [-0.4145, -0.325, 0.5813, 0.6203], "bip_foot_R": [0.5813, 0.6203, 0.4145, 0.325], "bip_hand_L": [-0.5, 0.5, 0.5, 0.5], "bip_hand_R": [-0.5, -0.5, -0.5, 0.5], "bip_toe_L": [-0.3717, 0, 0, 0.9283], "bip_toe_R": [-0.3717, 0, 0, 0.9283], "weapon_bone": [-0.5834, 0.0502, -0.107, 0.8035], "weapon_bone_1": [-0.0079, -0.7071, 0.7071, 0.0079], "weapon_bone_2": [0, 0, 0, 1], "weapon_bone_3": [0, 0, 0, 1], "weapon_bone_4": [0, 0, 0, 1], "weapon_bone_L": [0.8035, -0.107, -0.0502, 0.5834], "medal_bone": [0.9858, 0.0094, -0.1385, 0.0942], "mvm": [-0.2998, 0.2009, -0.9227, 0.1356], "effect_hand_L": [0.1087, 0.0476, 0.9927, 0.0221], "effect_hand_R": [-0.0476, 0.1087, -0.0221, 0.9927], "bip_dogtag_0": [-0.716, 0, 0, 0.6981], "bip_dogtag_1": [-1, 0, 0, 0], "bip_dogtag_2": [-0.0037, 0, 0, 1], "bip_dogtag_3": [0, 0, 0, 1], "bip_packtop": [-0.9037, -0.2843, 0.3165, 0.0472], "bip_packmiddle": [-0.4182, 0, 0, 0.9083], "bip_thumb_0_L": [-0.2259, -0.0807, -0.1503, 0.9591], "bip_thumb_0_R": [-0.2258, -0.0808, -0.1502, 0.9591], "bip_index_0_L": [-0.0125, 0.6498, -0.0064, 0.76], "bip_index_0_R": [-0.0125, 0.6497, -0.0063, 0.76], "bip_middle_0_L": [0.0778, 0.6956, 0.0285, 0.7137], "bip_middle_0_R": [0.0778, 0.6956, 0.0285, 0.7137], "bip_ring_0_L": [0, 0.7129, 0, 0.7013], "bip_ring_0_R": [0, 0.7129, 0, 0.7013], "bip_pinky_0_L": [0, 0.7344, 0, 0.6787], "bip_pinky_0_R": [0, 0.7344, 0, 0.6787], "bip_thumb_1_L": [0.2424, -0.0356, 0.1219, 0.9618], "bip_thumb_1_R": [0.2423, -0.0356, 0.1218, 0.9619], "bip_index_1_L": [0.0054, -0.0036, 0.013, 0.9999], "bip_index_1_R": [0.0054, -0.0036, 0.013, 0.9999], "bip_middle_1_L": [-0.0339, 0.0242, -0.0755, 0.9963], "bip_middle_1_R": [-0.034, 0.0242, -0.0755, 0.9963], "bip_ring_1_L": [-0.0199, -0.0008, 0.0031, 0.9998], "bip_ring_1_R": [0, 0, 0, 1], "bip_pinky_1_L": [0.0391, 0.0047, -0.018, 0.9991], "bip_pinky_1_R": [0.0391, 0.0047, -0.018, 0.9991], "bip_thumb_2_L": [-0.2094, 0, 0, 0.9778], "bip_thumb_2_R": [-0.2094, 0, 0, 0.9778], "bip_index_2_L": [0.033, 0, 0, 0.9995], "bip_index_2_R": [0.033, 0, 0, 0.9995], "bip_middle_2_L": [0.0507, 0, 0, 0.9987], "bip_middle_2_R": [0.0507, 0, 0, 0.9987], "bip_ring_2_L": [0.1209, 0, 0, 0.9927], "bip_ring_2_R": [0.1209, 0, 0, 0.9927], "bip_pinky_2_L": [0.1573, 0, 0, 0.9875], "bip_pinky_2_R": [0.1573, 0, 0, 0.9875], "prop_bone": [0, 0, 0, 1], "prop_bone_1": [0, 0, 0, 1], "prop_bone_2": [0, 0, 0, 1], "prop_bone_3": [0, 0, 0, 1], "prop_bone_4": [0, 0, 0, 1], "prop_bone_5": [0, 0, 0, 1], "prop_bone_6": [0, 0, 0, 1], "hlp_forearm_L": [-0.5, 0.5, 0.5, 0.5], "hlp_forearm_R": [-0.5, -0.5, -0.5, 0.5] }
-/*{
-
-
-	/*
-	bip_hip_L: [0.71, 0.68, 0.18, -0.05],
-	bip_knee_L: [0.0741, 0.1325, 0.0099, 0.9884],
-	bip_hip_R: [0.6257, 0.4416, 0.5275, 0.3677],
-	bip_knee_R: [0.6055, 0.1052, 0.0812, 0.7846],
-
-	bip_collar_L: [-0.7965, 0.5628, -0.0888, -0.2023],
-	bip_upperArm_L: [0.0938, 0.0806, -0.6734, 0.7288],
-	bip_lowerArm_L: [0.6976, -0.0565, 0.0637, 0.7114],
-
-	bip_collar_R: [-0.2191, 0.1157, 0.6153, 0.7484],
-	bip_upperArm_R: [-0.3586, -0.4214, -0.676, -0.4867],
-	bip_lowerArm_R: [0, 0, -0.0287, 0.9996],
-	* /
-}*/
-/*
-
-{"bip_pelvis":[0.9845,0,0,0.1752],"bip_spine_0":[0.0291,0,0,0.9996],"bip_spine_1":[0.047,0,0,0.9989],"bip_spine_2":[0,0,0,1],"bip_spine_3":[0.2107,0,0,0.9775],"bip_neck":[0.1091,0,0,0.994],"bip_head":[-0.2845,0,0,0.9587],"bip_collar_L":[-0.7965,0.5628,-0.0888,-0.2023],
-"bip_collar_R":[-0.2191,0.1157,0.6153,0.7484],
-"bip_upperArm_L":[0.0938,0.0806,-0.6734,0.7288],
-"bip_upperArm_R":[-0.3586,-0.4214,-0.676,-0.4867],
-"bip_lowerArm_L":[0.6976,-0.0565,0.0637,0.7114],
-"bip_lowerArm_R":[0,0,-0.0287,0.9996],"bip_hip_L":[0.7095,0.6795,0.1799,-0.05],"bip_hip_R":[0.6257,0.4416,0.5275,0.3677],"bip_knee_L":[0.0741,0.1325,0.0099,0.9884],"bip_knee_R":[0.6055,0.1052,0.0812,0.7846],"bip_foot_L":[-0.4145,-0.325,0.5813,0.6203],"bip_foot_R":[0.5813,0.6203,0.4145,0.325],"bip_hand_L":[-0.5,0.5,0.5,0.5],"bip_hand_R":[-0.5,-0.5,-0.5,0.5],"bip_toe_L":[-0.3717,0,0,0.9283],"bip_toe_R":[-0.3717,0,0,0.9283],"weapon_bone":[-0.5834,0.0502,-0.107,0.8035],"weapon_bone_1":[-0.0079,-0.7071,0.7071,0.0079],"weapon_bone_2":[0,0,0,1],"weapon_bone_3":[0,0,0,1],"weapon_bone_4":[0,0,0,1],"weapon_bone_L":[0.8035,-0.107,-0.0502,0.5834],"medal_bone":[0.9858,0.0094,-0.1385,0.0942],"mvm":[-0.2998,0.2009,-0.9227,0.1356],"effect_hand_L":[0.1087,0.0476,0.9927,0.0221],"effect_hand_R":[-0.0476,0.1087,-0.0221,0.9927],"bip_dogtag_0":[-0.716,0,0,0.6981],"bip_dogtag_1":[-1,0,0,0],"bip_dogtag_2":[-0.0037,0,0,1],"bip_dogtag_3":[0,0,0,1],"bip_packtop":[-0.9037,-0.2843,0.3165,0.0472],"bip_packmiddle":[-0.4182,0,0,0.9083],"bip_thumb_0_L":[-0.1986,-0.0843,-0.1824,0.9593],"bip_thumb_0_R":[-0.1986,-0.0843,-0.1824,0.9593],"bip_index_0_L":[0.1974,0.6687,-0.0266,0.7163],"bip_index_0_R":[0.1974,0.6687,-0.0266,0.7163],"bip_middle_0_L":[0.1783,0.7128,-0.017,0.6781],"bip_middle_0_R":[0.1783,0.7128,-0.017,0.6781],"bip_ring_0_L":[0.1891,0.7297,-0.0196,0.6568],"bip_ring_0_R":[0.1891,0.7297,-0.0196,0.6568],"bip_pinky_0_L":[0.2262,0.7418,0.0397,0.63],"bip_pinky_0_R":[0.2262,0.7418,0.0397,0.63],"bip_thumb_1_L":[0.2751,0,0,0.9614],"bip_thumb_1_R":[0.2751,0,0,0.9614],"bip_index_1_L":[0.2676,0,0,0.9635],"bip_index_1_R":[0.2676,0,0,0.9635],"bip_middle_1_L":[0.3144,0,0,0.9493],"bip_middle_1_R":[0.3144,0,0,0.9493],"bip_ring_1_L":[0.2394,0,0,0.9709],"bip_ring_1_R":[0.2394,0,0,0.9709],"bip_pinky_1_L":[0.2536,0,0,0.9673],"bip_pinky_1_R":[0.2536,0,0,0.9673],"bip_thumb_2_L":[-0.2094,0,0,0.9778],"bip_thumb_2_R":[-0.2094,0,0,0.9778],"bip_index_2_L":[0.033,0,0,0.9995],"bip_index_2_R":[0.033,0,0,0.9995],"bip_middle_2_L":[0.0507,0,0,0.9987],"bip_middle_2_R":[0.0507,0,0,0.9987],"bip_ring_2_L":[0.1209,0,0,0.9927],"bip_ring_2_R":[0.1209,0,0,0.9927],"bip_pinky_2_L":[0.1573,0,0,0.9875],"bip_pinky_2_R":[0.1573,0,0,0.9875],"prop_bone":[0,0,0,1],"prop_bone_1":[0,0,0,1],"prop_bone_2":[0,0,0,1],"prop_bone_3":[0,0,0,1],"prop_bone_4":[0,0,0,1],"prop_bone_5":[0,0,0,1],"prop_bone_6":[0,0,0,1],"hlp_forearm_L":[-0.5,0.5,0.5,0.5],"hlp_forearm_R":[-0.5,-0.5,-0.5,0.5]}
-
-
-*/
+	//{ "bip_pelvis": [0.9845, 0, 0, 0.1752], "bip_spine_0": [0.0291, 0, 0, 0.9996], "bip_spine_1": [0.093, 0, 0, 0.9957], "bip_spine_2": [0.1236, 0, 0, 0.9923], "bip_spine_3": [0.2107, 0, 0, 0.9775], "bip_neck": [0.1091, 0, 0, 0.994], "bip_head": [-0.2845, 0, 0, 0.9587], "bip_collar_L": [-0.7237, 0.6376, -0.2623, -0.0291], "bip_collar_R": [-0.0291, 0.2623, 0.6376, 0.7237], "bip_upperArm_L": [-0.114, -0.1315, -0.6768, 0.7153], "bip_upperArm_R": [0.3856, 0.5864, 0.4252, 0.5716], "bip_lowerArm_L": [0.7071, -0.0001, 0.0001, 0.7071], "bip_lowerArm_R": [0, 0, -0.0001, 1], "bip_hip_L": [0.7051, 0.6764, 0.206, -0.0531], "bip_hip_R": [0.624, 0.461, 0.5361, 0.3326], "bip_knee_L": [0.0009, 0.0311, 0.0069, 0.9995], "bip_knee_R": [0.7061, 0.0269, 0.0171, 0.7074], "bip_foot_L": [-0.4145, -0.325, 0.5813, 0.6203], "bip_foot_R": [0.5813, 0.6203, 0.4145, 0.325], "bip_hand_L": [-0.5, 0.5, 0.5, 0.5], "bip_hand_R": [-0.5, -0.5, -0.5, 0.5], "bip_toe_L": [-0.3717, 0, 0, 0.9283], "bip_toe_R": [-0.3717, 0, 0, 0.9283], "weapon_bone": [-0.5834, 0.0502, -0.107, 0.8035], "weapon_bone_1": [-0.0079, -0.7071, 0.7071, 0.0079], "weapon_bone_2": [0, 0, 0, 1], "weapon_bone_3": [0, 0, 0, 1], "weapon_bone_4": [0, 0, 0, 1], "weapon_bone_L": [0.8035, -0.107, -0.0502, 0.5834], "medal_bone": [0.9858, 0.0094, -0.1385, 0.0942], "mvm": [-0.2998, 0.2009, -0.9227, 0.1356], "effect_hand_L": [0.1087, 0.0476, 0.9927, 0.0221], "effect_hand_R": [-0.0476, 0.1087, -0.0221, 0.9927], "bip_dogtag_0": [-0.716, 0, 0, 0.6981], "bip_dogtag_1": [-1, 0, 0, 0], "bip_dogtag_2": [-0.0037, 0, 0, 1], "bip_dogtag_3": [0, 0, 0, 1], "bip_packtop": [-0.9037, -0.2843, 0.3165, 0.0472], "bip_packmiddle": [-0.4182, 0, 0, 0.9083], "bip_thumb_0_L": [-0.2259, -0.0807, -0.1503, 0.9591], "bip_thumb_0_R": [-0.2258, -0.0808, -0.1502, 0.9591], "bip_index_0_L": [-0.0125, 0.6498, -0.0064, 0.76], "bip_index_0_R": [-0.0125, 0.6497, -0.0063, 0.76], "bip_middle_0_L": [0.0778, 0.6956, 0.0285, 0.7137], "bip_middle_0_R": [0.0778, 0.6956, 0.0285, 0.7137], "bip_ring_0_L": [0, 0.7129, 0, 0.7013], "bip_ring_0_R": [0, 0.7129, 0, 0.7013], "bip_pinky_0_L": [0, 0.7344, 0, 0.6787], "bip_pinky_0_R": [0, 0.7344, 0, 0.6787], "bip_thumb_1_L": [0.2424, -0.0356, 0.1219, 0.9618], "bip_thumb_1_R": [0.2423, -0.0356, 0.1218, 0.9619], "bip_index_1_L": [0.0054, -0.0036, 0.013, 0.9999], "bip_index_1_R": [0.0054, -0.0036, 0.013, 0.9999], "bip_middle_1_L": [-0.0339, 0.0242, -0.0755, 0.9963], "bip_middle_1_R": [-0.034, 0.0242, -0.0755, 0.9963], "bip_ring_1_L": [-0.0199, -0.0008, 0.0031, 0.9998], "bip_ring_1_R": [0, 0, 0, 1], "bip_pinky_1_L": [0.0391, 0.0047, -0.018, 0.9991], "bip_pinky_1_R": [0.0391, 0.0047, -0.018, 0.9991], "bip_thumb_2_L": [-0.2094, 0, 0, 0.9778], "bip_thumb_2_R": [-0.2094, 0, 0, 0.9778], "bip_index_2_L": [0.033, 0, 0, 0.9995], "bip_index_2_R": [0.033, 0, 0, 0.9995], "bip_middle_2_L": [0.0507, 0, 0, 0.9987], "bip_middle_2_R": [0.0507, 0, 0, 0.9987], "bip_ring_2_L": [0.1209, 0, 0, 0.9927], "bip_ring_2_R": [0.1209, 0, 0, 0.9927], "bip_pinky_2_L": [0.1573, 0, 0, 0.9875], "bip_pinky_2_R": [0.1573, 0, 0, 0.9875], "prop_bone": [0, 0, 0, 1], "prop_bone_1": [0, 0, 0, 1], "prop_bone_2": [0, 0, 0, 1], "prop_bone_3": [0, 0, 0, 1], "prop_bone_4": [0, 0, 0, 1], "prop_bone_5": [0, 0, 0, 1], "prop_bone_6": [0, 0, 0, 1], "hlp_forearm_L": [-0.5, 0.5, 0.5, 0.5], "hlp_forearm_R": [-0.5, -0.5, -0.5, 0.5] }
+	{ "bip_pelvis": [0.9845, 0, 0, 0.1752], "bip_spine_0": [0.0291, 0, 0, 0.9996], "bip_spine_1": [0.093, 0, 0, 0.9957], "bip_spine_2": [0.1236, 0, 0, 0.9923], "bip_spine_3": [0.2107, 0, 0, 0.9775], "bip_neck": [0.1091, 0, 0, 0.994], "bip_head": [-0.2845, 0, 0, 0.9587], "bip_collar_L": [-0.7039, 0.6341, -0.3117, -0.0731], "bip_collar_R": [0.5488, -0.515, 0.326, 0.5721], "bip_upperArm_L": [-0.1259, -0.1227, -0.6958, 0.6964], "bip_upperArm_R": [-0.1696, -0.3965, 0.6865, 0.5854], "bip_lowerArm_L": [0, -0.0001, 0, 1], "bip_lowerArm_R": [0, 0, -0.0001, 1], "bip_hip_L": [0.7051, 0.6764, 0.206, -0.0531], "bip_hip_R": [0.624, 0.461, 0.5361, 0.3326], "bip_knee_L": [0.0009, 0.0311, 0.0069, 0.9995], "bip_knee_R": [0.7061, 0.0269, 0.0171, 0.7074], "bip_foot_L": [-0.4145, -0.325, 0.5813, 0.6203], "bip_foot_R": [0.5813, 0.6203, 0.4145, 0.325], "bip_hand_L": [-0.5, 0.5, 0.5, 0.5], "bip_hand_R": [-0.5, -0.5, -0.5, 0.5], "bip_toe_L": [-0.3717, 0, 0, 0.9283], "bip_toe_R": [-0.3717, 0, 0, 0.9283], "weapon_bone": [-0.5834, 0.0502, -0.107, 0.8035], "weapon_bone_1": [-0.0079, -0.7071, 0.7071, 0.0079], "weapon_bone_2": [0, 0, 0, 1], "weapon_bone_3": [0, 0, 0, 1], "weapon_bone_4": [0, 0, 0, 1], "weapon_bone_L": [0.8035, -0.107, -0.0502, 0.5834], "medal_bone": [0.9858, 0.0094, -0.1385, 0.0942], "mvm": [-0.2998, 0.2009, -0.9227, 0.1356], "effect_hand_L": [0.1087, 0.0476, 0.9927, 0.0221], "effect_hand_R": [-0.0476, 0.1087, -0.0221, 0.9927], "bip_dogtag_0": [-0.716, 0, 0, 0.6981], "bip_dogtag_1": [-1, 0, 0, 0], "bip_dogtag_2": [-0.0037, 0, 0, 1], "bip_dogtag_3": [0, 0, 0, 1], "bip_packtop": [-0.9037, -0.2843, 0.3165, 0.0472], "bip_packmiddle": [-0.4182, 0, 0, 0.9083], "bip_thumb_0_L": [0.1698, -0.1564, -0.2116, 0.9497], "bip_thumb_0_R": [0.1697, -0.1564, -0.2116, 0.9497], "bip_index_0_L": [0.0084, 0.6496, -0.0112, 0.7601], "bip_index_0_R": [0.0085, 0.6496, -0.0113, 0.7602], "bip_middle_0_L": [-0.0406, 0.6907, 0.0722, 0.7184], "bip_middle_0_R": [-0.0405, 0.6907, 0.0722, 0.7184], "bip_ring_0_L": [0, 0.7129, 0, 0.7013], "bip_ring_0_R": [0, 0.7129, 0, 0.7013], "bip_pinky_0_L": [0, 0.7344, 0, 0.6787], "bip_pinky_0_R": [0, 0.7344, 0, 0.6787], "bip_thumb_1_L": [-0.1047, -0.1117, 0.2503, 0.956], "bip_thumb_1_R": [-0.1047, -0.1117, 0.2501, 0.956], "bip_index_1_L": [-0.0137, -0.0038, 0.0032, 0.9999], "bip_index_1_R": [-0.0137, -0.0038, 0.0033, 0.9999], "bip_middle_1_L": [0.0797, 0.0174, -0.0225, 0.9964], "bip_middle_1_R": [0.0796, 0.0174, -0.0225, 0.9964], "bip_ring_1_L": [0.0002, -0.0012, -0.0201, 0.9998], "bip_ring_1_R": [0, 0, 0, 1], "bip_pinky_1_L": [0.0113, 0.0029, 0.0416, 0.9991], "bip_pinky_1_R": [0.0113, 0.0029, 0.0417, 0.9991], "bip_thumb_2_L": [-0.2094, 0, 0, 0.9778], "bip_thumb_2_R": [-0.2094, 0, 0, 0.9778], "bip_index_2_L": [0.033, 0, 0, 0.9995], "bip_index_2_R": [0.033, 0, 0, 0.9995], "bip_middle_2_L": [0.0507, 0, 0, 0.9987], "bip_middle_2_R": [0.0507, 0, 0, 0.9987], "bip_ring_2_L": [0.1209, 0, 0, 0.9927], "bip_ring_2_R": [0.1209, 0, 0, 0.9927], "bip_pinky_2_L": [0.1573, 0, 0, 0.9875], "bip_pinky_2_R": [0.1573, 0, 0, 0.9875], "prop_bone": [0, 0, 0, 1], "prop_bone_1": [0, 0, 0, 1], "prop_bone_2": [0, 0, 0, 1], "prop_bone_3": [0, 0, 0, 1], "prop_bone_4": [0, 0, 0, 1], "prop_bone_5": [0, 0, 0, 1], "prop_bone_6": [0, 0, 0, 1], "hlp_forearm_L": [-0.5, 0.5, 0.5, 0.5], "hlp_forearm_R": [-0.5, -0.5, -0.5, 0.5] }
 
 function convert(skeleton: Skeleton): void {
 	for (let joint = 0; joint < 77; joint++) {
@@ -829,16 +815,49 @@ function convert(skeleton: Skeleton): void {
 				}
 
 				if (count < 2 && scoutBone && scoutParentBone && scoutParentBone.isBone && scoutParentParentBone.isBone) {
+					// Align bone to the soma ref pose
 					const scoutDeltaPos = vec3.sub(vec3.create(), scoutBone.getWorldPosition(), scoutParentBone.getWorldPosition());
 
 					const scoutDeltaPosNorm = vec3.normalize(vec3.create(), scoutDeltaPos);
 					const deltaQuat = quat.rotationTo(quat.create(), scoutDeltaPosNorm, deltaPosSomaNorm);
 					const q = quat.mul(quat.create(), deltaQuat, scoutParentBone.getWorldOrientation());
+					//scoutParentBone.setWorldOrientation(q);
+
+					// At this point, bone are aligned, but the rotation along their axis may differ
+					if (rotateBones && (
+						scoutBoneName === 'bip_upperArm_L'
+						|| scoutBoneName === 'bip_lowerArm_L'
+						|| scoutBoneName === 'bip_hand_L'
+						|| scoutBoneName === 'bip_upperArm_R'
+						|| scoutBoneName === 'bip_lowerArm_R'
+						|| scoutBoneName === 'bip_hand_R'
+					)
+					) {
+						const v = vec3.transformQuat(vec3.create(), [0, 0, 1], q);
+						const test1 = projPlane(v, deltaPosSomaNorm);
+						const test2 = projPlane([0, 0, 1], deltaPosSomaNorm);
+						console.info(test1, test2);
+
+						const deltaQuat = quat.rotationTo(quat.create(), test1, test2);
+						quat.mul(q, deltaQuat, q);
+					}
+
 					scoutParentBone.setWorldOrientation(q);
 					scoutParentBone.forEach(ent => (ent as Bone).dirty = true);
-					scoutBone.dirty = true;
 				}
 			}
 		}
 	}
+}
+
+/**
+ * Compute the projection of a vector onto a plane
+ * @param proj The vector to project
+ * @param ortho A vector normal to the plane
+ * @param out A vector
+ * @returns The projected vector
+ */
+function projPlane(proj: ReadonlyVec3, ortho: ReadonlyVec3, out = vec3.create()): vec3 {
+	vec3.scale(out, ortho, vec3.dot(proj, ortho) / vec3.squaredLength(ortho));
+	return vec3.sub(out, proj, out);
 }
