@@ -29,11 +29,10 @@ registerDemo(KimodoDemo);
 const LOCAL_POS = true;
 const refPos = [60, 0, 0];
 let conv = false;
-let rotateBones = false;
 
 async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoContent: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
-	perspectiveCamera.position = [60, 0, 100];
-	orbitCameraControl.target.setPosition([60, 0, 0]);
+	perspectiveCamera.position = [0, 0, 100];
+	orbitCameraControl.target.setPosition([0, 0, 0]);
 	//orbitCameraControl.upVector = [0, 1, 0];
 	perspectiveCamera.farPlane = 10000;
 	perspectiveCamera.nearPlane = 10;
@@ -51,7 +50,7 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 	//let pos = vec3.create();
 
 	const group = scene.addChild(new Group({ name: 'Spheres', visible: false, }))!;
-	const group2 = scene.addChild(new Group({ name: 'Cylinders' }))!;
+	const group2 = scene.addChild(new Group({ name: 'Cylinders', visible: false, }))!;
 
 	const spheres: Cylinder[] = [];
 	const cylinders: Cylinder[] = [];
@@ -81,8 +80,8 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 
 	const somaSkeleton77 = createSOMASkeleton77({ name: 'SOMA rigged', parent: scene });
 	const somaSkeleton77RefPose = createSOMASkeleton77({ name: 'SOMA ref', parent: scene });
-	somaSkeleton77.addChild(new SkeletonHelper());
-	somaSkeleton77RefPose.addChild(new SkeletonHelper());
+	somaSkeleton77.addChild(new SkeletonHelper({ visible: false, }));
+	somaSkeleton77RefPose.addChild(new SkeletonHelper({ visible: false, }));
 
 
 	somaSkeleton77RefPose.setPosition(refPos);
@@ -93,7 +92,8 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 	//const scoutRef2 = (await AddSource1Model('tf2', 'models/player/scout', scene))!;
 	scoutRef.name = 'Scout ref';
 	scoutRef.setPosition(refPos);
-	scoutRef.addChild(new SkeletonHelper());
+	scoutRef.addChild(new SkeletonHelper({ visible: false, }));
+	scoutRef.setVisible(false);
 	//scoutRef2.setPosition([-40, -47, 0]);
 	//scoutRef2.playAnimation('ref');
 	//scoutRef2.rotateGlobalY(-90*DEG_TO_RAD);
@@ -151,18 +151,6 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 			innerText: 'bone names',
 			$change: (event: Event) => {
 				conv = (event?.target as HTMLInputElement).checked;
-				previousT = -1;
-			},
-		}),
-	});
-	createElement('label', {
-		innerText: 'rotate bones',
-		parent: htmlDemoContent,
-		child: createElement('input', {
-			type: 'checkbox',
-			innerText: 'bone names',
-			$change: (event: Event) => {
-				rotateBones = (event?.target as HTMLInputElement).checked;
 				previousT = -1;
 			},
 		}),
@@ -275,11 +263,11 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 			somaBone.setOrientation(q);
 		}
 
-		retargetPose(somaSkeleton77, scout.skeleton!);
-		retargetPose(somaSkeleton77RefPose, scoutRef.skeleton!);
+		//retargetPose(somaSkeleton77, scout.skeleton!);
+		//retargetPose(somaSkeleton77RefPose, scoutRef.skeleton!);
 
 
-		const skeleton = scoutRef.skeleton!;
+		const skeleton = scout.skeleton!;
 		for (const bone of skeleton.bones) {
 			if ((bone.parent as Bone).isBone) {
 				bone?.setOrientation(bone._initialQuaternion);
@@ -288,7 +276,7 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 		}
 		skeleton.dirty();
 		if (conv) {
-			convert(somaSkeleton77, scoutRef.skeleton!);
+			convert(somaSkeleton77, scout.skeleton!);
 		}
 
 		scoutRef.setPosition(refPos);
@@ -822,10 +810,15 @@ function convert(source: Skeleton, target: Skeleton): void {
 					if (
 						(child as Bone).isBone
 						&& (!child.name.startsWith('hlp'))
+						&& (!child.name.startsWith('bip_dogtag'))
 						&& (!vec3.equals(child.getPosition(), [0, 0, 0]))
 					) {
 						++count;
 					}
+				}
+
+				if (count >= 2) {
+					//console.count('bone rejected ' + scoutParentBone!.name);
 				}
 
 				if (count < 2 && scoutBone && scoutParentBone && scoutParentBone.isBone && scoutParentParentBone.isBone) {
@@ -835,25 +828,6 @@ function convert(source: Skeleton, target: Skeleton): void {
 					const scoutDeltaPosNorm = vec3.normalize(vec3.create(), scoutDeltaPos);
 					const deltaQuat = quat.rotationTo(quat.create(), scoutDeltaPosNorm, deltaPosSomaNorm);
 					const q = quat.mul(quat.create(), deltaQuat, scoutParentBone.getWorldOrientation());
-					//scoutParentBone.setWorldOrientation(q);
-
-					// At this point, bone are aligned, but the rotation along their axis may differ
-					if (rotateBones && (
-						scoutBoneName === 'bip_upperArm_L'
-						|| scoutBoneName === 'bip_lowerArm_L'
-						|| scoutBoneName === 'bip_hand_L'
-						|| scoutBoneName === 'bip_upperArm_R'
-						|| scoutBoneName === 'bip_lowerArm_R'
-						|| scoutBoneName === 'bip_hand_R'
-					)
-					) {
-						const v = vec3.transformQuat(vec3.create(), [0, 0, 1], q);
-						const test1 = projPlane(v, deltaPosSomaNorm);
-						const test2 = projPlane([0, 0, 1], deltaPosSomaNorm);
-
-						const deltaQuat = quat.rotationTo(quat.create(), test1, test2);
-						quat.mul(q, deltaQuat, q);
-					}
 
 					scoutParentBone.setWorldOrientation(q);
 					scoutParentBone.forEach(ent => (ent as Bone).dirty = true);
