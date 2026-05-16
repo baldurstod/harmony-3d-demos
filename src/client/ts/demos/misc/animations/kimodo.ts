@@ -29,6 +29,7 @@ registerDemo(KimodoDemo);
 const LOCAL_POS = true;
 const refPos = [60, 0, 0];
 let conv = false;
+let move = false;
 
 async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoContent: HTMLElement, perspectiveCamera: Camera, orbitCameraControl: OrbitControl) {
 	perspectiveCamera.position = [0, 0, 100];
@@ -151,6 +152,18 @@ async function testAnimations(scene: Scene, htmlDemoView: HTMLElement, htmlDemoC
 			innerText: 'bone names',
 			$change: (event: Event) => {
 				conv = (event?.target as HTMLInputElement).checked;
+				previousT = -1;
+			},
+		}),
+	});
+	createElement('label', {
+		innerText: 'move',
+		parent: htmlDemoContent,
+		child: createElement('input', {
+			type: 'checkbox',
+			innerText: 'bone names',
+			$change: (event: Event) => {
+				move = (event?.target as HTMLInputElement).checked;
 				previousT = -1;
 			},
 		}),
@@ -817,20 +830,26 @@ function convert(source: Skeleton, target: Skeleton): void {
 					}
 				}
 
-				if (count >= 2) {
-					//console.count('bone rejected ' + scoutParentBone!.name);
-				}
+				if (scoutBone && scoutParentBone && scoutParentBone.isBone && scoutParentParentBone.isBone) {
+					const scoutParentBonePosition = scoutParentBone.getWorldPosition()
+					const scoutDeltaPos = vec3.sub(vec3.create(), scoutBone.getWorldPosition(), scoutParentBonePosition);
 
-				if (count < 2 && scoutBone && scoutParentBone && scoutParentBone.isBone && scoutParentParentBone.isBone) {
-					// Align bone to the soma ref pose
-					const scoutDeltaPos = vec3.sub(vec3.create(), scoutBone.getWorldPosition(), scoutParentBone.getWorldPosition());
+					if (count < 2) {
+						// Align bone to the soma ref pose, by rotating parent bone
 
-					const scoutDeltaPosNorm = vec3.normalize(vec3.create(), scoutDeltaPos);
-					const deltaQuat = quat.rotationTo(quat.create(), scoutDeltaPosNorm, deltaPosSomaNorm);
-					const q = quat.mul(quat.create(), deltaQuat, scoutParentBone.getWorldOrientation());
+						const scoutDeltaPosNorm = vec3.normalize(vec3.create(), scoutDeltaPos);
+						const deltaQuat = quat.rotationTo(quat.create(), scoutDeltaPosNorm, deltaPosSomaNorm);
+						const q = quat.mul(quat.create(), deltaQuat, scoutParentBone.getWorldOrientation());
 
-					scoutParentBone.setWorldOrientation(q);
-					scoutParentBone.forEach(ent => (ent as Bone).dirty = true);
+						scoutParentBone.setWorldOrientation(q);
+						scoutParentBone.forEach(ent => (ent as Bone).dirty = true);
+					} else {
+						if (move) {
+							// The parent bone can't be rotated, move the child
+							const newPos = vec3.scaleAndAdd(vec3.create(), scoutParentBonePosition, deltaPosSomaNorm, vec3.length(scoutDeltaPos));
+							scoutBone.setWorldPosition(newPos);
+						}
+					}
 				}
 			}
 		} else {
