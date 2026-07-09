@@ -1,5 +1,6 @@
 import { vec3, vec4 } from 'gl-matrix';
 import { Camera, ColorBackground, Entity, Graphics, KeepOnlyLastChild, OrbitControl, Scene, Source1ModelInstance, Source1ParticleControler, Source1ParticleSystem } from 'harmony-3d';
+import { createElement } from 'harmony-ui';
 import { setTimeoutPromise } from 'harmony-utils';
 import { AddSource1Model } from '../../../../../utils/source1';
 import { InitDemoStd } from '../../../../../utils/utils';
@@ -11,6 +12,12 @@ class CreateUnusualsThumbsDemo implements Demo {
 	async initDemo(scene: Scene, params: InitDemoParams): Promise<void> {
 		const [perspectiveCamera, orbitCameraControl] = InitDemoStd(scene);
 		renderUnusuals(scene, params.htmlDemoContentTab, perspectiveCamera, orbitCameraControl);
+
+		createElement('button', {
+			parent: params.htmlDemoContent,
+			i18n: '#manual_picture',
+			$click: () => exportCanvas('test'),
+		});
 	}
 }
 
@@ -88,7 +95,8 @@ async function renderUnusualList(list: Effect[], parent: Entity, scene: Scene, d
 		await renderUnusual(unusual, parent, scene, perspectiveCamera, orbitCameraControl, scout, heavy);
 
 		//Graphics.savePicture(scene, perspectiveCamera, `${unusual.system}.webp`, THUMB_SIZE, THUMB_SIZE, 'image/webp', 1.0);
-		Graphics.exportCanvas('main_canvas', `${unusual.system}.webp`, THUMB_SIZE, THUMB_SIZE, 'image/webp', 1.0);
+		//Graphics.exportCanvas('main_canvas', `${unusual.system}.webp`, THUMB_SIZE, THUMB_SIZE, 'image/webp', 1.0);
+		exportCanvas(unusual.system);
 		/*
 			ctx.drawImage(new Graphics().getCanvas(), 0, dy, THUMB_SIZE, THUMB_SIZE);
 			if (ONE_BIG_PICTURE) {
@@ -98,6 +106,10 @@ async function renderUnusualList(list: Effect[], parent: Entity, scene: Scene, d
 			}
 		*/
 	}
+}
+
+function exportCanvas(name: string): void {
+	Graphics.exportCanvas('main_canvas', `${name}.webp`, THUMB_SIZE, THUMB_SIZE, 'image/webp', 1.0);
 }
 
 async function renderUnusual(unusual: Effect, parent: Entity, scene: Scene, perspectiveCamera: Camera, orbitCameraControl: OrbitControl, scout: Source1ModelInstance, heavy: Source1ModelInstance) {
@@ -550,6 +562,20 @@ const EffectList: Effect[] = [/*
 	{ system: 'unusual_growing_flake_parent_twilight', fov: 40, position: [50, 0, 0], target: [0, 0, 12], wait: 4000, setQuaternion: true },
 	{ system: 'unusual_cryogenic_parent', fov: 30, position: [50, 0, 0], target: [0, 0, 5], wait: 2000, setQuaternion: true },
 	//*/
+
+	// Summer 2026 Unusual
+	/*
+	{ system: 'unusual_aurora_purple_parent', fov: 40, position: [10, 20, 30], target: [0, 0, 13], wait: 6000, setQuaternion: true },
+	{ system: 'unusual_aurora_teal_parent', fov: 40, position: [10, 20, 30], target: [0, 0, 13], wait: 6000, setQuaternion: true },
+	{ system: 'unusual_aurora_green_parent', fov: 40, position: [10, 20, 30], target: [0, 0, 13], wait: 6000, setQuaternion: true },
+	{ system: 'unusual_vinethorn_teamcolor_red', fov: 30, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_vinethorn_teamcolor_blue', fov: 30, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_spaceorbit_parent', fov: 20, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_butterfly_teamcolor_red', fov: 30, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_butterfly_teamcolor_blue', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	{ system: 'unusual_butterfly_parent_purple', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	*/
+
 ]
 
 const EffectList2 = new Map([
@@ -796,10 +822,8 @@ const UnusualTauntList: Effect[] = [
 	{ system: 'utaunt_phantasam_green_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_phantasam_grey_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_phantasam_purple_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
-	//*/
 	{ system: 'utaunt_multicurse_teamcolor_red', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_multicurse_teamcolor_blue', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
-	/*
 	{ system: 'utaunt_voidcrawlers_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_tarpit_dinos_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_tarpit_people_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
@@ -819,7 +843,17 @@ const UnusualTauntList: Effect[] = [
 	{ system: 'utaunt_aurora25_parent_purple', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_chillingmist_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_80smalfunction_parent', fov: 80, position: [50, -100, 50], target: [0, 0, 45], wait: 2000, isTaunt: true },*
-	//*/
+	*/
+
+	// Summer 2026 Unusual Taunts
+	/*
+	{ system: 'utaunt_wheatfield_parent', fov: 60, position: [50, -100, 50], target: [0, 0, 20], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_luminousdrift_teamcolor_red', fov: 60, position: [50, -100, 50], target: [0, 0, 20], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_luminousdrift_teamcolor_blue', fov: 60, position: [50, -100, 50], target: [0, 0, 20], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_luminousdrift_purple_parent', fov: 60, position: [50, -100, 50], target: [0, 0, 20], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_dualspotlights_parent', fov: 60, position: [50, -100, 50], target: [0, 0, 20], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_underwater_parent', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	*/
 ]
 
 const UnusualTauntList2 = new Map([
