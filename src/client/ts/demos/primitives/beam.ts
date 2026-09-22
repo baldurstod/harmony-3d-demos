@@ -35,7 +35,7 @@ class BeamDemo implements Demo {
 
 		const wireframe = new Wireframe();
 
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, () => {
+		GraphicsEvents.addEventListener('tick', () => {
 			geometry.setSegments(segments, beamCamera);
 			mesh.addChild(wireframe);
 		});

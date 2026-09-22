@@ -34,7 +34,7 @@ class SheetViewerDemo implements Demo {
 		});
 
 
-		GraphicsEvents.addEventListener(GraphicsEvent.MouseMove, event => {
+		GraphicsEvents.addEventListener('mousemove', event => {
 			let normalizedX = ((event as CustomEvent<GraphicMouseEventData>).detail.x / (event as CustomEvent<GraphicMouseEventData>).detail.width) * 2 - 1;
 			let normalizedY = 1 - ((event as CustomEvent<GraphicMouseEventData>).detail.y / (event as CustomEvent<GraphicMouseEventData>).detail.height) * 2;
 			//console.log(normalizedX, normalizedY);

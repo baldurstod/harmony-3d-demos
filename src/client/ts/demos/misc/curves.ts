@@ -51,7 +51,7 @@ async function testCurves(scene: Scene) {
 		box.position = pos;
 
 	}
-	GraphicsEvents.addEventListener(GraphicsEvent.Tick, animate);
+	GraphicsEvents.addEventListener('tick', animate);
 
 	let line = scene.addChild(new LineSegments()) as LineSegments;
 	let segments = [];

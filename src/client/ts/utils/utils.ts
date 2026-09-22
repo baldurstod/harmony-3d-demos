@@ -8,7 +8,7 @@ export function InitDemoStd(scene: Scene): [Camera, OrbitControl, AmbientLight] 
 
 	perspectiveCamera = new Camera({ autoResize: true, parent: scene });
 	orbitCameraControl = new OrbitControl(perspectiveCamera/*, document.getElementById('demo-canvas')*/);
-	GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => orbitCameraControl.update((event as CustomEvent<GraphicTickEvent>).detail.delta / 1000));
+	GraphicsEvents.addEventListener('tick', (event) => orbitCameraControl.update((event as CustomEvent<GraphicTickEvent>).detail.delta / 1000));
 	perspectiveCamera.setActiveCamera();
 	scene.addChild(orbitCameraControl.target);
 	//ContextObserver.observe(GraphicsEvents, perspectiveCamera);

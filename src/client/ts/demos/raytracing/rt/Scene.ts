@@ -1,10 +1,9 @@
-import { OBJFile as wavefrontObjParser } from './OBJFile';
-import { MTLFile as wavefrontMtlParser } from './MTLFile';
-import { vec3, vec4 } from "gl-matrix";
-
-import { BV } from "./BV";
-import { Material } from "./Material";
+import { vec3, vec4 } from 'gl-matrix';
 import { float32, int32, uint32 } from 'harmony-types';
+import { BV } from './BV';
+import { Material } from './Material';
+import { MTLFile as wavefrontMtlParser } from './MTLFile';
+import { OBJFile as wavefrontObjParser } from './OBJFile';
 
 interface Model {
 	name: string;

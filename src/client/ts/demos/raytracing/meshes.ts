@@ -1,5 +1,5 @@
 import { vec3, vec4 } from 'gl-matrix';
-import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, DEG_TO_RAD, getCurrentTexture, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, PointLight, RayTracingPass, Scene, ShaderMaterial, TextureManager } from 'harmony-3d';
+import { AmbientLight, Camera, CanvasLayout, CanvasView, ClearPass, ColorBackground, Composer, DEG_TO_RAD, Graphics, GraphicsEvent, GraphicsEvents, GraphicTickEvent, PointLight, RayTracingPass, Scene, ShaderMaterial, TextureManager } from 'harmony-3d';
 import { float32, uint32 } from 'harmony-types';
 import { createElement, defineHarmonyToggleButton, HTMLHarmonyToggleButtonElement } from 'harmony-ui';
 import { InitDemoStd } from '../../utils/utils';
@@ -253,7 +253,7 @@ class RaytracingMeshesDemo implements Demo {
 			//new CanvasView({ name: 'view', scene, viewport: new Viewport({ x: 0.5, width: 0.5, }) }),
 		]));
 
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event: CustomEvent<GraphicTickEvent>) => {
+		GraphicsEvents.addEventListener('tick', (event: CustomEvent<GraphicTickEvent>) => {
 			let pos2 = perspectiveCamera.getWorldPosition();
 			if (pos[0] != pos2[0] || pos[1] != pos2[1] || pos[2] != pos2[2]) {
 				reset();
@@ -274,6 +274,7 @@ class RaytracingMeshesDemo implements Demo {
 			clearAccumulatedSamples = 0;
 
 			if (false && this.#renderFrames > 0) {
+				/*
 				Graphics.renderMultiCanvas(event.detail.delta, event.detail.context);
 				raytracerMat.setUniformValue('outTexture', getCurrentTexture());
 				Graphics.compute(raytracerMat, {
@@ -284,6 +285,7 @@ class RaytracingMeshesDemo implements Demo {
 				});
 
 				--this.#renderFrames;
+				*/
 			}
 		});
 

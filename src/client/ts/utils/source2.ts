@@ -8,7 +8,7 @@ export async function addSource2Model(repository: string, fileName: string, pare
 
 	parent.addChild(model);
 
-	GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => {
+	GraphicsEvents.addEventListener('tick', (event) => {
 		model.mainAnimFrame += (event as CustomEvent<GraphicTickEvent>).detail.delta / 1000;
 	});
 	return model;

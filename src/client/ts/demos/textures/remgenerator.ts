@@ -55,7 +55,7 @@ class RemGeneratorDemo implements Demo {
 			Graphics.render(scene, scene.activeCamera!, (event as CustomEvent<GraphicTickEvent>).detail.delta, (event as CustomEvent<GraphicTickEvent>).detail.context);
 			renderTargetViewer.render();
 		}
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, animate);
+		GraphicsEvents.addEventListener('tick', animate);
 
 
 		const material = new MeshBasicMaterial();

@@ -125,7 +125,7 @@ async function testMultiView(htmlDemoContent: HTMLElement, perspectiveCamera: Ca
 	});
 
 	//renderer.addEventListener('tick', animate);
-	//GraphicsEvents.addEventListener(GraphicsEvent.Tick, animate);
+	//GraphicsEvents.addEventListener('tick', animate);
 
 	//scene.addChild(new Sphere({ radius: 5, segments: 12, rings: 12, material: new MeshFlatMaterial() }));
 

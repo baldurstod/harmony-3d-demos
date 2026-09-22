@@ -135,7 +135,7 @@ class RaytracingSphereDemo implements Demo {
 
 		let pos = perspectiveCamera.getWorldPosition();
 
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, () => {
+		GraphicsEvents.addEventListener('tick', () => {
 			let pos2 = perspectiveCamera.getWorldPosition();
 			if (pos[0] != pos2[0] || pos[1] != pos2[1] || pos[2] != pos2[2]) {
 				reset();

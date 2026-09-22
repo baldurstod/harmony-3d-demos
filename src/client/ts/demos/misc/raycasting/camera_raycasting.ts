@@ -23,7 +23,7 @@ class CameraRayCastingDemo implements Demo {
 registerDemo(CameraRayCastingDemo);
 
 async function testCastray(scene: Scene, perspectiveCamera: Camera) {
-	GraphicsEvents.addEventListener(GraphicsEvent.MouseDown, (event) => {
+	GraphicsEvents.addEventListener('mousedown', (event) => {
 		let normalizedX = ((event as CustomEvent<GraphicMouseEventData>).detail.x / (event as CustomEvent<GraphicMouseEventData>).detail.width) * 2 - 1;
 		let normalizedY = 1 - ((event as CustomEvent<GraphicMouseEventData>).detail.y / (event as CustomEvent<GraphicMouseEventData>).detail.height) * 2;
 

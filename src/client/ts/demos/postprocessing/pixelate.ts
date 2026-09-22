@@ -30,7 +30,7 @@ class PixelateDemo implements Demo {
 		let composer = new Composer();
 		let clearPass = new ClearPass(vec4.fromValues(0.2, 0.2, 0.2, 1), 1, 0);
 		let renderPass = new RenderPass(scene, perspectiveCamera);
-		let pixelatePass = new PixelatePass(perspectiveCamera);
+		let pixelatePass = new PixelatePass({ camera: perspectiveCamera });
 
 		pixelatePass.horizontalTiles = 30;
 		pixelatePass.pixelStyle = 0;

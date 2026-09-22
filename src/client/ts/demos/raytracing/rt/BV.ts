@@ -1,5 +1,5 @@
-import { vec4 } from "gl-matrix";
-import { Face } from "./Scene";
+import { vec4 } from 'gl-matrix';
+import { Face } from './Scene';
 
 type Axis = 0 | 1 | 2;
 

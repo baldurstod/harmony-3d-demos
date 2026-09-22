@@ -1,4 +1,4 @@
-import { vec4 } from "gl-matrix";
+import { vec4 } from 'gl-matrix';
 
 type MaterialType = 0 | 1 | 2 | 3;
 

@@ -224,7 +224,7 @@ export class Application {
 		WebGLStats.start();
 		this.#htmlStats.append(WebGLStats.htmlElement);
 
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => this.#animate(event as CustomEvent<GraphicTickEvent>));
+		GraphicsEvents.addEventListener('tick', (event) => this.#animate(event as CustomEvent<GraphicTickEvent>));
 
 	}
 

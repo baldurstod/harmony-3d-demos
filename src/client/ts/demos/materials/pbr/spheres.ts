@@ -48,7 +48,7 @@ class PbrSpheresDemo implements Demo {
 			}
 		}
 
-		GraphicsEvents.addEventListener(GraphicsEvent.Tick, (event) => {
+		GraphicsEvents.addEventListener('tick', (event) => {
 			//orthoCameraControl.update(event.detail.delta / 1000)
 
 			for (let i = 0; i < 4; i++) {
