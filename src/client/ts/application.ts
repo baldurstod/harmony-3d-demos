@@ -31,7 +31,7 @@ export class Application {
 	#useDefaultRenderLoop = true;
 	#shaderEditor = new ShaderEditor();
 	#mainCanvas!: CanvasAttributes;
-	#contextType = ContextType.WebGL;
+	#contextType: ContextType = 'webgl2';
 	#openShader?: string;
 
 	static {
@@ -145,7 +145,7 @@ export class Application {
 												displayCustomShaderButtons: false,
 												defaultShader: this.#openShader,
 											});
-											this.#shaderEditorTab.append(this.#shaderEditor);
+											this.#shaderEditorTab.append(this.#shaderEditor.htmlElement);
 										}
 									},
 								}),
@@ -183,7 +183,7 @@ export class Application {
 		const url = new URL(document.URL);
 		//if (url.pathname.startsWith('/@webgpu')) {
 		if (url.hash.substring(1) == 'webgpu') {
-			this.#contextType = ContextType.WebGPU;
+			this.#contextType = 'webgpu';
 		}
 
 		this.#renderer = await Graphics.initCanvas({
@@ -200,8 +200,9 @@ export class Application {
 					alphaMode: 'premultiplied',
 				},
 				requiredLimits: {
-					maxStorageBufferBindingSize: 4294967292,
+					maxStorageBufferBindingSize: 2147483644,
 					maxBufferSize: 4294967292,
+					maxStorageBuffersPerShaderStage: 16,
 				}
 			}
 		});

@@ -576,6 +576,20 @@ const EffectList: Effect[] = [/*
 	{ system: 'unusual_butterfly_parent_purple', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
 	*/
 
+	// Halloween 2026 Unusual
+	//{ system: 'unusual_muertopetals_teamc_teamcolor_red', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	//{ system: 'unusual_muertopetals_teamc_teamcolor_blue', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	//{ system: 'unusual_autumnbreeze_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	//{ system: 'unusual_ghostspiral_purple_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	//{ system: 'unusual_ghostspiral_green_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	//{ system: 'unusual_fablefeathers_teamcolor_red', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 4000, setQuaternion: true },
+	//{ system: 'unusual_fablefeathers_teamcolor_blue', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 4000, setQuaternion: true },
+	//{ system: 'unusual_fablefeathers_purple_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 4000, setQuaternion: true },
+	//{ system: 'unusual_boiltoil_purple_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 4000, setQuaternion: true },
+	//{ system: 'unusual_boiltoil_green_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 4000, setQuaternion: true },
+	//{ system: 'unusual_scaredsouls_purple_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	//{ system: 'unusual_scaredsouls_green_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
+	//{ system: 'unusual_scaredsouls_orange_parent', fov: 60, position: [10, 20, 30], target: [0, 0, 5], wait: 2000, setQuaternion: true },
 ]
 
 const EffectList2 = new Map([
@@ -854,6 +868,21 @@ const UnusualTauntList: Effect[] = [
 	{ system: 'utaunt_dualspotlights_parent', fov: 60, position: [50, -100, 50], target: [0, 0, 20], wait: 2000, isTaunt: true },
 	{ system: 'utaunt_underwater_parent', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
 	*/
+
+	// Halloween 2026 Unusual Taunts
+	{ system: 'utaunt_electropulse_teamc_teamcolor_red', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_electropulse_teamc_teamcolor_blue', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_waste_purple_parent', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_waste_green_parent', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_waste_yellow_parent', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_shroud_parent', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_spiral_teamcolor_red', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_spiral_teamcolor_blue', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_spiral_parent_purple', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_radioactive_teamcolor_red', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_radioactive_teamcolor_blue', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_radioactive_purple_parent', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
+	{ system: 'utaunt_radioactive_green_parent', fov: 40, position: [100, -200, 60], target: [0, 0, 60], wait: 2000, isTaunt: true },
 ]
 
 const UnusualTauntList2 = new Map([
